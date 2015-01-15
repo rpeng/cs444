@@ -1,27 +1,8 @@
 from nfa import NFA
 
 
-def epsilon():
-    return NFA(
-        num_states=1,
-        start_state=0,
-        end_states=[0],
-        transitions={})
-
-
-def character(c):
-    return NFA(
-        num_states=2,
-        start_state=0,
-        end_states=[1],
-        transitions={
-            0: [(c, 1)]
-        })
-
-
-def concat(r1, r2):
-    offset = r1.num_states
-    r2 = r2.Offset(offset)
+def Concat(r1, r2):
+    r2 = r2.Offset(r1.num_states)
 
     trans = {}
     trans.update(r1.transitions)
@@ -38,3 +19,55 @@ def concat(r1, r2):
         start_state=r1.start_state,
         end_states=r2.end_states,
         transitions=trans)
+
+
+def ZeroOrMore(re):
+    re = re.Offset(1)
+    trans = {}
+    trans.update(re.transitions)
+    trans[0] = [(None, re.start_state)]
+    for es in re.end_states:
+        if es in trans:
+            trans[es].append((None, 0))
+        else:
+            trans[es] = [(None, 0)]
+
+    return NFA(
+        num_states=re.num_states + 1,
+        start_state=0,
+        end_states=list(re.end_states)+[0],
+        transitions=trans
+    )
+
+
+def Union(r1, r2):
+    r1 = r1.Offset(1)
+    r2 = r2.Offset(1 + r1.num_states)
+
+    trans = {}
+    trans.update(r1.transitions)
+    trans.update(r2.transitions)
+    trans[0] = [(None, r1.start_state), (None, r2.start_state)]
+
+    return NFA(
+        num_states=1 + r1.num_states + r2.num_states,
+        start_state=0,
+        end_states=r1.end_states | r2.end_states,
+        transitions=trans)
+
+
+def Character(c):
+    return NFA(
+        num_states=2,
+        start_state=0,
+        end_states=[1],
+        transitions={
+            0: [(c, 1)]
+        })
+
+
+epsilon = NFA(
+    num_states=1,
+    start_state=0,
+    end_states=[0],
+    transitions={})

@@ -77,7 +77,8 @@ class NFAExecutor(object):
             if state in self.nfa.transitions:
                 state_trans = self.nfa.transitions[state]
                 for (matcher, next_state) in state_trans:
-                    if matcher == input_token:
+                    if (matcher == input_token or
+                            callable(matcher) and matcher(input_token)):
                         new_states.add(next_state)
         self.current_states = self.nfa.EpsilonClosure(new_states)
 
