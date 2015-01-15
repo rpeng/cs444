@@ -39,6 +39,10 @@ class NFA(object):
             transitions=offset_trans)
 
     def EpsilonClosure(self, states):
+        """
+        Set of all states that can be reached in zero or more
+        epsilon moves from each state in states
+        """
         result = set(states)
         worklist = set(states)
         while worklist:
