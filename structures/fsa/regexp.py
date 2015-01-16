@@ -25,6 +25,10 @@ def Optional(re):
     return Union(re, epsilon)
 
 
+def OneOrMore(re):
+    return Concat(re, ZeroOrMore(re))
+
+
 def ZeroOrMore(re):
     re = re.Offset(1)
     trans = {}
@@ -60,6 +64,16 @@ def Union(r1, r2):
         transitions=trans)
 
 
+def UnionsOf(*regs):
+    result = None
+    for reg in regs:
+        if result is None:
+            result = reg
+        else:
+            result = Union(result, reg)
+    return result
+
+
 def Character(c):
     return NFA(
         num_states=2,
@@ -68,6 +82,11 @@ def Character(c):
         transitions={
             0: [(c, 1)]
         })
+
+
+def OneOf(chars):
+    matcher = lambda x: x in chars
+    return Character(matcher)
 
 
 epsilon = NFA(
