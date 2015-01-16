@@ -21,6 +21,10 @@ def Concat(r1, r2):
         transitions=trans)
 
 
+def Optional(re):
+    return Union(re, epsilon)
+
+
 def ZeroOrMore(re):
     re = re.Offset(1)
     trans = {}

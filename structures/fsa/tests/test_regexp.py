@@ -40,6 +40,14 @@ class TestRegexp(object):
         assert not nfa.ShouldAccept('')
         assert nfa.ShouldAccept('a')
 
+    def test_optional(self):
+        r = regexp.Character('a')
+        opt = regexp.Optional(r)
+
+        assert opt.ShouldAccept('a')
+        assert opt.ShouldAccept('')
+        assert not opt.ShouldAccept('b')
+
     def test_zero_or_more(self):
         r = regexp.ZeroOrMore(regexp.Character('a'))
         assert r.ShouldAccept('')
