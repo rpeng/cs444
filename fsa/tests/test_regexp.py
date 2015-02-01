@@ -27,6 +27,19 @@ class TestRegexp(object):
         assert re.ShouldAccept('c')
         assert not re.ShouldAccept('2')
 
+    def test_not(self):
+        re = regexp.Not('cde')
+        assert re.ShouldAccept('a')
+        assert re.ShouldAccept('f')
+        assert not re.ShouldAccept('d')
+        assert not re.ShouldAccept('')
+
+    def test_exact(self):
+        re = regexp.Exact('abc')
+        assert re.ShouldAccept('abc')
+        assert not re.ShouldAccept('')
+        assert not re.ShouldAccept('abd')
+
     def test_concat_simple(self):
         r1 = regexp.Character('a')
         r2 = regexp.Character('b')
@@ -70,7 +83,7 @@ class TestRegexp(object):
         assert r.ShouldAccept('aaa')
         assert not r.ShouldAccept('aab')
 
-    def test_union_simple(self):
+    def test_union(self):
         r1 = regexp.Character('a')
         r2 = regexp.Character('b')
         union = regexp.Union(r1, r2)
@@ -90,3 +103,12 @@ class TestRegexp(object):
         assert union.ShouldAccept('b')
         assert union.ShouldAccept('c')
         assert not union.ShouldAccept('d')
+
+    def test_concats_of(self):
+        r1 = regexp.Character('a')
+        r2 = regexp.Character('b')
+        r3 = regexp.Character('c')
+        concat = regexp.ConcatsOf(r1, r2, r3)
+        assert concat.ShouldAccept('abc')
+        assert not concat.ShouldAccept('')
+        assert not concat.ShouldAccept('ab')

@@ -1,7 +1,7 @@
 from joos.tokens.integers import *
 
 
-class TestExprs(object):
+class TestIntegers(object):
     def test_decimal_integer_literal(self):
         re = decimal_integer_literal
         assert re.ShouldAccept('0')

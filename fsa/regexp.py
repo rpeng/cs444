@@ -21,6 +21,13 @@ def Concat(r1, r2):
         transitions=trans)
 
 
+def ConcatsOf(*regs):
+    result = epsilon
+    for reg in regs:
+        result = Concat(result, reg)
+    return result
+
+
 def Optional(re):
     return Union(re, epsilon)
 
@@ -65,12 +72,9 @@ def Union(r1, r2):
 
 
 def UnionsOf(*regs):
-    result = None
+    result = epsilon
     for reg in regs:
-        if result is None:
-            result = reg
-        else:
-            result = Union(result, reg)
+        result = Union(result, reg)
     return result
 
 
@@ -86,6 +90,15 @@ def Character(c):
 
 def OneOf(chars):
     matcher = lambda x: x in chars
+    return Character(matcher)
+
+
+def Exact(string):
+    return ConcatsOf(*[Character(x) for x in string])
+
+
+def Not(chars):
+    matcher = lambda x: x not in chars
     return Character(matcher)
 
 
