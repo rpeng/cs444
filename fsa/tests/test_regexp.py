@@ -1,4 +1,4 @@
-from structures.fsa import regexp
+from fsa import regexp
 
 
 class TestRegexp(object):
