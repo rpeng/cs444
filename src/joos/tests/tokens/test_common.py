@@ -1,7 +1,7 @@
 from joos.tokens.common import *
 
 
-class TestExprs(object):
+class TestCommon(object):
 
     def AssertAcceptsRange(self, re, string):
         for x in string:
@@ -33,8 +33,8 @@ class TestExprs(object):
         assert not re.ShouldAccept('0a00')
         assert not re.ShouldAccept('')
 
-    def test_java_identifier_or_keyword(self):
-        re = identifier_or_keyword
+    def test_java_identifier(self):
+        re = identifier
         assert re.ShouldAccept('j')
         assert re.ShouldAccept('jane123')
         assert re.ShouldAccept('$_123')

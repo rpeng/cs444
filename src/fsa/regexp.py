@@ -1,5 +1,6 @@
 from nfa import NFA
 
+
 # Applies an expression over an array of results
 def _Apply(method, *regs):
     result = None

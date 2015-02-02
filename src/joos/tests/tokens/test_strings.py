@@ -1,6 +1,7 @@
 from joos.tokens.strings import *
 
-class TestSmall(object):
+
+class TestStrings(object):
     def test_character_literal(self):
         re = character_literal
         assert re.ShouldAccept(r"'a'")

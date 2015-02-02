@@ -10,4 +10,4 @@ decimal_numeral = Union(Character('0'),
 decimal_integer_literal = Concat(decimal_numeral,
                                  Optional(integer_type_suffix))
 
-integer_literal = UnionsOf(decimal_integer_literal)
+integer_literal = decimal_integer_literal

@@ -1,8 +1,10 @@
 from joos.tokens.common import *
 from fsa.regexp import *
 
+
 def SingleCharacterMatcher(ch):
     return InputCharacterMatcher(ch) and ch not in "'\\"
+
 
 def StringCharacterMatcher(ch):
     return InputCharacterMatcher(ch) and ch not in '"\\'
@@ -35,4 +37,4 @@ string_literal = ConcatsOf(
 
 character_literal = Union(
     ConcatsOf(single_quote, single_character, single_quote),
-    ConcatsOf(single_quote, escape_sequence, single_quote));
+    ConcatsOf(single_quote, escape_sequence, single_quote))

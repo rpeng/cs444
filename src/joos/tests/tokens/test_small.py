@@ -1,5 +1,6 @@
 from joos.tokens.small import *
 
+
 class TestSmall(object):
     def test_boolean_literal(self):
         re = boolean_literal
