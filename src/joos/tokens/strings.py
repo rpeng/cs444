@@ -4,6 +4,9 @@ from fsa.regexp import *
 def SingleCharacterMatcher(ch):
     return InputCharacterMatcher(ch) and ch not in "'\\"
 
+def StringCharacterMatcher(ch):
+    return InputCharacterMatcher(ch) and ch not in '"\\'
+
 single_quote = Character("'")
 double_quote = Character('"')
 backslash = Character("\\")
@@ -23,6 +26,12 @@ single_escape_char = OneOf('btnfr"\'\"\\')
 escape_sequence = Union(
     Concat(backslash, single_escape_char),
     Concat(backslash, octal_escape_digits))
+
+string_chars = OneOrMore(
+    Union(Character(StringCharacterMatcher), escape_sequence))
+
+string_literal = ConcatsOf(
+    double_quote, Optional(string_chars), double_quote)
 
 character_literal = Union(
     ConcatsOf(single_quote, single_character, single_quote),
