@@ -36,3 +36,4 @@ input_character = Character(InputCharacterMatcher)
 identifier_or_keyword = Concat(java_letter, ZeroOrMore(java_letter_or_digit))
 line_terminator = Union(OneOf(CR + LF), Exact(CR + LF))
 whitespace = Union(OneOf('\x20\x09\x0c'), line_terminator)
+
