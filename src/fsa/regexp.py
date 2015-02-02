@@ -1,5 +1,15 @@
 from nfa import NFA
 
+# Applies an expression over an array of results
+def _Apply(method, *regs):
+    result = None
+    for reg in regs:
+        if result is None:
+            result = reg
+        else:
+            result = method(result, reg)
+    return result
+
 
 def Concat(r1, r2):
     r2 = r2.Offset(r1.num_states)
@@ -22,10 +32,7 @@ def Concat(r1, r2):
 
 
 def ConcatsOf(*regs):
-    result = epsilon
-    for reg in regs:
-        result = Concat(result, reg)
-    return result
+    return _Apply(Concat, *regs)
 
 
 def Optional(re):
@@ -72,10 +79,7 @@ def Union(r1, r2):
 
 
 def UnionsOf(*regs):
-    result = epsilon
-    for reg in regs:
-        result = Union(result, reg)
-    return result
+    return _Apply(Union, *regs)
 
 
 def Character(c):

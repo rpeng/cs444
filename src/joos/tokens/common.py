@@ -31,6 +31,7 @@ java_letter = Character(JavaLetterMatcher)
 java_digit = Character(JavaDigitMatcher)
 java_letter_or_digit = Union(java_letter, java_digit)
 
+digits = OneOrMore(java_digit)
 input_character = Character(InputCharacterMatcher)
 identifier_or_keyword = Concat(java_letter, ZeroOrMore(java_letter_or_digit))
 line_terminator = Union(OneOf(CR + LF), Exact(CR + LF))

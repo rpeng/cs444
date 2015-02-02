@@ -25,6 +25,14 @@ class TestExprs(object):
         self.AssertAcceptsRange(java_digit, '0123456789')
         self.AssertNotAcceptsRange(java_digit, '()abcABC$_')
 
+    def test_digits(self):
+        re = digits
+        assert re.ShouldAccept('01231')
+        assert re.ShouldAccept('120')
+        assert re.ShouldAccept('000')
+        assert not re.ShouldAccept('0a00')
+        assert not re.ShouldAccept('')
+
     def test_java_identifier_or_keyword(self):
         re = identifier_or_keyword
         assert re.ShouldAccept('j')
