@@ -54,25 +54,25 @@ class NFA(object):
                         worklist.add(next_state)
         return result
 
-    def Executor(self):
-        return NFAExecutor(self)
-
     def ShouldAccept(self, inputs):
         """Runs the automaton on the given inputs
 
         Returns True if the input is accepted by the atomaton."""
-        executor = self.Executor()
+        executor = NFAExecutor(self)
         for input_token in inputs:
-            executor.Consume(input_token)
-        return executor.IsAccepted()
+            executor = executor.Consume(input_token)
+        return executor.IsAccepting()
 
 
 class NFAExecutor(object):
     """The executor will step through the NFA given some input"""
-    def __init__(self, nfa):
+    def __init__(self, nfa, current_states=None):
         self.nfa = nfa
-        self.current_states = set([self.nfa.start_state])
-        self.current_states = self.nfa.EpsilonClosure(self.current_states)
+        if current_states is None:
+            self.current_states = set([self.nfa.start_state])
+            self.current_states = self.nfa.EpsilonClosure(self.current_states)
+        else:
+            self.current_states = current_states
 
     def Consume(self, input_token):
         """Consumes a single input and steps through the NFA"""
@@ -84,8 +84,11 @@ class NFAExecutor(object):
                     if (matcher == input_token or
                             callable(matcher) and matcher(input_token)):
                         new_states.add(next_state)
-        self.current_states = self.nfa.EpsilonClosure(new_states)
+        return NFAExecutor(self.nfa, self.nfa.EpsilonClosure(new_states))
 
-    def IsAccepted(self):
+    def IsAccepting(self):
         """Returns True if the current input sequence is accepted"""
         return not self.current_states.isdisjoint(self.nfa.end_states)
+
+    def IsError(self):
+        return len(self.current_states) == 0
