@@ -69,6 +69,7 @@ operator_exports = [
 
 common_exports = [
     (t.WHITESPACE, common.whitespace),
+    (t.NEWLINE, common.line_terminator),
     (t.ID, common.identifier),
     (t.COMMENT, comments.comment)
 ]

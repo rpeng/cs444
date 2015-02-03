@@ -46,8 +46,13 @@ class TestCommon(object):
         re = whitespace
         assert re.ShouldAccept(' ')
         assert re.ShouldAccept('\x09')
-        assert re.ShouldAccept('\x0a')
-        assert re.ShouldAccept('\x0d\x0a')
         assert not re.ShouldAccept('j ')
         assert not re.ShouldAccept(' j')
         assert not re.ShouldAccept('kasdjf')
+
+    def test_line_terminator(self):
+        re = line_terminator
+        assert re.ShouldAccept('\x0a')
+        assert re.ShouldAccept('\x0d\x0a')
+        assert not re.ShouldAccept(' ')
+        assert not re.ShouldAccept('\n\r')

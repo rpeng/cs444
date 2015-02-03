@@ -1,6 +1,97 @@
-class MaximalMunchExecutor(self):
-    def __init__(self, nfa_exports):
+from fsa.nfa import NFAExecutor
+
+
+class Token(object):
+    def __init__(self, token_type, lexeme, row=None, col=None):
+        self.token_type = token_type
+        self.lexeme = lexeme
+        self.row = row
+        self.col = col
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+                and self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        return "TOKEN=type:{} row:{} col:{}".format(
+            self.token_type, self.row, self.col)
+
+
+class _MaximalMunchExecutor(object):
+    def __init__(self, nfa_exports, newline_token):
         self.nfa_exports = nfa_exports
+        self.newline_token = newline_token
+
+    def StatesWithoutErrors(self, states):
+        new_states = []
+        for emit, nfa in states:
+            if not nfa.IsError():
+                new_states.append((emit, nfa))
+        return new_states
+
+    def PerformStep(self, states, ch):
+        new_states = []
+        for emit, nfa in states:
+            new_states.append((emit, nfa.Consume(ch)))
+        return self.StatesWithoutErrors(new_states)
+
+    def FirstEmit(self, states):
+        for emit, nfa in states:
+            if nfa.IsAccepting():
+                return emit
+        return None
+
+    def NewStates(self):
+        states = []
+        for emit, nfa in self.nfa_exports:
+            states.append((emit, NFAExecutor(nfa)))
+        return states
 
     def Consume(self, inputs):
-        pass
+        idx = 0
+        row = 1
+        col = 0
+        last_accepting = None
+        lexeme = ""
+        result = []
+        states = self.NewStates()
+
+        while idx < len(inputs):
+            col += 1
+            ch = inputs[idx]
+            states = self.PerformStep(states, ch)
+            lexeme += ch
+
+            # Current states have at least one accepting state
+            token_type = self.FirstEmit(states)
+            if token_type is not None:
+                last_accepting = (idx, lexeme, token_type, row, col)
+            # No states without errors, rewind machine
+            elif not states:
+                if last_accepting is None:
+                    return None  # TODO: Output Error
+                idx, lexeme, token_type, row, col = last_accepting
+                states = self.NewStates()
+                result.append(Token(
+                    token_type, lexeme, row, col - len(lexeme) + 1))
+                last_accepting = None
+                lexeme = ""
+                if token_type is self.newline_token:
+                    row += 1
+                    col = 0
+            idx += 1
+
+        # emit final token
+        token_type = self.FirstEmit(states)
+        if not token_type:
+            return None  # TODO: Output Error
+        result.append(Token(token_type, lexeme, row, col - len(lexeme) + 1))
+        return result
+
+
+def scan(exports, inputs, newline_token=None):
+    mm = _MaximalMunchExecutor(exports, newline_token)
+    return mm.Consume(inputs)

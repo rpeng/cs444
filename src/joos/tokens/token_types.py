@@ -3,7 +3,7 @@ def _enum(*sequential, **named):
     enums['from_str'] = enums
     return type('Enum', (), enums)
 
-COMMON = ['WHITESPACE', 'ID', 'COMMENT']
+COMMON = ['WHITESPACE', 'NEWLINE', 'ID', 'COMMENT']
 
 KEYWORDS = ['ABSTRACT', 'DEFAULT', 'BOOLEAN', 'DO', 'BREAK', 'DOUBLE', 'BYTE',
             'ELSE', 'CASE', 'EXTENDS', 'CATCH', 'FINAL', 'CHAR', 'FINALLY',
@@ -28,4 +28,6 @@ OPERATORS = ['ASSIGN', 'GT', 'BANG', 'TILDE', 'QUESTION_MARK', 'COLON', 'EQ',
 
 ALL = COMMON + KEYWORDS + LITERALS + SEPARATORS + OPERATORS
 
-Types = _enum(*ALL)
+ALL_DICT = dict((token, token) for token in ALL)
+
+Types = _enum(**ALL_DICT)
