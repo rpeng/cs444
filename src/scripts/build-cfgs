@@ -3,7 +3,8 @@ import glob
 import sys
 
 
-ACCEPTED_STATES = ['terminals', 'start_symbol', 'nonterminals', 'rules']
+ACCEPTED_STATES = ['terminals', 'start_symbol', 'nonterminals', 'rules',
+                   'skip']
 
 
 def _err(reason):
@@ -12,7 +13,7 @@ def _err(reason):
 
 
 def Main(paths, output_path):
-    state = None  # terminals, start_symbol, nonterminals, rules
+    state = None  # terminals, start_symbol, nonterminals, rules, skip
 
     result = {
         'terminals': [],
@@ -23,6 +24,7 @@ def Main(paths, output_path):
 
     # Grab all the inputs
     for script in paths:
+        state = None
         with open(script) as f:
             for raw_line in f:
                 line = raw_line.strip()
@@ -32,6 +34,8 @@ def Main(paths, output_path):
                     new_state = line[2:-2]
                     if new_state not in ACCEPTED_STATES:
                         _err('Invalid tag '+new_state)
+                    if state == 'skip':
+                        break
                     state = new_state
                 elif state is None:
                     _err('Missing start tag before '+line)
@@ -52,7 +56,7 @@ def Main(paths, output_path):
                 elif state == 'rules':
                     left, right = line.split('->', 1)
                     left = left.strip()
-                    right = right.strip()
+                    right = [x.strip() for x in right.split(' ') if x]
                     result['rules'].append((left, right))
 
     # sanity check
@@ -63,7 +67,12 @@ def Main(paths, output_path):
     for (lhs, rhs) in result['rules']:
         if lhs not in result['nonterminals']:
             _err('You need non terminal LHS in your rule: {} -> {}'.format(
-                lhs, rhs))
+                lhs, ' '.join(rhs)))
+        for symbol in rhs:
+            if (symbol not in result['terminals']
+                    and symbol not in result['nonterminals']):
+                _err('Your rhs must be a valid terminal or non terminal: '
+                     + ' '.join(rhs))
 
     # output
     with open(output_path, 'w') as f:
@@ -76,10 +85,10 @@ def Main(paths, output_path):
         f.write('{}\n'.format(result['start_symbol']))
         f.write('{}\n'.format(len(result['rules'])))
         for lhs, rhs in result['rules']:
-            if not rhs.strip():
+            if not rhs:
                 f.write(lhs + '\n')
             else:
-                f.write('{} {}\n'.format(lhs, rhs))
+                f.write('{} {}\n'.format(lhs, ' '.join(rhs)))
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

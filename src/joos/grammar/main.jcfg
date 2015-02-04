@@ -1,5 +1,6 @@
 {{terminals}}
-EndOfFile
+BOF
+EOF
 
 {{start_symbol}}
 Start
@@ -7,8 +8,16 @@ Start
 {{nonterminals}}
 Start
 CompilationUnit
+PackageDeclarations
 
 {{rules}}
-Start -> CompilationUnit EndOfFile
 
-# more terminals in: terminals.jcfg
+Start               -> BOF CompilationUnit EOF
+## CompilationUnit  -> PackageDeclarations ImportDeclarations TypeDeclarations
+## CompilationUnit  -> PackageDeclarations ImportDeclarations
+CompilationUnit     -> PackageDeclarations
+PackageDeclarations -> package Name ;
+
+### imports
+# Name               : names
+# ImportDeclarations : import_decls

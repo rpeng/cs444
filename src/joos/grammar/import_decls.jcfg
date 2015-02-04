@@ -1,0 +1,21 @@
+{{nonterminals}}
+
+ImportDeclaration
+ImportDeclarations
+
+ClassImportDeclaration
+PackageImportDeclaration
+
+{{rules}}
+
+ImportDeclarations -> ImportDeclaration
+ImportDeclarations -> ImportDeclarations ImportDeclaration
+
+ImportDeclaration -> ClassImportDeclaration
+ImportDeclaration -> PackageImportDeclaration
+
+ClassImportDeclaration   -> import Name ;
+PackageImportDeclaration -> import Name . * ;
+
+### imports
+# Name : names
