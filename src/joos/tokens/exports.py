@@ -2,6 +2,7 @@ from fsa.regexp import *
 from joos.tokens.token_types import KEYWORDS, Types as t
 from joos.tokens import common, comments, integers, small, strings
 
+# If you update this file, please also update terminals.jcfg
 # Exported NFAs for maximal munch
 keyword_exports = [
     (t.from_str[x], Exact(x.lower())) for x in KEYWORDS
@@ -72,6 +73,17 @@ common_exports = [
     (t.NEWLINE, common.line_terminator),
     (t.ID, common.identifier),
     (t.COMMENT, comments.comment)
+]
+
+unsupported = [
+    # unsupported keywords
+    t.DEFAULT, t.DO, t.BREAK, t.DOUBLE, t.CASE, t.CATCH, t.FINALLY, t.FLOAT,
+    t.CONST, t.CONTINUE, t.GOTO, t.PRIVATE, t.LONG, t.STRICTFP, t.SUPER,
+    t.SWITCH, t.SYNCHRONIZED, t.THROW, t.THROWS, t.TRANSIENT, t.TRY, t.VOLATILE,
+    # unsupported operators
+    t.TILDE, t.QUESTION_MARK, t.COLON, t.INC, t.DEC, t.XOR, t.LSHIFT, t.RSHIFT,
+    t.R_USHIFT, t.PLUS_EQ, t.MINUS_EQ, t.TIMES_EQ, t.DIV_EQ, t.AND_EQ, t.OR_EQ,
+    t.MOD_EQ, t.LSHIFT_EQ, t.RSHIFT_EQ, t.R_USHIFT_EQ,
 ]
 
 all_exports = (keyword_exports +
