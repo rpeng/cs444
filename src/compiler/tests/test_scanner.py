@@ -42,7 +42,6 @@ class TestScanner(object):
         assert_equal(e.lexeme, '1')
         assert_equal(e.row, 1)
         assert_equal(e.col, 8)
-        print e
 
     def test_mm_with_crlf(self):
         exports = [('ID', OneOrMore(OneOf('ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),
