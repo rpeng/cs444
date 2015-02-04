@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+import glob
+import sys
+
+
+ACCEPTED_STATES = ['terminals', 'start_symbol', 'nonterminals', 'rules']
+
+
+def _err(reason):
+    print >> sys.stderr, reason
+    sys.exit(1)
+
+
+def Main(paths, output_path):
+    state = None # terminals, start_symbol, nonterminals, rules
+
+    result = {
+        'terminals': [],
+        'nonterminals': [],
+        'rules': [],
+        'start_symbol': None
+    }
+
+    # Grab all the inputs
+    for script in paths:
+        with open(script) as f:
+            for raw_line in f:
+                line = raw_line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                elif line.startswith('{{'):
+                    new_state = line[2:-2]
+                    if new_state not in ACCEPTED_STATES:
+                        _err('Invalid tag '+new_state)
+                    state = new_state
+                elif state is None:
+                    _err('Missing start tag before '+line)
+                elif state == 'terminals':
+                    if line in result['terminals'] or line in result['nonterminals']:
+                        _err('Duplicate token ' +line)
+                    result['terminals'].append(line)
+                elif state == 'start_symbol':
+                    if result['start_symbol'] is not None:
+                        _err('Start symbol already read')
+                    result['start_symbol'] = line
+                elif state == 'nonterminals':
+                    if line in result['terminals'] or line in result['nonterminals']:
+                        _err('Duplicate token ' +line)
+                    result['nonterminals'].append(line)
+                elif state == 'rules':
+                    left, right = line.split('->', 1)
+                    left = left.strip()
+                    right = right.strip()
+                    result['rules'].append((left, right))
+
+    # sanity check
+    if result['start_symbol'] is None:
+        _err('You need a start symbol!')
+
+    # make sure lhs are all nonterminals
+    for (lhs, rhs) in result['rules']:
+        if lhs not in result['nonterminals']:
+            _err('You need non terminal LHS in your rule: {} -> {}'.format(
+                lhs, rhs))
+
+    # output
+    with open(output_path, 'w') as f:
+        f.write('{}\n'.format(len(result['terminals'])))
+        for terminal in result['terminals']:
+            f.write(terminal + '\n')
+        f.write('{}\n'.format(len(result['nonterminals'])))
+        for nonterminal in result['nonterminals']:
+            f.write(nonterminal + '\n')
+        f.write('{}\n'.format(result['start_symbol']))
+        f.write('{}\n'.format(len(result['rules'])))
+        for lhs, rhs in result['rules']:
+            f.write('{} {}\n'.format(lhs, rhs))
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print "Usage: build-cfgs [path-to-cfg...] [output-path]"
+    else:
+        paths = sys.argv[1:-1]
+        output = sys.argv[-1]
+        Main(paths, output)

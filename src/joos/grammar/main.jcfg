@@ -1,0 +1,14 @@
+{{terminals}}
+EndOfFile
+
+{{start_symbol}}
+Start
+
+{{nonterminals}}
+Start
+CompilationUnit
+
+{{rules}}
+Start -> CompilationUnit EndOfFile
+
+# more terminals in: terminals.jcfg
