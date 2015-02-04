@@ -1,4 +1,4 @@
-from fsa.regexp import *
+from structs.regexp import *
 
 boolean_literal = Union(Exact('true'), Exact('false'))
 null_literal = Exact('null')

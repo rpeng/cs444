@@ -1,4 +1,4 @@
-from fsa.regexp import *
+from structs.regexp import *
 from compiler.errors import *
 from compiler.scanner import scan, Token
 

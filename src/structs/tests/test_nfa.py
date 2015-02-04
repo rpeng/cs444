@@ -1,4 +1,4 @@
-from fsa import nfa
+from structs import nfa
 
 
 class TestNFA(object):

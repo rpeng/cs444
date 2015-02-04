@@ -1,5 +1,5 @@
 from joos.tokens.common import *
-from fsa.regexp import *
+from structs.regexp import *
 
 
 def SingleCharacterMatcher(ch):

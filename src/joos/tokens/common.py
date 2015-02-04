@@ -1,4 +1,4 @@
-from fsa.regexp import *
+from structs.regexp import *
 
 
 def JavaLetterMatcher(ch):

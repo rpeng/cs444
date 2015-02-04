@@ -1,5 +1,5 @@
 from joos.tokens.common import *
-from fsa.regexp import *
+from structs.regexp import *
 
 integer_type_suffix = OneOf('lL')
 

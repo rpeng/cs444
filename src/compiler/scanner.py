@@ -1,4 +1,4 @@
-from fsa.nfa import NFAExecutor
+from structs.nfa import NFAExecutor
 from compiler.errors import *
 
 

@@ -1,4 +1,4 @@
-from fsa.regexp import *
+from structs.regexp import *
 from joos.tokens.token_types import KEYWORDS, Types as t
 from joos.tokens import common, comments, integers, small, strings
 
