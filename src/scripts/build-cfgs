@@ -76,7 +76,10 @@ def Main(paths, output_path):
         f.write('{}\n'.format(result['start_symbol']))
         f.write('{}\n'.format(len(result['rules'])))
         for lhs, rhs in result['rules']:
-            f.write('{} {}\n'.format(lhs, rhs))
+            if not rhs.strip():
+                f.write(lhs + '\n')
+            else:
+                f.write('{} {}\n'.format(lhs, rhs))
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

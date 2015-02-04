@@ -1,3 +1,22 @@
 #!/bin/sh
+
+echo "Creating generated"
+mkdir -p generated
+
+echo "Cleaning generated files cfgs"
+rm generated/*.cfg
+rm generated/*.lr1
+
 echo "Generating JOOS cfg"
 ./scripts/build-cfgs joos/grammar/*.jcfg generated/joos.cfg
+
+if [ ! -d "./generated/jlalr/" ]; then
+  echo "Compiling JLALR1"
+  javac ./extern/jlalr/Jlalr1.java -d ./generated/
+fi
+
+echo "Generating JOOS lalr1"
+(
+  cd generated
+  java jlalr.Jlalr1 < joos.cfg > joos.lr1
+)
