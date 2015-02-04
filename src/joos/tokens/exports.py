@@ -45,7 +45,7 @@ operator_exports = [
     (t.DEC, Exact('--')),
     (t.PLUS, Exact('+')),
     (t.MINUS, Exact('-')),
-    (t.TIMES, Exact('*')),
+    (t.STAR, Exact('*')),
     (t.DIV, Exact('/')),
     (t.B_AND, Exact('&')),
     (t.B_OR, Exact('|')),
@@ -53,7 +53,7 @@ operator_exports = [
     (t.MOD, Exact('%')),
     (t.LSHIFT, Exact('<<')),
     (t.RSHIFT, Exact('>>')),
-    (t.RDBL_SHIFT, Exact('>>>')),
+    (t.R_USHIFT, Exact('>>>')),
     (t.PLUS_EQ, Exact('+=')),
     (t.MINUS_EQ, Exact('-=')),
     (t.TIMES_EQ, Exact('*=')),
@@ -64,7 +64,7 @@ operator_exports = [
     (t.MOD_EQ, Exact('%=')),
     (t.LSHIFT_EQ, Exact('<<=')),
     (t.RSHIFT_EQ, Exact('>>=')),
-    (t.RDBL_SHIFT_EQ, Exact('>>>='))
+    (t.R_USHIFT_EQ, Exact('>>>='))
 ]
 
 common_exports = [

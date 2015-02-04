@@ -21,10 +21,10 @@ SEPARATORS = ['LPAREN', 'RPAREN', 'LBRACE', 'RBRACE', 'LBRACKET', 'RBRACKET',
 
 OPERATORS = ['ASSIGN', 'GT', 'BANG', 'TILDE', 'QUESTION_MARK', 'COLON', 'EQ',
              'LE', 'GE', 'NE', 'AND', 'OR', 'INC', 'DEC', 'PLUS', 'MINUS',
-             'TIMES', 'DIV', 'B_AND', 'B_OR', 'XOR', 'MOD', 'LSHIFT', 'RSHIFT',
-             'RDBL_SHIFT', 'PLUS_EQ', 'MINUS_EQ', 'TIMES_EQ',
+             'STAR', 'DIV', 'B_AND', 'B_OR', 'XOR', 'MOD', 'LSHIFT', 'RSHIFT',
+             'R_USHIFT', 'PLUS_EQ', 'MINUS_EQ', 'TIMES_EQ',
              'DIV_EQ', 'AND_EQ', 'OR_EQ', 'XOR_EQ', 'MOD_EQ', 'LSHIFT_EQ',
-             'RSHIFT_EQ', 'RDBL_SHIFT_EQ']
+             'RSHIFT_EQ', 'R_USHIFT_EQ']
 
 ALL = COMMON + KEYWORDS + LITERALS + SEPARATORS + OPERATORS
 
