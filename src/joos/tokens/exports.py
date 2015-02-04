@@ -79,7 +79,8 @@ unsupported = [
     # unsupported keywords
     t.DEFAULT, t.DO, t.BREAK, t.DOUBLE, t.CASE, t.CATCH, t.FINALLY, t.FLOAT,
     t.CONST, t.CONTINUE, t.GOTO, t.PRIVATE, t.LONG, t.STRICTFP, t.SUPER,
-    t.SWITCH, t.SYNCHRONIZED, t.THROW, t.THROWS, t.TRANSIENT, t.TRY, t.VOLATILE,
+    t.SWITCH, t.SYNCHRONIZED, t.THROW, t.THROWS, t.TRANSIENT, t.TRY,
+    t.VOLATILE,
     # unsupported operators
     t.TILDE, t.QUESTION_MARK, t.COLON, t.INC, t.DEC, t.XOR, t.LSHIFT, t.RSHIFT,
     t.R_USHIFT, t.PLUS_EQ, t.MINUS_EQ, t.TIMES_EQ, t.DIV_EQ, t.AND_EQ, t.OR_EQ,

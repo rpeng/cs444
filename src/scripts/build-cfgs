@@ -12,7 +12,7 @@ def _err(reason):
 
 
 def Main(paths, output_path):
-    state = None # terminals, start_symbol, nonterminals, rules
+    state = None  # terminals, start_symbol, nonterminals, rules
 
     result = {
         'terminals': [],
@@ -36,16 +36,18 @@ def Main(paths, output_path):
                 elif state is None:
                     _err('Missing start tag before '+line)
                 elif state == 'terminals':
-                    if line in result['terminals'] or line in result['nonterminals']:
-                        _err('Duplicate token ' +line)
+                    if (line in result['terminals'] or line in
+                            result['nonterminals']):
+                        _err('Duplicate token ' + line)
                     result['terminals'].append(line)
                 elif state == 'start_symbol':
                     if result['start_symbol'] is not None:
                         _err('Start symbol already read')
                     result['start_symbol'] = line
                 elif state == 'nonterminals':
-                    if line in result['terminals'] or line in result['nonterminals']:
-                        _err('Duplicate token ' +line)
+                    if (line in result['terminals'] or line in
+                            result['nonterminals']):
+                        _err('Duplicate token ' + line)
                     result['nonterminals'].append(line)
                 elif state == 'rules':
                     left, right = line.split('->', 1)

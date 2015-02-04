@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Generating JOOS cfg"
+./scripts/build-cfgs joos/grammar/*.jcfg generated/joos.cfg
