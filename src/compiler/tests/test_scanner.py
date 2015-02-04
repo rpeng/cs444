@@ -1,10 +1,22 @@
 from fsa.regexp import *
+from compiler.errors import *
 from compiler.scanner import scan, Token
 
 from nose.tools import *
 
 
+def CatchException(method, *args, **kwargs):
+    try:
+        method(*args, **kwargs)
+    except Exception, e:
+        return e
+    return None
+
+
 class TestScanner(object):
+    def test_empty(self):
+        assert_raises(EmptyInput, scan, [], "")
+
     def test_mm_simple(self):
         exports = [('ONE', Exact('AAA')), ('TWO', Exact('AA'))]
         result = scan(exports, 'AAAAA')
@@ -21,6 +33,16 @@ class TestScanner(object):
                               Token('ID', 'ABCD', 1, 7),
                               Token('WS', ' ', 1, 11),
                               Token('KW', 'WORLD', 1, 12)])
+
+    def test_mm_more_advanced_error(self):
+        exports = [('KW', UnionsOf(Exact('HELLO'), Exact('WORLD'))),
+                   ('ID', OneOrMore(OneOf('ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),
+                   ('WS', Exact(' '))]
+        e = CatchException(scan, exports, "HELLO A123 WORLD")
+        assert_equal(e.lexeme, '1')
+        assert_equal(e.row, 1)
+        assert_equal(e.col, 8)
+        print e
 
     def test_mm_with_crlf(self):
         exports = [('ID', OneOrMore(OneOf('ABCDEFGHIJKLMNOPQRSTUVWXYZ'))),

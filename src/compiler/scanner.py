@@ -1,4 +1,5 @@
 from fsa.nfa import NFAExecutor
+from compiler.errors import *
 
 
 class Token(object):
@@ -51,6 +52,9 @@ class _MaximalMunchExecutor(object):
         return states
 
     def Consume(self, inputs):
+        if not inputs:
+            raise EmptyInput("Input file is empty")
+
         idx = 0
         row = 1
         col = 0
@@ -72,7 +76,7 @@ class _MaximalMunchExecutor(object):
             # No states without errors, rewind machine
             elif not states:
                 if last_accepting is None:
-                    return None  # TODO: Output Error
+                    raise InvalidToken(lexeme, row, col)
                 idx, lexeme, token_type, row, col = last_accepting
                 states = self.NewStates()
                 result.append(Token(
@@ -87,7 +91,7 @@ class _MaximalMunchExecutor(object):
         # emit final token
         token_type = self.FirstEmit(states)
         if not token_type:
-            return None  # TODO: Output Error
+            raise InvalidToken(lexeme, row, col)
         result.append(Token(token_type, lexeme, row, col - len(lexeme) + 1))
         return result
 

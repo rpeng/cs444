@@ -1,14 +1,13 @@
 from joos.joosc import scan_input
 from compiler.scanner import Token
+from compiler.errors import *
 
 from nose.tools import *
 
 
-# TODO: Write some tests
 class TestJooscScanner(object):
     def test_empty(self):
-        result = scan_input("")
-        assert_equal(result, None)
+        assert_raises(EmptyInput, scan_input, "")
 
     def test_simple(self):
         result = scan_input("public void main")
@@ -34,3 +33,6 @@ class TestJooscScanner(object):
                               Token('ASSIGN', '=', 1, 9),
                               Token('STRING', r'"world\r\t"', 1, 10),
                               Token('SEMICOLON', ';', 1, 21)])
+
+    def test_error(self):
+        assert_raises(InvalidToken, scan_input, r"""String \ns="world\r\t";""")
