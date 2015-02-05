@@ -84,11 +84,12 @@ PrimaryNoNewArray -> FieldAccess
 PrimaryNoNewArray -> MethodInvocation
 PrimaryNoNewArray -> ArrayAccess
 
-ArrayCreationExpression -> new PrimitiveType DimExprs Dims?
-ArrayCreationExpression -> new ClassOrInterfaceType DimExprs Dims?
+ArrayCreationExpression -> new PrimitiveType DimExpr Dims?
+ArrayCreationExpression -> new ClassOrInterfaceType DimExpr Dims?
 
 DimExprs -> DimExpr
 DimExprs -> DimExprs DimExpr
+
 DimExpr -> [ Expression ]
 
 Dims -> [ ]

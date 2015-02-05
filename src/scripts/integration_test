@@ -1,0 +1,36 @@
+#!/bin/sh
+ALL_FILES="extern/testcases/a1/*"
+
+IGNORE="extern/testcases/a1/J2_staticFieldDecl.java,extern/testcases/a1/J2_staticfielddeclaration.java,extern/testcases/a1/Je_1_AbstractClass_Final.java,extern/testcases/a1/Je_1_AbstractMethodCannotBeFinal.java,extern/testcases/a1/Je_1_AbstractMethod_Body.java,extern/testcases/a1/Je_1_AbstractMethod_EmptyBody.java,extern/testcases/a1/Je_1_AbstractMethod_Final.java,extern/testcases/a1/Je_1_AbstractMethod_Static.java"
+
+for file in $ALL_FILES; do
+    printf "Processing $file..."
+    head -n3 $file | grep EXCEPTION
+    EXC=$?
+
+    ./joosc $file >/dev/null
+    JOOSC=$?
+
+    if [ $EXC -eq 0 ]; then
+        if [ $JOOSC -ne 42 ]; then
+            if [[ $IGNORE =~ $file ]]; then
+                printf "FAILED because missing WEEDER\n"
+                continue
+            else
+                printf "FAILED, expected 42 but got 0\n"
+                exit
+            fi
+        fi
+    else
+        if [ $JOOSC -ne 0 ]; then
+            if [[ $IGNORE =~ $file ]]; then
+                printf "FAILED because missing WEEDER\n"
+                continue 
+            else
+                printf "FAILED, expected 0 but got 42\n"
+                exit
+            fi
+        fi
+    fi
+    printf "OK\n"
+done
