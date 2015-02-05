@@ -1,4 +1,5 @@
 *.swp
 *.pyc
 .coverage
+.DS_Store
 generated/
