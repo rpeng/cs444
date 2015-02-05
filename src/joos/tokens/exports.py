@@ -32,6 +32,7 @@ separator_exports = [
 operator_exports = [
     (t.ASSIGN, Exact('=')),
     (t.GT, Exact('>')),
+    (t.LT, Exact('<')),
     (t.BANG, Exact('!')),
     (t.TILDE, Exact('~')),
     (t.QUESTION_MARK, Exact('?')),
