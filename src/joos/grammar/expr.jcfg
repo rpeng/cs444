@@ -1,0 +1,104 @@
+{{nonterminals}}
+Expression
+AssignmentExpression
+Assignment
+ConditionalOrExpression
+ConditionalAndExpression
+InclusiveOrExpression
+AndExpression
+EqualityExpression
+RelationalExpression
+AdditiveExpression
+MultiplicativeExpression
+Primary
+PrimaryNoNewArray
+ArrayCreationExpression
+ClassInstanceCreationExpression
+FieldAccess
+MethodInvocation
+ArrayAccess
+DimExprs
+DimExpr
+Dims
+ArgumentList
+
+{{rules}}
+Expression -> AssignmentExpression
+
+AssignmentExpression -> ConditionalOrExpression
+AssignmentExpression -> Assignment
+
+ConditionalOrExpression -> ConditionalAndExpression
+ConditionalOrExpression -> ConditionalOrExpression || ConditionalAndExpression
+
+ConditionalAndExpression -> InclusiveOrExpression
+ConditionalAndExpression -> ConditionalAndExpression && InclusiveOrExpression
+
+InclusiveOrExpression -> AndExpression
+InclusiveOrExpression -> InclusiveOrExpression | AndExpression
+
+AndExpression -> EqualityExpression
+AndExpression -> AndExpression & EqualityExpression
+
+EqualityExpression -> RelationalExpression
+EqualityExpression -> EqualityExpression == RelationalExpression
+EqualityExpression -> EqualityExpression != RelationalExpression
+
+RelationalExpression -> AdditiveExpression
+RelationalExpression -> RelationalExpression < AdditiveExpression
+RelationalExpression -> RelationalExpression > AdditiveExpression
+RelationalExpression -> RelationalExpression <= AdditiveExpression
+RelationalExpression -> RelationalExpression >= AdditiveExpression
+RelationalExpression -> RelationalExpression instanceof ReferenceType
+
+AdditiveExpression -> MultiplicativeExpression
+AdditiveExpression -> AdditiveExpression + MultiplicativeExpression
+AdditiveExpression -> AdditiveExpression - MultiplicativeExpression
+
+MultiplicativeExpression -> Primary
+MultiplicativeExpression -> Name
+MultiplicativeExpression -> MultiplicativeExpression * Primary
+MultiplicativeExpression -> MultiplicativeExpression * Name
+MultiplicativeExpression -> MultiplicativeExpression / Primary
+MultiplicativeExpression -> MultiplicativeExpression / Name
+MultiplicativeExpression -> MultiplicativeExpression % Primary
+MultiplicativeExpression -> MultiplicativeExpression % Name
+
+Primary -> PrimaryNoNewArray
+Primary -> ArrayCreationExpression
+
+PrimaryNoNewArray -> Literal
+PrimaryNoNewArray -> this
+PrimaryNoNewArray -> ( Expression )
+PrimaryNoNewArray -> ClassInstanceCreationExpression
+PrimaryNoNewArray -> FieldAccess
+PrimaryNoNewArray -> MethodInvocation
+PrimaryNoNewArray -> ArrayAccess
+
+ArrayCreationExpression -> new PrimitiveType DimExprs Dims?
+ArrayCreationExpression -> new ClassOrInterfaceType DimExprs Dims?
+
+DimExprs -> DimExpr
+DimExprs -> DimExprs DimExpr
+DimExpr -> [ Expression ]
+
+Dims -> [ ]
+Dims -> Dims [ ]
+
+ClassInstanceCreationExpression -> new ClassType ( ArgumentList? )
+
+ArgumentList -> Expression
+ArgumentList -> ArgumentList , Expression
+
+FieldAccess -> Primary . ID
+
+MethodInvocation -> Name ( ArgumentList? )
+MethodInvocation -> Primary . ID ( ArgumentList? )
+
+ArrayAccess -> Name [ Expression ]
+ArrayAccess -> PrimaryNoNewArray [ Expression ]
+
+### import
+# ClassType : names
+
+

@@ -1,0 +1,31 @@
+{{nonterminals}}
+ConstructorDeclaration
+ConstructorDeclarator
+ConstructorBody
+FormalParameterList
+FormalParameter
+ExplicitConstructorInvocation
+
+{{rules}}
+ConstructorDeclaration -> Modifiers? ConstructorDeclarator ConstructorBody
+
+ConstructorDeclarator -> SimpleName ( FormalParameterList? )
+
+FormalParameterList -> FormalParameter
+FormalParameterList -> FormalParameterList , FormalParameter
+
+FormalParameter -> Type VariableDeclaratorId
+
+ConstructorBody -> { ExplicitConstructorInvocation? BlockStatements? }
+
+ExplicitConstructorInvocation -> this ( ArgumentList? ) ;
+
+
+### imports
+# SimpleName : names
+# Modifiers : main
+# VariableDeclaratorId : variable
+# Type : types
+# BlockStatements : main
+
+

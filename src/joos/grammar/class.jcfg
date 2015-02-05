@@ -1,0 +1,37 @@
+###### Class Declaration ######
+{{nonterminals}}
+ClassDeclaration
+Super
+ClassBody
+ClassBodyDeclaarations
+ClassBodyDeclaaration
+ClassMemberDeclaration
+FieldDeclaration
+ClassType
+
+{{rules}}
+ClassDeclaration -> Modifiers? class ID Super? Interfaces? ClassBody
+
+Super -> extends ClassType
+
+ClassType -> ClassOrInterfaceType
+
+ClassBody -> { ClassBodyDeclaarations? }
+
+ClassBodyDeclaarations -> ClassBodyDeclaaration
+ClassBodyDeclaarations -> ClassBodyDeclaarations ClassBodyDeclaaration
+ClassBodyDeclaaration -> ClassMemberDeclaration
+ClassBodyDeclaaration -> StaticInitializer
+ClassBodyDeclaaration -> ConstructorDeclaration
+
+ClassMemberDeclaration -> FieldDeclaration
+ClassMemberDeclaration -> MethodDeclaration
+
+FieldDeclaration -> Modifiers? Type VariableDeclarators ;
+
+## imports
+# VariableDeclarators : variable
+# Modifiers : main
+# Type : types
+
+

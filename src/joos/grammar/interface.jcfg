@@ -1,0 +1,42 @@
+{{nonterminals}}
+Interfaces
+InterfaceTypeList
+InterfaceType
+InterfaceDeclaration
+ExtendsInterfaces
+InterfaceBody
+InterfaceMemberDeclarations
+InterfaceMemberDeclaration
+ConstantDeclaration
+AbstractMethodDeclaration
+
+{{rules}}
+Interfaces -> implements InterfaceTypeList
+
+InterfaceTypeList -> InterfaceType
+InterfaceTypeList -> InterfaceTypeList , InterfaceType
+
+InterfaceType -> ClassOrInterfaceType
+
+InterfaceDeclaration -> Modifiers? interface? ID ExtendsInterfaces? InterfaceBody
+
+ExtendsInterfaces -> extends InterfaceType
+ExtendsInterfaces -> ExtendsInterfaces , InterfaceType
+
+InterfaceBody -> { InterfaceMemberDeclarations? }
+
+InterfaceMemberDeclarations -> InterfaceMemberDeclaration
+InterfaceMemberDeclarations -> InterfaceMemberDeclarations InterfaceMemberDeclaration
+
+InterfaceMemberDeclaration -> ConstantDeclaration
+InterfaceMemberDeclaration -> AbstractMethodDeclaration
+
+ConstantDeclaration -> FieldDeclaration
+
+AbstractMethodDeclaration -> MethodHeader ;
+
+### Imports
+# Modifiers : main
+# FieldDeclaration : class
+# MethodHeader : method
+

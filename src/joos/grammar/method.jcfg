@@ -1,0 +1,24 @@
+{{nonterminals}}
+MethodDeclaration
+MethodHeader
+MethodBody
+MethodDeclarator
+
+{{rules}}
+MethodDeclaration -> MethodHeader MethodBody
+
+MethodHeader -> Modifiers? Type MethodDeclarator
+MethodHeader -> Modifiers? void MethodDeclarator
+
+MethodDeclarator -> ID ( FormalParameterList? )
+MethodDeclarator -> MethodDeclarator [ ]
+
+MethodBody -> Block
+MethodBody -> ;
+
+### Imports
+# Modifiers : main
+# Type : types
+# FormalParameterList : constructor
+# Block : main
+

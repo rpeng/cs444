@@ -8,16 +8,66 @@ Start
 {{nonterminals}}
 Start
 CompilationUnit
-PackageDeclarations
+PackageDeclaration
 
 {{rules}}
-
 Start               -> BOF CompilationUnit EOF
-## CompilationUnit  -> PackageDeclarations ImportDeclarations TypeDeclarations
-## CompilationUnit  -> PackageDeclarations ImportDeclarations
-CompilationUnit     -> PackageDeclarations
-PackageDeclarations -> package Name ;
+CompilationUnit  -> PackageDeclaration? ImportDeclarations? TypeDeclarations?
+PackageDeclaration -> package Name ;
 
+###### Static Initializer ######
+{{nonterminals}}
+StaticInitializer
+Block
+BlockStatements
+BlockStatement
+LocalVariableDeclarationStatement
+LocalVariableDeclaration
+Statement
+
+{{rules}}
+StaticInitializer -> static Block
+Block -> { BlockStatements? }
+BlockStatements -> BlockStatement
+BlockStatements -> BlockStatements BlockStatement
+BlockStatement -> LocalVariableDeclarationStatement
+BlockStatement -> Statement
+
+LocalVariableDeclarationStatement -> LocalVariableDeclaration
+LocalVariableDeclaration -> Type VariableDeclarators
+
+### Modifiers ###
+{{nonterminals}}
+Modifiers
+Modifier
+
+{{rules}}
+Modifiers -> Modifier
+Modifiers -> Modifiers Modifier
+
+Modifier -> public
+Modifier -> protected
+Modifier -> static
+Modifier -> abstract
+Modifier -> final
+Modifier -> native
+
+###### Lexical Structure ######
+{{nonterminals}}
+Literal
+
+{{rules}}
+Literal -> INT
+Literal -> true
+Literal -> false
+Literal -> CHAR
+Literal -> STRING
+Literal -> null
+
+### imports
+# the terminals are defined in terminals.jcfg
 ### imports
 # Name               : names
 # ImportDeclarations : import_decls
+# Type : types
+# VariableDeclarators : variable

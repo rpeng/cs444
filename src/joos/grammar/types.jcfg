@@ -1,0 +1,44 @@
+{{nonterminals}}
+Type
+TypeDeclarations
+TypeDeclaration
+PrimitiveType
+ReferenceType
+NumericType
+IntegralType
+ClassOrInterfaceType
+ArrayType
+
+{{rules}}
+TypeDeclarations -> TypeDeclaration
+TypeDeclarations -> TypeDeclarations TypeDeclaration
+TypeDeclaration -> ClassDeclaration
+TypeDeclaration -> InterfaceDeclaration
+TypeDeclaration -> ;
+
+Type -> PrimitiveType
+Type -> ReferenceType
+
+PrimitiveType -> NumericType
+PrimitiveType -> boolean
+
+# omit floating point type b/c joos do not support it
+NumericType -> IntegralType
+
+IntegralType -> byte
+IntegralType -> short
+IntegralType -> int
+IntegralType -> char
+
+ReferenceType -> ClassOrInterfaceType
+ReferenceType -> ArrayType
+
+ClassOrInterfaceType -> Name
+
+ArrayType -> PrimitiveType [ ]
+ArrayType -> Name [ ]
+
+### import
+# Name : names
+
+

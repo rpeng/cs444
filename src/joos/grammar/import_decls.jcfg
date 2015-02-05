@@ -1,5 +1,4 @@
 {{nonterminals}}
-
 ImportDeclaration
 ImportDeclarations
 
@@ -7,7 +6,6 @@ ClassImportDeclaration
 PackageImportDeclaration
 
 {{rules}}
-
 ImportDeclarations -> ImportDeclaration
 ImportDeclarations -> ImportDeclarations ImportDeclaration
 

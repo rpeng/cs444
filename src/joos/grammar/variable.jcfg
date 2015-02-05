@@ -1,0 +1,28 @@
+{{nonterminals}}
+VariableDeclarators
+VariableDeclarator
+VariableDeclaratorId
+VariableInitializer
+ArrayInitializer
+VariableInitializers
+
+{{rules}}
+VariableDeclarators -> VariableDeclarator
+VariableDeclarators -> VariableDeclarators , VariableDeclarator
+
+VariableDeclarator -> VariableDeclaratorId
+VariableDeclarator -> VariableDeclaratorId = VariableInitializer
+
+VariableDeclaratorId -> ID
+VariableDeclaratorId -> VariableDeclaratorId [ ]
+
+VariableInitializer -> Expression
+VariableInitializer -> ArrayInitializer
+
+ArrayInitializer -> { VariableInitializers , }
+ArrayInitializer -> { VariableInitializers? }
+
+VariableInitializers -> VariableInitializer
+VariableInitializers -> VariableInitializers , VariableInitializer
+
+
