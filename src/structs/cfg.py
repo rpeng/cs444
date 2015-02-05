@@ -10,6 +10,24 @@ class Rule(object):
             return "{} -> None".format(self.lhs)
 
 
+class Token(object):
+    def __init__(self, token_type, lexeme, row=None, col=None):
+        self.token_type = token_type
+        self.lexeme = lexeme
+        self.row = row
+        self.col = col
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+                and self.__dict__ == other.__dict__)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        return "Type: {} Lex: {}".format(self.token_type, self.lexeme)
+
+
 class CFG(object):
 
     def __init__(self,

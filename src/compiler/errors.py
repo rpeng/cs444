@@ -22,6 +22,8 @@ class ParseErrorWithToken(ParseError):
     def __init__(self, token, expected):
         self.token = token
         self.expected = expected
-        self.message = "Unexpected token '{}', expecting one of: {}".format(
-            self.token, ' '.join(self.expected))
+        self.message = ("Unexpected token '{}' on row {} col {}."
+                        " Expecting one of: {}").format(
+            self.token.lexeme, self.token.row, self.token.col,
+            ' '.join(self.expected))
         super(Exception, self).__init__(self.message)

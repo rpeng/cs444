@@ -1,10 +1,14 @@
-from structs.cfg import CFG
-from compiler.parser import parse, from_lr1
+from structs.cfg import CFG, Token
+from compiler.parser import Parse, FromLr1
 from compiler.errors import *
 
 from nose.tools import *
 
 SAMPLE_LR1_PATH = 'compiler/tests/fixtures/sample.lr1'
+
+
+def _tokenate(a_list):
+    return [Token(x, x) for x in a_list]
 
 
 class TestParser(object):
@@ -14,7 +18,7 @@ class TestParser(object):
     @classmethod
     def setupClass(cls):
         with open(SAMPLE_LR1_PATH) as f:
-            cls.cfg, cls.parse_table = from_lr1(f.readlines())
+            cls.cfg, cls.parse_table = FromLr1(f.readlines())
 
     def test_parser_subtract_parens(self):
         expected_tree = """S -> BOF expr EOF
@@ -32,16 +36,16 @@ class TestParser(object):
       )
   EOF
 """
-        tree = parse(self.cfg, self.parse_table, [
+        tree = Parse(self.cfg, self.parse_table, _tokenate([
             'BOF', '(', 'id', '-', 'id', ')', 'EOF'
-        ])
+        ]))
         assert_equal(expected_tree, tree.StrTree())
 
     def test_parser_error_past_eof(self):
-        tokens = ['BOF', '(', 'id', '-', 'id', ')', 'EOF', 'e']
-        assert_raises(ParseError, parse, self.cfg, self.parse_table, tokens)
+        tokens = _tokenate(['BOF', '(', 'id', '-', 'id', ')', 'EOF', 'e'])
+        assert_raises(ParseError, Parse, self.cfg, self.parse_table, tokens)
 
     def test_parser_error_invalid_token(self):
-        tokens = ['BOF', '(', 'id', '-', 'id', '(', 'EOF']
-        assert_raises(ParseErrorWithToken, parse, self.cfg, self.parse_table,
+        tokens = _tokenate(['BOF', '(', 'id', '-', 'id', '(', 'EOF'])
+        assert_raises(ParseErrorWithToken, Parse, self.cfg, self.parse_table,
                       tokens)

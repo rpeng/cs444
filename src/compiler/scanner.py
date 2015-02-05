@@ -1,24 +1,6 @@
 from structs.nfa import NFAExecutor
+from structs.cfg import Token
 from compiler.errors import *
-
-
-class Token(object):
-    def __init__(self, token_type, lexeme, row=None, col=None):
-        self.token_type = token_type
-        self.lexeme = lexeme
-        self.row = row
-        self.col = col
-
-    def __eq__(self, other):
-        return (isinstance(other, self.__class__)
-                and self.__dict__ == other.__dict__)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __repr__(self):
-        return "TOKEN=type:{} row:{} col:{}".format(
-            self.token_type, self.row, self.col)
 
 
 class _MaximalMunchExecutor(object):
@@ -96,6 +78,6 @@ class _MaximalMunchExecutor(object):
         return result
 
 
-def scan(exports, inputs, newline_token=None):
+def Scan(exports, inputs, newline_token=None):
     mm = _MaximalMunchExecutor(exports, newline_token)
     return mm.Consume(inputs)

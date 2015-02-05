@@ -4,70 +4,85 @@ from joos.tokens import common, comments, integers, small, strings
 
 # If you update this file, please also update terminals.jcfg
 # Exported NFAs for maximal munch
+
+keyword_map = [
+    (t.from_str[x], x.lower()) for x in KEYWORDS
+]
+
 keyword_exports = [
-    (t.from_str[x], Exact(x.lower())) for x in KEYWORDS
+    (k, Exact(v)) for k, v in keyword_map
+]
+
+literal_map = [
+    (t.TRUE, 'true'),
+    (t.FALSE, 'false'),
+    (t.NULL, 'null')
 ]
 
 literal_exports = [
-    (t.INTEGER, integers.integer_literal),
     (t.TRUE, Exact('true')),
     (t.FALSE, Exact('false')),
+    (t.NULL, Exact('null')),
+    (t.INTEGER, integers.integer_literal),
     (t.CHARACTER, strings.character_literal),
     (t.STRING, strings.string_literal),
-    (t.NULL, Exact('null'))
 ]
 
-separator_exports = [
-    (t.LPAREN, Exact('(')),
-    (t.RPAREN, Exact(')')),
-    (t.LBRACE, Exact('{')),
-    (t.RBRACE, Exact('}')),
-    (t.LBRACKET, Exact('[')),
-    (t.RBRACKET, Exact(']')),
-    (t.SEMICOLON, Exact(';')),
-    (t.COMMA, Exact(',')),
-    (t.DOT, Exact('.'))
+separator_map = [
+    (t.LPAREN, '('),
+    (t.RPAREN, ')'),
+    (t.LBRACE, '{'),
+    (t.RBRACE, '}'),
+    (t.LBRACKET, '['),
+    (t.RBRACKET, ']'),
+    (t.SEMICOLON, ';'),
+    (t.COMMA, ','),
+    (t.DOT, '.')
 ]
 
-operator_exports = [
-    (t.ASSIGN, Exact('=')),
-    (t.GT, Exact('>')),
-    (t.LT, Exact('<')),
-    (t.BANG, Exact('!')),
-    (t.TILDE, Exact('~')),
-    (t.QUESTION_MARK, Exact('?')),
-    (t.COLON, Exact(':')),
-    (t.EQ, Exact('==')),
-    (t.LE, Exact('<=')),
-    (t.GE, Exact('>=')),
-    (t.NE, Exact('!=')),
-    (t.AND, Exact('&&')),
-    (t.OR, Exact('||')),
-    (t.INC, Exact('++')),
-    (t.DEC, Exact('--')),
-    (t.PLUS, Exact('+')),
-    (t.MINUS, Exact('-')),
-    (t.STAR, Exact('*')),
-    (t.DIV, Exact('/')),
-    (t.B_AND, Exact('&')),
-    (t.B_OR, Exact('|')),
-    (t.XOR, Exact('^')),
-    (t.MOD, Exact('%')),
-    (t.LSHIFT, Exact('<<')),
-    (t.RSHIFT, Exact('>>')),
-    (t.R_USHIFT, Exact('>>>')),
-    (t.PLUS_EQ, Exact('+=')),
-    (t.MINUS_EQ, Exact('-=')),
-    (t.TIMES_EQ, Exact('*=')),
-    (t.DIV_EQ, Exact('/=')),
-    (t.AND_EQ, Exact('&=')),
-    (t.OR_EQ, Exact('|=')),
-    (t.XOR_EQ, Exact('^=')),
-    (t.MOD_EQ, Exact('%=')),
-    (t.LSHIFT_EQ, Exact('<<=')),
-    (t.RSHIFT_EQ, Exact('>>=')),
-    (t.R_USHIFT_EQ, Exact('>>>='))
+separator_exports = [(k, Exact(v)) for k, v in separator_map]
+
+operator_map = [
+    (t.ASSIGN, '='),
+    (t.GT, '>'),
+    (t.LT, '<'),
+    (t.BANG, '!'),
+    (t.TILDE, '~'),
+    (t.QUESTION_MARK, '?'),
+    (t.COLON, ':'),
+    (t.EQ, '=='),
+    (t.LE, '<='),
+    (t.GE, '>='),
+    (t.NE, '!='),
+    (t.AND, '&&'),
+    (t.OR, '||'),
+    (t.INC, '++'),
+    (t.DEC, '--'),
+    (t.PLUS, '+'),
+    (t.MINUS, '-'),
+    (t.STAR, '*'),
+    (t.DIV, '/'),
+    (t.B_AND, '&'),
+    (t.B_OR, '|'),
+    (t.XOR, '^'),
+    (t.MOD, '%'),
+    (t.LSHIFT, '<<'),
+    (t.RSHIFT, '>>'),
+    (t.R_USHIFT, '>>>'),
+    (t.PLUS_EQ, '+='),
+    (t.MINUS_EQ, '-='),
+    (t.TIMES_EQ, '*='),
+    (t.DIV_EQ, '/='),
+    (t.AND_EQ, '&='),
+    (t.OR_EQ, '|='),
+    (t.XOR_EQ, '^='),
+    (t.MOD_EQ, '%='),
+    (t.LSHIFT_EQ, '<<='),
+    (t.RSHIFT_EQ, '>>='),
+    (t.R_USHIFT_EQ, '>>>=')
 ]
+
+operator_exports = [(k, Exact(v)) for k, v in operator_map]
 
 common_exports = [
     (t.WHITESPACE, common.whitespace),

@@ -19,7 +19,7 @@ class ParseTreeNode(object):
         if self.rule:
             result += str(self.rule)
         else:
-            result += self.token
+            result += self.token.lexeme
         result += '\n'
         for child in self.children:
             result += child.StrTree(indent + 2)
@@ -27,7 +27,7 @@ class ParseTreeNode(object):
 
     def __repr__(self):
         if not self.rule:
-            return "ParseTreeNode: '{}'".format(self.token)
+            return "ParseTreeNode: '{}'".format(self.token.lexeme)
         else:
             return "ParseTreeNode: " + str(self.rule)
 
@@ -37,7 +37,7 @@ def _gen_list(a_string_list):
         yield x.strip()
 
 
-def from_lr1(lr1_input_lines):
+def FromLr1(lr1_input_lines):
     l = _gen_list(lr1_input_lines)
 
     terminals = []
@@ -82,7 +82,7 @@ def from_lr1(lr1_input_lines):
     return cfg, parse_table
 
 
-def parse(cfg, parse_table, tokens):
+def Parse(cfg, parse_table, tokens):
     """
     Parses given tokens, using the specified context free grammar, and a parse
     table.
@@ -113,9 +113,9 @@ def parse(cfg, parse_table, tokens):
 
             rules = parse_table[state]
 
-            if token not in rules:
+            if token.token_type not in rules:
                 raise ParseErrorWithToken(token, rules.keys())
-            action, context = rules[token]
+            action, context = rules[token.token_type]
 
             # print state, token, action, context
 
