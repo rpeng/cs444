@@ -1,0 +1,4 @@
+#!/bin/sh
+
+rm generated/dist.zip
+zip -r generated/dist.zip generated/joos.lr1 compiler joos structs Makefile joosc
