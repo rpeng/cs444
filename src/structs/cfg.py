@@ -1,5 +1,3 @@
-
-
 class Rule(object):
     def __init__(self, lhs, rhs):
         self.lhs = lhs
@@ -25,6 +23,12 @@ class CFG(object):
         self.start_symbol = start_symbol
         self.rules = [Rule(lhs, rhs) for lhs, rhs in rules]
 
+        self.origin_rule = None
+        for rule in self.rules:
+            if rule.lhs == start_symbol:
+                self.origin_rule = rule
+                break
+
         self.all_symbols = self.terminals + self.nonterminals
         self._ComputeNullables()  # self.nullables
         self._ComputeFirsts()     # self.firsts
@@ -44,7 +48,7 @@ class CFG(object):
                     all_nullable = True
                     for symbol in r.rhs:
                         if (symbol in self.terminals
-                                or not self.nullables[r.rhs]):
+                                or not self.nullables[symbol]):
                             all_nullable = False
                             break
                     if all_nullable:
