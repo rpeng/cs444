@@ -63,6 +63,33 @@ def Main(paths, output_path):
     if result['start_symbol'] is None:
         _err('You need a start symbol!')
 
+    # expand optionals
+    optionals = []
+    for lhs, rhs in result['rules']:
+        for token in rhs:
+            if token.endswith('?'):
+                optionals.append((lhs, rhs))
+                break
+
+    for lhs, rhs in optionals:
+        result['rules'].remove((lhs, rhs))
+        worklist = [rhs]
+        while worklist:
+            item = worklist.pop()
+            has_optional = False
+            for i, t in enumerate(item):
+                if t.endswith('?'):
+                    has_optional = True
+                    if i == 0:
+                        worklist.append(item[1:])
+                        worklist.append([t[:-1]] + item[1:])
+                    else:
+                        worklist.append(item[0:i] + item[i+1:])
+                        worklist.append(item[0:i] + [t[:-1]] + item[i+1:])
+            if not has_optional:
+                if (lhs, item) not in result['rules']:
+                    result['rules'].append((lhs, item))
+
     # make sure lhs are all nonterminals
     for (lhs, rhs) in result['rules']:
         if lhs not in result['nonterminals']:
