@@ -1,11 +1,13 @@
 {{nonterminals}}
 Expression
-AssignmentExpression
-Assignment
 ConditionalOrExpression
 ConditionalAndExpression
 InclusiveOrExpression
 AndExpression
+UnaryExpression
+UnaryExpressionNotPlusMinus
+CastExpression
+PostfixExpression
 EqualityExpression
 RelationalExpression
 AdditiveExpression
@@ -24,9 +26,6 @@ ArgumentList
 
 {{rules}}
 Expression -> AssignmentExpression
-
-AssignmentExpression -> ConditionalOrExpression
-AssignmentExpression -> Assignment
 
 ConditionalOrExpression -> ConditionalAndExpression
 ConditionalOrExpression -> ConditionalOrExpression || ConditionalAndExpression
@@ -55,14 +54,24 @@ AdditiveExpression -> MultiplicativeExpression
 AdditiveExpression -> AdditiveExpression + MultiplicativeExpression
 AdditiveExpression -> AdditiveExpression - MultiplicativeExpression
 
-MultiplicativeExpression -> Primary
-MultiplicativeExpression -> Name
-MultiplicativeExpression -> MultiplicativeExpression * Primary
-MultiplicativeExpression -> MultiplicativeExpression * Name
-MultiplicativeExpression -> MultiplicativeExpression / Primary
-MultiplicativeExpression -> MultiplicativeExpression / Name
-MultiplicativeExpression -> MultiplicativeExpression % Primary
-MultiplicativeExpression -> MultiplicativeExpression % Name
+MultiplicativeExpression -> UnaryExpression
+MultiplicativeExpression -> MultiplicativeExpression * UnaryExpression
+MultiplicativeExpression -> MultiplicativeExpression / UnaryExpression
+MultiplicativeExpression -> MultiplicativeExpression % UnaryExpression
+
+UnaryExpression -> UnaryExpressionNotPlusMinus
+UnaryExpression -> - UnaryExpression
+
+UnaryExpressionNotPlusMinus -> ! UnaryExpression
+UnaryExpressionNotPlusMinus -> CastExpression
+UnaryExpressionNotPlusMinus -> PostfixExpression
+
+PostfixExpression -> Primary
+PostfixExpression -> Name
+
+CastExpression -> ( PrimitiveType Dims? ) UnaryExpression
+CastExpression -> ( Expression ) UnaryExpressionNotPlusMinus
+CastExpression -> ( Name Dims ) UnaryExpressionNotPlusMinus
 
 Primary -> PrimaryNoNewArray
 Primary -> ArrayCreationExpression
@@ -83,7 +92,6 @@ DimExprs -> DimExprs DimExpr
 DimExpr -> [ Expression ]
 
 Dims -> [ ]
-Dims -> Dims [ ]
 
 ClassInstanceCreationExpression -> new ClassType ( ArgumentList? )
 

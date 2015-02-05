@@ -4,7 +4,6 @@ ConstructorDeclarator
 ConstructorBody
 FormalParameterList
 FormalParameter
-ExplicitConstructorInvocation
 
 {{rules}}
 ConstructorDeclaration -> Modifiers? ConstructorDeclarator ConstructorBody
@@ -16,10 +15,7 @@ FormalParameterList -> FormalParameterList , FormalParameter
 
 FormalParameter -> Type VariableDeclaratorId
 
-ConstructorBody -> { ExplicitConstructorInvocation? BlockStatements? }
-
-ExplicitConstructorInvocation -> this ( ArgumentList? ) ;
-
+ConstructorBody -> { BlockStatements? }
 
 ### imports
 # SimpleName : names

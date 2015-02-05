@@ -23,7 +23,6 @@ BlockStatements
 BlockStatement
 LocalVariableDeclarationStatement
 LocalVariableDeclaration
-Statement
 
 {{rules}}
 StaticInitializer -> static Block
@@ -33,7 +32,7 @@ BlockStatements -> BlockStatements BlockStatement
 BlockStatement -> LocalVariableDeclarationStatement
 BlockStatement -> Statement
 
-LocalVariableDeclarationStatement -> LocalVariableDeclaration
+LocalVariableDeclarationStatement -> LocalVariableDeclaration ;
 LocalVariableDeclaration -> Type VariableDeclarators
 
 ### Modifiers ###

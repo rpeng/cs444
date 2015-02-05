@@ -3,8 +3,8 @@
 ClassDeclaration
 Super
 ClassBody
-ClassBodyDeclaarations
-ClassBodyDeclaaration
+ClassBodyDeclarations
+ClassBodyDeclaration
 ClassMemberDeclaration
 FieldDeclaration
 ClassType
@@ -16,13 +16,13 @@ Super -> extends ClassType
 
 ClassType -> ClassOrInterfaceType
 
-ClassBody -> { ClassBodyDeclaarations? }
+ClassBody -> { ClassBodyDeclarations? }
 
-ClassBodyDeclaarations -> ClassBodyDeclaaration
-ClassBodyDeclaarations -> ClassBodyDeclaarations ClassBodyDeclaaration
-ClassBodyDeclaaration -> ClassMemberDeclaration
-ClassBodyDeclaaration -> StaticInitializer
-ClassBodyDeclaaration -> ConstructorDeclaration
+ClassBodyDeclarations -> ClassBodyDeclaration
+ClassBodyDeclarations -> ClassBodyDeclarations ClassBodyDeclaration
+ClassBodyDeclaration -> ClassMemberDeclaration
+ClassBodyDeclaration -> StaticInitializer
+ClassBodyDeclaration -> ConstructorDeclaration
 
 ClassMemberDeclaration -> FieldDeclaration
 ClassMemberDeclaration -> MethodDeclaration

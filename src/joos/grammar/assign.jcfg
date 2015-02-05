@@ -1,0 +1,17 @@
+{{nonterminals}}
+Assignment
+LeftHandSide
+AssignmentOperator
+AssignmentExpression
+
+{{rules}}
+Assignment -> LeftHandSide AssignmentOperator AssignmentExpression
+
+LeftHandSide -> Name
+LeftHandSide -> FieldAccess
+LeftHandSide -> ArrayAccess
+
+AssignmentOperator -> =
+
+AssignmentExpression -> ConditionalOrExpression
+AssignmentExpression -> Assignment

@@ -18,7 +18,7 @@ InterfaceTypeList -> InterfaceTypeList , InterfaceType
 
 InterfaceType -> ClassOrInterfaceType
 
-InterfaceDeclaration -> Modifiers? interface ID ExtendsInterfaces? InterfaceBody
+InterfaceDeclaration -> public interface ID ExtendsInterfaces? InterfaceBody
 
 ExtendsInterfaces -> extends InterfaceType
 ExtendsInterfaces -> ExtendsInterfaces , InterfaceType

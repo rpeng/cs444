@@ -1,0 +1,74 @@
+{{nonterminals}}
+Statement
+StatementWithoutTrailingSubstatement
+IfThenStatement
+IfThenElseStatement
+WhileStatement
+ForStatement
+EmptyStatement
+ExpressionStatement
+ReturnStatement
+StatementNoShortIf
+ForInit
+ForUpdate
+StatementExpression
+IfThenElseStatementNoShortIf
+WhileStatementNoShortIf
+ForStatementNoShortIf
+StatementExpressionList
+
+{{rules}}
+Statement -> StatementWithoutTrailingSubstatement
+Statement -> IfThenStatement
+Statement -> IfThenElseStatement
+Statement -> WhileStatement
+Statement -> ForStatement
+
+StatementWithoutTrailingSubstatement -> Block
+StatementWithoutTrailingSubstatement -> EmptyStatement
+StatementWithoutTrailingSubstatement -> ExpressionStatement
+StatementWithoutTrailingSubstatement -> ReturnStatement
+
+EmptyStatement -> ;
+
+IfThenStatement -> if ( Expression ) Statement
+
+IfThenElseStatement -> if ( Expression ) StatementNoShortIf else Statement
+
+WhileStatement -> while ( Expression ) Statement
+
+ForStatement -> for ( ForInit? ; Expression? ; ForUpdate? ) Statement
+
+ExpressionStatement -> StatementExpression ;
+
+ReturnStatement -> return Expression? ;
+
+StatementExpression -> Assignment
+StatementExpression -> MethodInvocation
+StatementExpression -> ClassInstanceCreationExpression
+
+StatementNoShortIf -> StatementWithoutTrailingSubstatement
+StatementNoShortIf -> IfThenElseStatementNoShortIf
+StatementNoShortIf -> WhileStatementNoShortIf
+StatementNoShortIf -> ForStatementNoShortIf
+
+ForInit -> StatementExpressionList
+ForInit -> LocalVariableDeclaration
+
+ForUpdate -> StatementExpressionList
+
+IfThenElseStatementNoShortIf -> if ( Expression ) StatementNoShortIf else StatementNoShortIf
+
+WhileStatementNoShortIf -> while ( Expression ) StatementNoShortIf
+
+ForStatementNoShortIf -> for ( ForInit? ; Expression? ; ForUpdate? ) StatementNoShortIf
+
+StatementExpressionList -> StatementExpression
+StatementExpressionList -> StatementExpressionList , StatementExpression
+
+
+
+
+
+
+
