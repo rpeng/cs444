@@ -11,7 +11,7 @@ class Rule(object):
 
 
 class Token(object):
-    def __init__(self, token_type, lexeme, row=None, col=None):
+    def __init__(self, token_type, lexeme='', row=None, col=None):
         self.token_type = token_type
         self.lexeme = lexeme
         self.row = row

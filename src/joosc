@@ -1,0 +1,26 @@
+#!/usr/bin/python
+
+import sys
+
+from joos.joosc import ScanInput, PrepareTokens, Parse
+
+JOOS_LR1_FILE = 'generated/joos.lr1'
+
+
+def Main(input_file):
+    with open(input_file) as f:
+        try:
+            tokens = ScanInput(f.read())
+            tokens = PrepareTokens(tokens)
+            Parse(tokens, JOOS_LR1_FILE)
+        except Exception, e:
+            print >> sys.stderr, str(e)
+            sys.exit(42)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print "Usage: joosc [input_file]"
+    else:
+        input_file = sys.argv[1]
+        Main(input_file)

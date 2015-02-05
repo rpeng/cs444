@@ -5,27 +5,19 @@ from joos.tokens import common, comments, integers, small, strings
 # If you update this file, please also update terminals.jcfg
 # Exported NFAs for maximal munch
 
+# MAPS (token -> string repr)
+
 keyword_map = [
     (t.from_str[x], x.lower()) for x in KEYWORDS
-]
-
-keyword_exports = [
-    (k, Exact(v)) for k, v in keyword_map
 ]
 
 literal_map = [
     (t.TRUE, 'true'),
     (t.FALSE, 'false'),
-    (t.NULL, 'null')
-]
-
-literal_exports = [
-    (t.TRUE, Exact('true')),
-    (t.FALSE, Exact('false')),
-    (t.NULL, Exact('null')),
-    (t.INTEGER, integers.integer_literal),
-    (t.CHARACTER, strings.character_literal),
-    (t.STRING, strings.string_literal),
+    (t.NULL, 'null'),
+    (t.INTEGER, 'INT'),
+    (t.CHARACTER, 'CHAR'),
+    (t.STRING, 'STRING')
 ]
 
 separator_map = [
@@ -39,8 +31,6 @@ separator_map = [
     (t.COMMA, ','),
     (t.DOT, '.')
 ]
-
-separator_exports = [(k, Exact(v)) for k, v in separator_map]
 
 operator_map = [
     (t.ASSIGN, '='),
@@ -82,6 +72,31 @@ operator_map = [
     (t.R_USHIFT_EQ, '>>>=')
 ]
 
+common_map = [
+    (t.WHITESPACE, 'WHITESPACE'),
+    (t.NEWLINE, 'LINEBREAK'),
+    (t.ID, 'ID'),
+    (t.COMMENT, 'COMMENT'),
+    (t.BOF, 'BOF'),
+    (t.EOF, 'EOF')
+]
+
+# EXPORTS: toke -> dfa
+keyword_exports = [
+    (k, Exact(v)) for k, v in keyword_map
+]
+
+literal_exports = [
+    (t.TRUE, Exact('true')),
+    (t.FALSE, Exact('false')),
+    (t.NULL, Exact('null')),
+    (t.INTEGER, integers.integer_literal),
+    (t.CHARACTER, strings.character_literal),
+    (t.STRING, strings.string_literal),
+]
+
+separator_exports = [(k, Exact(v)) for k, v in separator_map]
+
 operator_exports = [(k, Exact(v)) for k, v in operator_map]
 
 common_exports = [
@@ -102,6 +117,15 @@ unsupported = [
     t.R_USHIFT, t.PLUS_EQ, t.MINUS_EQ, t.TIMES_EQ, t.DIV_EQ, t.AND_EQ, t.OR_EQ,
     t.MOD_EQ, t.LSHIFT_EQ, t.RSHIFT_EQ, t.R_USHIFT_EQ,
 ]
+
+
+# module exports
+symbols_map = (keyword_map +
+               literal_map +
+               separator_map +
+               operator_map +
+               common_map)
+
 
 all_exports = (keyword_exports +
                literal_exports +
