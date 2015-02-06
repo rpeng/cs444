@@ -7,7 +7,7 @@ decimal_numeral = Union(Character('0'),
                         Concat(Character(NonZeroDigitMatcher),
                                ZeroOrMore(java_digit)))
 
-decimal_integer_literal = Concat(decimal_numeral,
-                                 Optional(integer_type_suffix))
+decimal_integer_literal = decimal_numeral
+                                 
 
 integer_literal = decimal_integer_literal

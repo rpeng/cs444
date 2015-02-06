@@ -17,7 +17,8 @@ literal_map = [
     (t.NULL, 'null'),
     (t.INTEGER, 'INT'),
     (t.CHARACTER, 'CHAR'),
-    (t.STRING, 'STRING')
+    (t.STRING, 'STRING'),
+    (t.MAXINT, '2147483648')
 ]
 
 separator_map = [
@@ -90,6 +91,7 @@ literal_exports = [
     (t.TRUE, Exact('true')),
     (t.FALSE, Exact('false')),
     (t.NULL, Exact('null')),
+    (t.MAXINT, Exact('2147483648')),
     (t.INTEGER, integers.integer_literal),
     (t.CHARACTER, strings.character_literal),
     (t.STRING, strings.string_literal),

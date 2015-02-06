@@ -43,6 +43,7 @@
 INT
 CHAR
 STRING
+2147483648
 
 true
 false

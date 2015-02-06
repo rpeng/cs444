@@ -28,10 +28,7 @@ InterfaceBody -> { InterfaceMemberDeclarations? }
 InterfaceMemberDeclarations -> InterfaceMemberDeclaration
 InterfaceMemberDeclarations -> InterfaceMemberDeclarations InterfaceMemberDeclaration
 
-InterfaceMemberDeclaration -> ConstantDeclaration
 InterfaceMemberDeclaration -> AbstractMethodDeclaration
-
-ConstantDeclaration -> FieldDeclaration
 
 AbstractMethodDeclaration -> MethodHeader ;
 

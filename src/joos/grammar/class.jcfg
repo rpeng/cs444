@@ -21,7 +21,6 @@ ClassBody -> { ClassBodyDeclarations? }
 ClassBodyDeclarations -> ClassBodyDeclaration
 ClassBodyDeclarations -> ClassBodyDeclarations ClassBodyDeclaration
 ClassBodyDeclaration -> ClassMemberDeclaration
-ClassBodyDeclaration -> StaticInitializer
 ClassBodyDeclaration -> ConstructorDeclaration
 
 ClassMemberDeclaration -> FieldDeclaration

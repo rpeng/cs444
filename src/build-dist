@@ -1,4 +1,4 @@
 #!/bin/sh
 
 rm generated/dist.zip
-zip -r generated/dist.zip generated/joos.lr1 compiler joos structs Makefile joosc
+zip -r generated/dist.zip compiler generated/joos.lr1 joos scripts structs build-all build-dist Makefile joosc

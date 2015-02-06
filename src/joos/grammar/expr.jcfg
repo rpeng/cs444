@@ -6,6 +6,7 @@ InclusiveOrExpression
 AndExpression
 UnaryExpression
 UnaryExpressionNotPlusMinus
+UnaryExpressionOrMaxInt
 CastExpression
 PostfixExpression
 EqualityExpression
@@ -60,7 +61,10 @@ MultiplicativeExpression -> MultiplicativeExpression / UnaryExpression
 MultiplicativeExpression -> MultiplicativeExpression % UnaryExpression
 
 UnaryExpression -> UnaryExpressionNotPlusMinus
-UnaryExpression -> - UnaryExpression
+UnaryExpression -> - UnaryExpressionOrMaxInt
+
+UnaryExpressionOrMaxInt -> UnaryExpression
+UnaryExpressionOrMaxInt -> 2147483648
 
 UnaryExpressionNotPlusMinus -> ! UnaryExpression
 UnaryExpressionNotPlusMinus -> CastExpression
@@ -70,7 +74,7 @@ PostfixExpression -> Primary
 PostfixExpression -> Name
 
 CastExpression -> ( PrimitiveType Dims? ) UnaryExpression
-CastExpression -> ( Expression ) UnaryExpressionNotPlusMinus
+# CastExpression -> ( Expression ) UnaryExpressionNotPlusMinus
 CastExpression -> ( Name Dims ) UnaryExpressionNotPlusMinus
 
 Primary -> PrimaryNoNewArray

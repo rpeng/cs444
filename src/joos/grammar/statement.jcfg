@@ -55,7 +55,7 @@ StatementNoShortIf -> ForStatementNoShortIf
 ForInit -> StatementExpressionList
 ForInit -> LocalVariableDeclaration
 
-ForUpdate -> StatementExpressionList
+ForUpdate -> StatementExpression
 
 IfThenElseStatementNoShortIf -> if ( Expression ) StatementNoShortIf else StatementNoShortIf
 

@@ -7,8 +7,8 @@ MethodDeclarator
 {{rules}}
 MethodDeclaration -> MethodHeader MethodBody
 
-MethodHeader -> Modifiers? Type MethodDeclarator
-MethodHeader -> Modifiers? void MethodDeclarator
+MethodHeader -> Modifiers Type MethodDeclarator
+MethodHeader -> Modifiers void MethodDeclarator
 
 MethodDeclarator -> ID ( FormalParameterList? )
 MethodDeclarator -> MethodDeclarator [ ]

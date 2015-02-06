@@ -8,7 +8,6 @@ VariableInitializers
 
 {{rules}}
 VariableDeclarators -> VariableDeclarator
-VariableDeclarators -> VariableDeclarators , VariableDeclarator
 
 VariableDeclarator -> VariableDeclaratorId
 VariableDeclarator -> VariableDeclaratorId = VariableInitializer

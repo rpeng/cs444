@@ -1,22 +1,18 @@
 #!/bin/sh
 ALL_FILES="extern/testcases/a1/*"
 
-IGNORE="extern/testcases/a1/J2_staticFieldDecl.java,extern/testcases/a1/J2_staticfielddeclaration.java,extern/testcases/a1/Je_1_AbstractClass_Final.java,extern/testcases/a1/Je_1_AbstractMethodCannotBeFinal.java,extern/testcases/a1/Je_1_AbstractMethod_Body.java,extern/testcases/a1/Je_1_AbstractMethod_EmptyBody.java,extern/testcases/a1/Je_1_AbstractMethod_Final.java,extern/testcases/a1/Je_1_AbstractMethod_Static.java"
-
-
 touch generated/completed_tests
 
 for file in $ALL_FILES; do
 
-    grep $file generated/completed_tests
+    grep $file generated/completed_tests >/dev/null
     SKIP=$?
     if [ $SKIP -eq 0 ]; then
-      printf "Skipping $file..."
       continue
     fi
 
     printf "Processing $file..."
-    head -n3 $file | grep EXCEPTION
+    head -n3 $file | grep 'EXCEPTION\|INVALID'
     EXC=$?
 
     ./joosc $file >/dev/null
@@ -24,23 +20,13 @@ for file in $ALL_FILES; do
 
     if [ $EXC -eq 0 ]; then
         if [ $JOOSC -ne 42 ]; then
-            if [[ $IGNORE =~ $file ]]; then
-                printf "FAILED because missing WEEDER\n"
-                continue
-            else
-                printf "FAILED, expected 42 but got 0\n"
-                exit
-            fi
+            printf "FAILED, expected 42 but got 0\n"
+            continue
         fi
     else
         if [ $JOOSC -ne 0 ]; then
-            if [[ $IGNORE =~ $file ]]; then
-                printf "FAILED because missing WEEDER\n"
-                continue 
-            else
-                printf "FAILED, expected 0 but got 42\n"
-                exit
-            fi
+            printf "FAILED, expected 0 but got 42\n"
+            continue
         fi
     fi
     printf "OK\n"
