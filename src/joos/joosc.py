@@ -3,6 +3,7 @@ import sys
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
+from joos.visitors.builder import BuilderVisitor
 from compiler.errors import *
 from compiler import scanner, parser
 
@@ -40,8 +41,6 @@ def PrepareTokens(tokens):
         token.token_type = TOKEN_TO_LR1_REPR[token.token_type]
         filtered.append(token)
     filtered.append(Token(t.EOF, 'EOF'))
-    for token in filtered:
-        print token.token_type, token.row, token.col
     return filtered
 
 
@@ -58,3 +57,12 @@ def Parse(tokens, lr1_grammar_file):
                                     ' '.join(e.expected)))
         else:
             raise
+
+
+def BuildAST(parse_tree):
+    visitor = BuilderVisitor()
+    return visitor.VisitParseTreeNode(parse_tree)
+
+
+def Weed(parse_tree):
+    pass

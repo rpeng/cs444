@@ -9,6 +9,10 @@ class Rule(object):
         else:
             return "{} -> None".format(self.lhs)
 
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__)
+                and self.__dict__ == other.__dict__)
+
 
 class Token(object):
     def __init__(self, token_type, lexeme='', row=None, col=None):

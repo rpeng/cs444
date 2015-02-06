@@ -1,0 +1,2 @@
+class WeederVisitor(object):
+    pass

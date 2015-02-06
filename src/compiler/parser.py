@@ -11,9 +11,6 @@ class ParseTreeNode(object):
         else:
             self.children = children
 
-    def AddChild(self, child):
-        self.children.append(child)
-
     def StrTree(self, indent=0):
         result = " "*indent
         if self.rule:
@@ -30,6 +27,9 @@ class ParseTreeNode(object):
             return "ParseTreeNode: '{}'".format(self.token.lexeme)
         else:
             return "ParseTreeNode: " + str(self.rule)
+
+    def __getitem__(self, idx):
+        return self.children[idx]
 
 
 def _gen_list(a_string_list):
