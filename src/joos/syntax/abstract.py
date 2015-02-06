@@ -14,6 +14,7 @@ class AbstractSyntax(object):
             result += child.StrTree(indent + 2)
         return result
 
+
 class InterfaceMethodDecl(object):
     @classmethod
     def create(cls, visitor, node):
@@ -26,6 +27,7 @@ class InterfaceMethodDecl(object):
         self.modifiers = modifiers
         self.m_type = m_type
         self.decl = decl
+
 
 class MethodDecl(object):
     @classmethod
@@ -41,6 +43,7 @@ class MethodDecl(object):
         self.decl = decl
         self.body = body
 
+
 class InterfaceDecl(object):
     @classmethod
     def create(cls, visitor, node):
@@ -50,9 +53,10 @@ class InterfaceDecl(object):
         visitor.VisitInterfaceDecl(self)
 
     def __init__(self, name, extends_interface, body):
-        self.name = name #token
+        self.name = name  # token
         self.extends_interface = extends_interface
         self.body = body
+
 
 class ClassDecl(object):
     @classmethod
@@ -64,7 +68,7 @@ class ClassDecl(object):
 
     def __init__(self, modifiers, name, extends, interfaces, body):
         self.modifiers = modifiers
-        self.name = name #token
+        self.name = name  # token
         self.extends = extends
         self.interfaces = interfaces
         self.body = body
@@ -87,6 +91,7 @@ class Modifiers(object):
     def __repr__(self):
         return "Modifiers: '{}'".format(self.modifiers)
 
+
 class Literal(object):
     @classmethod
     def create(cls, visitor, node):
@@ -98,6 +103,7 @@ class Literal(object):
     def __init__(self, l_type, value):
         self.l_type = l_type
         self.value = value
+
 
 class FieldDecl(object):
     @classmethod
@@ -112,6 +118,7 @@ class FieldDecl(object):
         self.decl_type = decl_type
         self.var_decl = var_decl
 
+
 class ClassMemberDecl(AbstractSyntax):
     @classmethod
     def create(cls, visitor, node):
@@ -125,6 +132,7 @@ class ClassMemberDecl(AbstractSyntax):
         self.cf_type = cf_type
         self.decl = decl
         self.body = body
+
 
 rules_map = {
     'ClassDeclaration': ClassDecl,

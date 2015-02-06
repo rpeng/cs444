@@ -32,8 +32,8 @@ class BuilderVisitor(object):
             return new_node
 
     def CreateClassDecl(self, klass, node):
-        (modifiers, name, extends, interfaces, body) = self._resolve(node,
-                'Modifiers', 'ID', 'Super', 'Interfaces', 'ClassBody')
+        (modifiers, name, extends, interfaces, body) = self._resolve(
+            node, 'Modifiers', 'ID', 'Super', 'Interfaces', 'ClassBody')
         if modifiers:
             modifiers = modifiers.modifiers
         name = name.token
@@ -77,12 +77,12 @@ class BuilderVisitor(object):
         return klass(name, extends_interface, body)
 
     def CreateFieldDecl(self, klass, node):
-        modifiers, decl_type, var_decl = self._resolve(node,
-                'Modifiers', 'Type', 'VariableDeclarations')
+        modifiers, decl_type, var_decl = self._resolve(
+            node, 'Modifiers', 'Type', 'VariableDeclarations')
         if modifiers:
             modifiers = modifiers.modifiers
         return klass(modifiers, decl_type, var_decl)
-   
+
     def CreateClassMemberDecl(self, klass, node):
         modifiers = []
         cf_type = node.rule.rhs[0]
@@ -91,7 +91,7 @@ class BuilderVisitor(object):
         if cf_type == 'FieldDeclaration':
             modifiers = self.VisitParseTreeNode(node[0][0]).modifiers
             decl = self.VisitParseTreeNode(node[0][-1]).token
-        else: # MethodDeclaration
+        else:  # MethodDeclaration
             modifiers = self.VisitParseTreeNode(node[0]).modifiers
             decl = self.VisitParseTreeNode(node[0][0][-1][0]).token
             body = self.VisitParseTreeNode(node[0][-1])

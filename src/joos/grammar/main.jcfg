@@ -11,8 +11,8 @@ CompilationUnit
 PackageDeclaration
 
 {{rules}}
-Start               -> BOF CompilationUnit EOF
-CompilationUnit  -> PackageDeclaration? ImportDeclarations? TypeDeclarations?
+Start              -> BOF CompilationUnit EOF
+CompilationUnit    -> PackageDeclaration? ImportDeclarations? TypeDeclarations?
 PackageDeclaration -> package Name ;
 
 ###### Static Initializer ######

@@ -8,6 +8,5 @@ decimal_numeral = Union(Character('0'),
                                ZeroOrMore(java_digit)))
 
 decimal_integer_literal = decimal_numeral
-                                 
 
-integer_literal = decimal_integer_literal
+integer_literal = decimal_numeral

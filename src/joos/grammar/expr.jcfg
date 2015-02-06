@@ -74,7 +74,7 @@ PostfixExpression -> Primary
 PostfixExpression -> Name
 
 CastExpression -> ( PrimitiveType Dims? ) UnaryExpression
-# CastExpression -> ( Expression ) UnaryExpressionNotPlusMinus
+CastExpression -> ( Expression ) UnaryExpressionNotPlusMinus
 CastExpression -> ( Name Dims ) UnaryExpressionNotPlusMinus
 
 Primary -> PrimaryNoNewArray

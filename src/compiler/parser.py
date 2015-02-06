@@ -13,8 +13,8 @@ class ParseTreeNode(object):
         self.rule_map = {}
         if rule and rule.rhs:
             self.rule_map = dict(
-                    [(t, self.children[i]) for i, t in enumerate(rule.rhs) 
-                        if i < len(self.children)])
+                [(t, self.children[i]) for i, t in enumerate(rule.rhs)
+                 if i < len(self.children)])
 
     def StrTree(self, indent=0):
         result = " "*indent
@@ -26,7 +26,7 @@ class ParseTreeNode(object):
         for child in self.children:
             result += child.StrTree(indent + 2)
         return result
-    
+
     def __repr__(self):
         if not self.rule:
             return "ParseTreeNode: '{}'".format(self.token.lexeme)
@@ -42,7 +42,7 @@ class ParseTreeNode(object):
     def visit(self, visitor):
         visitor.VisitParseTreeNode(self)
 
-    
+
 def _gen_list(a_string_list):
     for x in a_string_list:
         yield x.strip()
@@ -162,6 +162,7 @@ def Parse(cfg, parse_table, tokens):
     if n > 0:
         symbols_stack = symbols_stack[:-n]
         states_stack = states_stack[:-n]
+        children = parse_tree[-n:]
         parse_tree = parse_tree[:-n]
         parse_tree.append(ParseTreeNode(rule.lhs, rule, children))
     return parse_tree[0]
