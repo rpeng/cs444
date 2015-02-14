@@ -2,7 +2,7 @@ from compiler.parser import ParseTreeNode
 from structs.cfg import Rule
 
 
-class AbstractSyntax(object):
+class AbstractSyntaxNode(object):
     def __repr__(self):
         return self.__class__.__name__
 
@@ -15,13 +15,13 @@ class AbstractSyntax(object):
         return result
 
 
-class InterfaceMethodDecl(object):
+class InterfaceMemberDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateInterfaceMethodDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitInterfaceMethodDecl(self)
+        visitor.VisitInterfaceMemberDecl(self)
 
     def __init__(self, modifiers, m_type, decl):
         self.modifiers = modifiers
@@ -29,7 +29,7 @@ class InterfaceMethodDecl(object):
         self.decl = decl
 
 
-class MethodDecl(object):
+class MethodDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateMethodDecl(cls, node)
@@ -44,7 +44,7 @@ class MethodDecl(object):
         self.body = body
 
 
-class InterfaceDecl(object):
+class InterfaceDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateInterfaceDecl(cls, node)
@@ -77,22 +77,7 @@ class ClassDecl(object):
         return "ClassDecl: '{}'".format(self.name)
 
 
-class Modifiers(object):
-    @classmethod
-    def create(cls, visitor, node):
-        return visitor.CreateModifiers(cls, node)
-
-    def visit(self, visitor):
-        visitor.VisitModifiers(self)
-
-    def __init__(self, modifiers):
-        self.modifiers = modifiers
-
-    def __repr__(self):
-        return "Modifiers: '{}'".format(self.modifiers)
-
-
-class Literal(object):
+class Literal(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateLiteral(cls, node)
@@ -105,7 +90,7 @@ class Literal(object):
         self.value = value
 
 
-class FieldDecl(object):
+class FieldDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateFieldDecl(cls, node)
@@ -119,7 +104,7 @@ class FieldDecl(object):
         self.var_decl = var_decl
 
 
-class ClassMemberDecl(AbstractSyntax):
+class ClassMemberDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateClassMemberDecl(cls, node)
@@ -136,9 +121,8 @@ class ClassMemberDecl(AbstractSyntax):
 
 rules_map = {
     'ClassDeclaration': ClassDecl,
-    'Modifiers': Modifiers,
     'MethodDeclaration': MethodDecl,
-    'AbstractMethodDeclaration': InterfaceMethodDecl,
+    'InterfaceMemberDeclaration': InterfaceMemberDecl,
     'InterfaceDeclaration': InterfaceDecl,
     'FieldDeclaration': FieldDecl,
     'Literal': Literal,

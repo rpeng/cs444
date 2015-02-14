@@ -10,9 +10,9 @@ class ParseTreeNode(object):
             self.children = []
         else:
             self.children = children
-        self.rule_map = {}
+        self.rhs_map = {}
         if rule and rule.rhs:
-            self.rule_map = dict(
+            self.rhs_map = dict(
                 [(t, self.children[i]) for i, t in enumerate(rule.rhs)
                  if i < len(self.children)])
 

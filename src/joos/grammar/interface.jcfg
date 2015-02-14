@@ -8,7 +8,6 @@ InterfaceBody
 InterfaceMemberDeclarations
 InterfaceMemberDeclaration
 ConstantDeclaration
-AbstractMethodDeclaration
 
 {{rules}}
 Interfaces -> implements InterfaceTypeList
@@ -28,9 +27,7 @@ InterfaceBody -> { InterfaceMemberDeclarations? }
 InterfaceMemberDeclarations -> InterfaceMemberDeclaration
 InterfaceMemberDeclarations -> InterfaceMemberDeclarations InterfaceMemberDeclaration
 
-InterfaceMemberDeclaration -> AbstractMethodDeclaration
-
-AbstractMethodDeclaration -> MethodHeader ;
+InterfaceMemberDeclaration -> MethodHeader ;
 
 ### Imports
 # Modifiers : main
