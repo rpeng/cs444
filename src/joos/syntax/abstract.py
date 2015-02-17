@@ -43,6 +43,16 @@ class MethodDecl(AbstractSyntaxNode):
         self.decl = decl
         self.body = body
 
+class Name(AbstractSyntaxNode):
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateName(cls, node)
+
+    def visit(self, visitor):
+        visitor.VisitName(self)
+
+    def __init__(self, name):
+        self.name = name
 
 class InterfaceDecl(AbstractSyntaxNode):
     @classmethod
@@ -58,7 +68,7 @@ class InterfaceDecl(AbstractSyntaxNode):
         self.body = body
 
 
-class ClassDecl(object):
+class ClassDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateClassDecl(cls, node)
@@ -126,5 +136,6 @@ rules_map = {
     'InterfaceDeclaration': InterfaceDecl,
     'FieldDeclaration': FieldDecl,
     'Literal': Literal,
+    'Name': Name
     # 'ClassMemberDeclaration': ClassMemberDecl
 }

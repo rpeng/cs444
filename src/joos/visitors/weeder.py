@@ -78,5 +78,5 @@ class WeederVisitor(object):
         if node.body:
             node.body.visit(self)
 
-    def VisitModifiers(self, node):
+    def VisitName(self, node):
         pass

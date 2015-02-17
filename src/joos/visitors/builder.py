@@ -7,9 +7,14 @@ class BuilderVisitor(object):
     def _resolve(self, node, *accessors):
         result = []
         for accessor in accessors:
-            child = node.rhs_map.get(accessor)
-            if child:
-                child = self.VisitParseTreeNode(child)
+            if (accessor.startswith('+')):  # expand
+                child = node.rhs_map.get(accessor[1:])
+                if child:
+                    child = self._expand(child)
+            else:
+                child = node.rhs_map.get(accessor)
+                if child:
+                    child = self.VisitParseTreeNode(child)
             result.append(child)
         return tuple(result)
 
@@ -18,10 +23,10 @@ class BuilderVisitor(object):
         if node:
             while True:
                 if node.rule.rhs[0] == node.rule.lhs:
-                    expanded.append(self.VisitParseTreeNode(node[:-1]))
+                    expanded.append(self.VisitParseTreeNode(node[-1]))
                     node = node[0]
                 else:
-                    expanded.append(node[0])
+                    expanded.append(self.VisitParseTreeNode(node[-1]))
                     break
         return expanded
 
@@ -45,8 +50,8 @@ class BuilderVisitor(object):
 
     def CreateClassDecl(self, klass, node):
         (modifiers, name, extends, interfaces, body) = self._resolve(
-            node, 'Modifiers', 'ID', 'Super', 'Interfaces', 'ClassBody')
-        modifiers = [x[0].token for x in self._expand(modifiers)]
+            node, '+Modifiers', 'ID', 'Super', 'Interfaces', 'ClassBody')
+        modifiers = [x[0].token for x in modifiers]
         name = name.token
         return klass(modifiers, name, extends, interfaces, body)
 
@@ -69,13 +74,20 @@ class BuilderVisitor(object):
         return klass(modifiers, m_type, decl)
 
     def CreateInterfaceDecl(self, klass, node):
-        name = node[2].token
-        extends_interface = ''
-        body = self.VisitParseTreeNode(node[3])
-        if node[3].rule.lhs != 'InterfaceBody':
-            extends_interface = body
-            body = self.VisitParseTreeNode(node[4])
+        (name, extends_interface, body) = self._resolve(node, 'ID', 
+                '+ExtendsInterfaces', 'InterfaceBody')
+        name = name.token
+        extends_interface = [x[0][0].name for x in extends_interface]
         return klass(name, extends_interface, body)
+
+    def CreateName(self, klass, node):
+        if node.rule.lhs == 'Name':
+            return self.CreateName(klass, node[0])
+        elif node.rule.lhs == 'SimpleName':
+            return klass([node[0].token])
+        else:
+            lhs = self.CreateName(klass, node[0])
+            return klass(lhs.name + [node[-1].token])
 
     def CreateFieldDecl(self, klass, node):
         modifiers, decl_type, var_decl = self._resolve(
