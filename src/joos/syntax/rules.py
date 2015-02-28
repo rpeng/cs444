@@ -24,7 +24,8 @@ rules_map = {
     'BlockStatement': BlockStatement,
     'Statement': Statement,
     'StatementNoShortIf': Statement,
-    'StatementWithoutTrailingSubstatement': StatementWithoutTrailingSubstatement,
+    'StatementWithoutTrailingSubstatement':
+        StatementWithoutTrailingSubstatement,
     'IfThenStatement': IfThenStatement,
     'IfThenElseStatement': IfThenElseStatement,
     'IfThenElseStatementNoShortIf': IfThenElseStatement,

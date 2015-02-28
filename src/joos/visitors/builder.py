@@ -74,8 +74,8 @@ class BuilderVisitor(object):
         return klass(modifiers, m_type, decl)
 
     def CreateInterfaceDecl(self, klass, node):
-        (name, extends_interface, body) = self._resolve(node, 'ID', 
-                '+ExtendsInterfaces', 'InterfaceBody')
+        (name, extends_interface, body) = self._resolve(
+            node, 'ID', '+ExtendsInterfaces', 'InterfaceBody')
         name = name.token
         extends_interface = [x[0][0].name for x in extends_interface]
         return klass(name, extends_interface, body)

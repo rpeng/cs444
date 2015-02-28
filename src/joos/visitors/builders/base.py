@@ -1,6 +1,8 @@
 from compiler.parser import ParseTreeNode
 from joos.syntax import rules_map
-from joos.visitors.builders import ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin
+from joos.visitors.builders import (ExprBuilderMixin,
+                                    DeclBuilderMixin, StmtBuilderMixin)
+
 
 class BuilderVisitor(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
     def _resolve(self, node, *accessors):

@@ -17,6 +17,7 @@ class AbstractSyntaxNode(object):
     def __getitem__(self, idx):
         return self.children[idx]
 
+
 class CompilationUnit(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -30,6 +31,7 @@ class CompilationUnit(AbstractSyntaxNode):
         self.import_decls = import_decls
         self.type_decls = type_decls
 
+
 class PackageDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -40,6 +42,7 @@ class PackageDecl(AbstractSyntaxNode):
 
     def __init__(self, name):
         self.name = name
+
 
 class ImportDecl(AbstractSyntaxNode):
     @classmethod
@@ -52,10 +55,12 @@ class ImportDecl(AbstractSyntaxNode):
     def __init__(self, name):
         self.name = name
 
+
 class TypeDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateTypeDecl(cls, node)
+
 
 class ClassDecl(AbstractSyntaxNode):
     @classmethod
@@ -66,7 +71,7 @@ class ClassDecl(AbstractSyntaxNode):
         visitor.VisitClassDecl(self)
 
     def __init__(self, modifiers, name, extends, interfaces, field_decls,
-            method_decls, constructor_decls):
+                 method_decls, constructor_decls):
         self.modifiers = modifiers
         self.name = name  # token
         self.extends = extends
@@ -77,6 +82,7 @@ class ClassDecl(AbstractSyntaxNode):
 
     def __repr__(self):
         return "ClassDecl: '{}'".format(self.name)
+
 
 class MethodDecl(AbstractSyntaxNode):
     @classmethod
@@ -89,6 +95,7 @@ class MethodDecl(AbstractSyntaxNode):
     def __init__(self, header, body):
         self.header = header
         self.body = body
+
 
 class MethodHeader(AbstractSyntaxNode):
     @classmethod
@@ -104,6 +111,7 @@ class MethodHeader(AbstractSyntaxNode):
         self.m_id = m_id
         self.m_param = m_param
 
+
 class InterfaceDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -117,6 +125,7 @@ class InterfaceDecl(AbstractSyntaxNode):
         self.extends_interface = extends_interface
         self.method_headers = method_headers
 
+
 class FieldDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -129,6 +138,7 @@ class FieldDecl(AbstractSyntaxNode):
         self.modifiers = modifiers
         self.f_type = f_type
         self.var_decl = var_decl
+
 
 class ConstructorDecl(AbstractSyntaxNode):
     @classmethod
@@ -144,6 +154,7 @@ class ConstructorDecl(AbstractSyntaxNode):
         self.params = params
         self.body = body
 
+
 class VariableDecl(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -155,6 +166,7 @@ class VariableDecl(AbstractSyntaxNode):
     def __init__(self, var_id, exp):
         self.var_id = var_id
         self.exp = exp
+
 
 class Parameter(AbstractSyntaxNode):
     @classmethod
@@ -168,6 +180,7 @@ class Parameter(AbstractSyntaxNode):
         self.p_type = p_type
         self.var_id = var_id
 
+
 class Type(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -178,6 +191,7 @@ class Type(AbstractSyntaxNode):
 
     def __init__(self, t_type):
         self.t_type = t_type
+
 
 class PrimitiveType(AbstractSyntaxNode):
     @classmethod
@@ -190,6 +204,7 @@ class PrimitiveType(AbstractSyntaxNode):
     def __init__(self, t_type):
         self.t_type = t_type
 
+
 class Name(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -200,6 +215,7 @@ class Name(AbstractSyntaxNode):
 
     def __init__(self, name):
         self.name = name
+
 
 class MethodInvocation(AbstractSyntaxNode):
     @classmethod
@@ -213,6 +229,7 @@ class MethodInvocation(AbstractSyntaxNode):
         self.primary = primary
         self.name = name
         self.args = args
+
 
 class Block(AbstractSyntaxNode):
     @classmethod

@@ -1,4 +1,3 @@
-
 def _err(token, msg):
     string = "Row {} col {}: {}".format(token.row, token.col, msg)
     raise RuntimeError(string)
@@ -12,7 +11,7 @@ class WeederVisitor(object):
         for child in node.children:
             if child:
                 child.visit(self)
-    
+
     def VisitCompilationUnit(self, node):
         pass
 
@@ -41,7 +40,7 @@ class WeederVisitor(object):
             md.visit(self)
         for cd in node.constructor_decls:
             cd.visit(self)
-    
+
     def VisitMethodDecl(self, node):
         modifiers = [x.lexeme for x in node.header.modifiers]
         if (('abstract' in modifiers or 'native' in modifiers) and
@@ -71,11 +70,11 @@ class WeederVisitor(object):
                  + self.filename)
         if node.method_headers:
             modifiers = [x.lexeme for x in node.method_headers.modifiers]
-            if ('static' in modifiers or 'final' in modifiers 
+            if ('static' in modifiers or 'final' in modifiers
                     or 'native' in modifiers):
                 _err(node.modifiers[0],
-                 'An interface method cannot be static, final, or native')
-    
+                     'An interface method cannot be static, final, or native')
+
     def VisitFieldDecl(self, node):
         modifiers = [x.lexeme for x in node.modifiers]
         if 'final' in modifiers and node.var_decl is None:
@@ -84,48 +83,42 @@ class WeederVisitor(object):
             _err(node.f_type, "Package cannot have private field")
         if node.var_decl:
             node.var_decl.visit(self)
-    
+
     def VisitConstructorDecl(self, node):
         pass
-    
+
     def VisitVariableDecl(self, node):
         pass
-    
+
     def VisitParameter(self, node):
         pass
-    
+
     def VisitType(self, node):
         pass
 
     def VisitName(self, node):
         pass
-    
-    ### Statement ###
+
+    # Statement
     def VisitIfThenStatement(self, node):
         pass
-    
+
     def VisitIfThenElseStatement(self, node):
         pass
-    
+
     def VisitWhileStatement(self, node):
         pass
-    
+
     def VisitForStatement(self, node):
         pass
-    
+
     def VisitLocalVarDecl(self, node):
         pass
-    
 
-    ### Expression ###
+    # Expression
     def VisitLiteral(self, node):
         if node.token.token_type == 'INT' and node.token.lexeme > 2147483647:
             _err(node.l_type, "Integer overflowed")
 
-
-   
     def VisitExpression(self, node):
         pass
-
-
-

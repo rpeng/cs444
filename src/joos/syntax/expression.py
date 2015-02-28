@@ -1,9 +1,11 @@
 from joos.syntax.abstract import AbstractSyntaxNode
 
+
 class Expression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateExpression(cls, node)
+
 
 class Assignment(AbstractSyntaxNode):
     @classmethod
@@ -17,6 +19,7 @@ class Assignment(AbstractSyntaxNode):
         self.lhs = lhs
         self.exp = exp
 
+
 class ConditionalOrExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -28,6 +31,7 @@ class ConditionalOrExpression(AbstractSyntaxNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
+
 
 class ConditionalAndExpression(AbstractSyntaxNode):
     @classmethod
@@ -41,6 +45,7 @@ class ConditionalAndExpression(AbstractSyntaxNode):
         self.left = left
         self.right = right
 
+
 class InclusiveOrExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -53,6 +58,7 @@ class InclusiveOrExpression(AbstractSyntaxNode):
         self.left = left
         self.right = right
 
+
 class AndExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -64,6 +70,7 @@ class AndExpression(AbstractSyntaxNode):
     def __init__(self, left, right):
         self.left = left
         self.right = right
+
 
 class EqualityExpression(AbstractSyntaxNode):
     @classmethod
@@ -78,6 +85,7 @@ class EqualityExpression(AbstractSyntaxNode):
         self.operator = operator
         self.right = right
 
+
 class RelationalExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -90,6 +98,7 @@ class RelationalExpression(AbstractSyntaxNode):
         self.left = left
         self.operator = operator
         self.right = right
+
 
 class AdditiveExpression(AbstractSyntaxNode):
     @classmethod
@@ -104,6 +113,7 @@ class AdditiveExpression(AbstractSyntaxNode):
         self.operator = operator
         self.right = right
 
+
 class MultiplicativeExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -117,6 +127,7 @@ class MultiplicativeExpression(AbstractSyntaxNode):
         self.operator = operator
         self.right = right
 
+
 class UnaryExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -128,6 +139,7 @@ class UnaryExpression(AbstractSyntaxNode):
     def __init__(self, sign, right):
         self.sign = sign
         self.right = right
+
 
 class UnaryExpressionNotPlusMinus(AbstractSyntaxNode):
     @classmethod
@@ -141,6 +153,7 @@ class UnaryExpressionNotPlusMinus(AbstractSyntaxNode):
         self.sign = sign
         self.right = right
 
+
 class CastExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -152,6 +165,7 @@ class CastExpression(AbstractSyntaxNode):
     def __init__(self, cast_type, exp):
         self.cast_type = cast_type
         self.exp = exp
+
 
 class FieldAccess(AbstractSyntaxNode):
     @classmethod
@@ -165,6 +179,7 @@ class FieldAccess(AbstractSyntaxNode):
         self.primary = primary
         self.name = name
 
+
 class ArrayAccess(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -177,25 +192,30 @@ class ArrayAccess(AbstractSyntaxNode):
         self.name = name
         self.exp = exp
 
+
 class Primary(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreatePrimary(cls, node)
+
 
 class PrimaryNoNewArray(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreatePrimaryNoNewArray(cls, node)
 
+
 class ReferenceType(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateReferenceType(cls, node)
 
+
 class ArrayType(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateArrayType(cls, node)
+
 
 class ArrayCreationExpression(AbstractSyntaxNode):
     @classmethod
@@ -209,6 +229,7 @@ class ArrayCreationExpression(AbstractSyntaxNode):
         self.p_type = p_type
         self.exp = exp
 
+
 class Literal(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
@@ -220,10 +241,12 @@ class Literal(AbstractSyntaxNode):
     def __init__(self, token):
         self.token = token
 
+
 class StatementExpression(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateStatementExpression(cls, node)
+
 
 class ClassInstanceCreationExpression(AbstractSyntaxNode):
     @classmethod

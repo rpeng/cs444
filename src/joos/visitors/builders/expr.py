@@ -5,92 +5,93 @@ class ExprBuilderMixin(object):
         return self.VisitParseTreeNode(node[0])
 
     def CreateAssignment(self, klass, node):
-        (lhs, exp) = self._resolve(node, 'LeftHandSide', 'AssignmentExpression')
+        (lhs, exp) = self._resolve(
+            node, 'LeftHandSide', 'AssignmentExpression')
         if lhs.rule.rhs == ['Name']:
             lhs = lhs[0].name
         else:
-            lhs = lhs[0] # FieldAccess ArrayAccess
+            lhs = lhs[0]  # FieldAccess ArrayAccess
         return klass(lhs, exp)
 
     def CreateConditionalOrExpression(self, klass, node):
         if node.rule.rhs[0] == 'ConditionalAndExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'ConditionalOrExpression', 
-                    'ConditionalAndExpression')
+            (left, right) = self._resolve(
+                node, 'ConditionalOrExpression', 'ConditionalAndExpression')
             return klass(left, right)
 
     def CreateConditionalAndExpression(self, klass, node):
         if node.rule.rhs[0] == 'InclusiveOrExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'ConditionalAndExpression', 
-                    'InclusiveOrExpression')
+            (left, right) = self._resolve(
+                node, 'ConditionalAndExpression', 'InclusiveOrExpression')
             return klass(left, right)
 
     def CreateInclusiveOrExpression(self, klass, node):
         if node.rule.rhs[0] == 'AndExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'InclusiveOrExpression', 
-                    'AndExpression')
+            (left, right) = self._resolve(
+                node, 'InclusiveOrExpression', 'AndExpression')
             return klass(left, right)
-    
+
     def CreateAndExpression(self, klass, node):
         if node.rule.rhs[0] == 'EqualityExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'AndExpression', 
-                    'EqualityExpression')
+            (left, right) = self._resolve(
+                node, 'AndExpression', 'EqualityExpression')
             return klass(left, right)
-    
+
     def CreateEqualityExpression(self, klass, node):
         if node.rule.rhs[0] == 'RelationalExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'EqualityExpression', 
-                    'RelationalExpression')
+            (left, right) = self._resolve(
+                node, 'EqualityExpression', 'RelationalExpression')
             operator = node[1].token
             return klass(left, operator, right)
-    
+
     def CreateRelationalExpression(self, klass, node):
         if node.rule.rhs[0] == 'AdditiveExpression':
             return self.VisitParseTreeNode(node[0])
         else:
             if node.rule.rhs[1] == 'instanceof':
-                (left, right) = self._resolve(node, 'RelationalExpression', 
-                        'ReferenceType')
+                (left, right) = self._resolve(
+                    node, 'RelationalExpression', 'ReferenceType')
             else:
-                (left, right) = self._resolve(node, 'RelationalExpression', 
-                        'AdditiveExpression')
+                (left, right) = self._resolve(
+                    node, 'RelationalExpression', 'AdditiveExpression')
             operator = node[1].token
             return klass(left, operator, right)
-    
+
     def CreateAdditiveExpression(self, klass, node):
         if node.rule.rhs[0] == 'MultiplicativeExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'AdditiveExpression', 
-                        'MultiplicativeExpression')
+            (left, right) = self._resolve(
+                node, 'AdditiveExpression', 'MultiplicativeExpression')
             operator = node[1].token
             return klass(left, operator, right)
-    
+
     def CreateMultiplicativeExpression(self, klass, node):
         if node.rule.rhs[0] == 'UnaryExpression':
             return self.VisitParseTreeNode(node[0])
         else:
-            (left, right) = self._resolve(node, 'MultiplicativeExpression', 
-                        'UnaryExpression')
+            (left, right) = self._resolve(
+                node, 'MultiplicativeExpression', 'UnaryExpression')
             operator = node[1].token
             return klass(left, operator, right)
-    
+
     def CreateUnaryExpression(self, klass, node):
         if node.rule.rhs[0] == 'UnaryExpressionOrMaxInt':
             (sign, right) = self._resolve(node, '-', 'UnaryExpressionOrMaxInt')
             return klass(sign, right[0])
         else:
             return self.VisitParseTreeNode(node[0])
-    
+
     def CreateUnaryExpressionNotPlusMinus(self, klass, node):
         if node.rule.rhs[0] == '!':
             (sign, right) = self._resolve(node, '!', 'UnaryExpression')
@@ -99,19 +100,19 @@ class ExprBuilderMixin(object):
             return self.VisitParseTreeNode(node[0][0])
         else:
             return self.VisitParseTreeNode(node[0])
-    
+
     def CreateCastExpression(self, klass, node):
         if node.rule.rhs[-1] == 'UnaryExpression':
-            (p_type, exp) = self._resolve(node, 'PrimitiveType',
-                    'UnaryExpression')
+            (p_type, exp) = self._resolve(
+                node, 'PrimitiveType', 'UnaryExpression')
             return klass(p_type, exp)
         elif node.rule.rhs[1] == 'Expression':
-            (name, exp) = self._resolve(node, 'Expression', 
-                    'UnaryExpressionNotPlusMinus')
+            (name, exp) = self._resolve(
+                node, 'Expression', 'UnaryExpressionNotPlusMinus')
             return klass(name, exp)
         else:
-            (name, exp) = self._resolve(node, 'Name',
-                    'UnaryExpressionNotPlusMinus')
+            (name, exp) = self._resolve(
+                node, 'Name', 'UnaryExpressionNotPlusMinus')
             return klass(name, exp)
 
     def CreateArrayAccess(self, klass, node):
@@ -119,7 +120,8 @@ class ExprBuilderMixin(object):
             (name, exp) = self._resolve(node, 'Name', 'Expression')
             return klass(name, exp)
         else:
-            (name, exp) = self._resolve(node, 'PrimaryNoNewArray', 'Expression')
+            (name, exp) = self._resolve(
+                node, 'PrimaryNoNewArray', 'Expression')
             return klass(name, exp)
 
     def CreatePrimaryNoNewArray(self, klass, node):
@@ -151,7 +153,7 @@ class ExprBuilderMixin(object):
             return klass(node.token)
         else:
             return klass(node[0].token)
-    
+
     def CreateArrayCreationExpression(self, klass, node):
         (p_type, exp) = self._resolve(node[0], 'PrimitiveType', 'DimExpr')
         exp = exp[1]
@@ -164,4 +166,3 @@ class ExprBuilderMixin(object):
         (class_type, args) = self._resolve(node, 'ClassType', '+ArgumentList')
         class_type = class_type[0][0].name
         return klass(class_type, args)
-
