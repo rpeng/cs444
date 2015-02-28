@@ -26,10 +26,10 @@ ClassBodyDeclaration -> ConstructorDeclaration
 ClassMemberDeclaration -> FieldDeclaration
 ClassMemberDeclaration -> MethodDeclaration
 
-FieldDeclaration -> Modifiers? Type VariableDeclarators ;
+FieldDeclaration -> Modifiers? Type VariableDeclarator ;
 
 ## imports
-# VariableDeclarators : variable
+# VariableDeclarator : variable
 # Modifiers : main
 # Type : types
 

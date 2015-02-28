@@ -1,5 +1,4 @@
 {{nonterminals}}
-VariableDeclarators
 VariableDeclarator
 VariableDeclaratorId
 VariableInitializer
@@ -7,16 +6,10 @@ ArrayInitializer
 VariableInitializers
 
 {{rules}}
-VariableDeclarators -> VariableDeclarator
-
 VariableDeclarator -> VariableDeclaratorId
 VariableDeclarator -> VariableDeclaratorId = VariableInitializer
 
 VariableDeclaratorId -> ID
 
 VariableInitializer -> Expression
-
-VariableInitializers -> VariableInitializer
-VariableInitializers -> VariableInitializers , VariableInitializer
-
 

@@ -20,7 +20,6 @@ ClassInstanceCreationExpression
 FieldAccess
 MethodInvocation
 ArrayAccess
-DimExprs
 DimExpr
 Dims
 ArgumentList
@@ -90,9 +89,6 @@ PrimaryNoNewArray -> ArrayAccess
 
 ArrayCreationExpression -> new PrimitiveType DimExpr Dims?
 ArrayCreationExpression -> new ClassOrInterfaceType DimExpr Dims?
-
-DimExprs -> DimExpr
-DimExprs -> DimExprs DimExpr
 
 DimExpr -> [ Expression ]
 

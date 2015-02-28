@@ -31,7 +31,7 @@ BlockStatement -> LocalVariableDeclarationStatement
 BlockStatement -> Statement
 
 LocalVariableDeclarationStatement -> LocalVariableDeclaration ;
-LocalVariableDeclaration -> Type VariableDeclarators
+LocalVariableDeclaration -> Type VariableDeclarator
 
 ### Modifiers ###
 {{nonterminals}}
@@ -67,4 +67,4 @@ Literal -> null
 # Name               : names
 # ImportDeclarations : import_decls
 # Type : types
-# VariableDeclarators : variable
+# VariableDeclarator : variable

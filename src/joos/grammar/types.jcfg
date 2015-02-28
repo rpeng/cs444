@@ -4,7 +4,6 @@ TypeDeclarations
 TypeDeclaration
 PrimitiveType
 ReferenceType
-NumericType
 IntegralType
 ClassOrInterfaceType
 ArrayType
@@ -19,12 +18,10 @@ TypeDeclaration -> ;
 Type -> PrimitiveType
 Type -> ReferenceType
 
-PrimitiveType -> NumericType
+PrimitiveType -> IntegralType
 PrimitiveType -> boolean
 
 # omit floating point type b/c joos do not support it
-NumericType -> IntegralType
-
 IntegralType -> byte
 IntegralType -> short
 IntegralType -> int

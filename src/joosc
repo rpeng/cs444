@@ -9,15 +9,16 @@ JOOS_LR1_FILE = 'generated/joos.lr1'
 
 def Main(input_file):
     with open(input_file) as f:
-        try:
+#        try:
             tokens = ScanInput(f.read())
             tokens = PrepareTokens(tokens)
             parse_tree = Parse(tokens, JOOS_LR1_FILE)
+            print parse_tree.StrTree()
             ast = BuildAST(parse_tree)
             Weed(ast)
-        except Exception, e:
-            print >> sys.stderr, str(e)
-            sys.exit(42)
+#        except Exception, e:
+#            print >> sys.stderr, str(e)
+#            sys.exit(42)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import sys
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
-from joos.visitors.builder import BuilderVisitor
+from joos.visitors.builders import BuilderVisitor
 from joos.visitors.weeder import WeederVisitor
 from compiler.errors import *
 from compiler import scanner, parser

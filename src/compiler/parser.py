@@ -11,7 +11,7 @@ class ParseTreeNode(object):
         else:
             self.children = children
         self.rhs_map = {}
-        if rule and rule.rhs:
+        if rule is not None and rule.rhs:
             self.rhs_map = dict(
                 [(t, self.children[i]) for i, t in enumerate(rule.rhs)
                  if i < len(self.children)])
