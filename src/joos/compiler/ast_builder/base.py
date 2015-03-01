@@ -70,7 +70,7 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
         (integral_type, boolean) = self._resolve(
             node, 'IntegralType', 'boolean')
         if boolean is not None:
-            return klass(boolean.token) 
+            return klass(boolean.token)
         else:
             return klass(integral_type[0].token)
 

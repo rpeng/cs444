@@ -37,7 +37,6 @@ class AbstractSyntaxNode(object):
                         result += node.StrTree(indent + 4)
         return result
 
-
     def __repr__(self):
         return self.__class__.__name__
 
