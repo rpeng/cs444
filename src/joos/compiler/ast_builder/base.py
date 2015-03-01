@@ -39,6 +39,12 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
             if new_node:
                 new_node.InitializeDefaults(node)
             return new_node
+        elif node.token and node.token.token_type in rules_map:
+            klass = rules_map[node.token.token_type]
+            new_node = klass.create(self, node)
+            if new_node:
+                new_node.InitializeDefaults(node)
+            return new_node 
         else:
             children = []
             if node.children:
@@ -73,6 +79,9 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
             return klass(boolean.token)
         else:
             return klass(integral_type[0].token)
+
+    def CreateVoidType(self, klass, node):
+        return klass()
 
     def CreateName(self, klass, node):
         if node.rule.lhs == 'Name':

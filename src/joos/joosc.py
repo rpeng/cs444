@@ -51,7 +51,7 @@ def Parse(tokens, lr1_grammar_file):
     with open(lr1_grammar_file) as f:
         cfg, parse_table = parser.FromLr1(f)
     try:
-        return parser.Parse(cfg, parse_table, tokens)
+        return parser.Parse(cfg, parse_table, tokens)[1]
     except ParseErrorWithToken, e:
         if e.token.token_type == t.EOF:
             raise RuntimeError(("Unexpected token at end of file. "

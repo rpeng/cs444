@@ -20,6 +20,9 @@ class ASTVisitor(object):
     def VisitClassOrInterfaceType(self, node):
         return self.DefaultBehaviour(node)
 
+    def VisitVoidType(self, node):
+        return self.DefaultBehaviour(node)
+
     def VisitPrimitiveType(self, node):
         return self.DefaultBehaviour(node)
 

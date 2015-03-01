@@ -72,7 +72,7 @@ class DeclBuilderMixin(object):
         (m_id, params) = self._resolve(decl, 'ID', '+FormalParameterList')
         modifiers = [x[0].token for x in modifiers]
         if not m_type:
-            m_type = node[1].token
+            m_type = self.VisitParseTreeNode(node[1])
         m_id = m_id.token
         return klass(modifiers, m_type, m_id, params)
 

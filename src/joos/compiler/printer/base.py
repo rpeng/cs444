@@ -1,7 +1,7 @@
 from joos.compiler.printer import *
 from joos.syntax import ASTVisitor
 
-class ASTPrinter(DeclPrinterMixin, ASTVisitor):
+class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin, ExprPrinterMixin, ASTVisitor):
     def __init__(self, indent=0):
         self.indent = indent
 
@@ -24,7 +24,15 @@ class ASTPrinter(DeclPrinterMixin, ASTVisitor):
         if tokens:
             return ", ".join([x.lexeme for x in tokens])
 
+    def n(self, node, indent_add=4):
+        # Resolves an AST node
+        if node:
+            return ASTPrinter(self.indent+indent_add).Visit(node)
+        else:
+            return "{i}None".format(i=self.i() + " "*indent_add)
+
     def ns(self, list_to_check, indent_add=4):
+        # Resolves a list of AST nodes
         if list_to_check:
             return '\n'.join([ASTPrinter(self.indent+indent_add).Visit(x)
                               for x in list_to_check])
@@ -47,7 +55,10 @@ class ASTPrinter(DeclPrinterMixin, ASTVisitor):
         return node.type_or_name.visit(self) + "[]"
 
     def VisitClassOrInterfaceType(self, node):
-        return self.DefaultBehaviour(node)
+        return self.r(node.name)
+
+    def VisitVoidType(self, node):
+        return 'void'
 
     def VisitPrimitiveType(self, node):
         return node.t_type.lexeme
@@ -56,4 +67,5 @@ class ASTPrinter(DeclPrinterMixin, ASTVisitor):
         return self.r(node.name)
 
     def VisitLiteral(self, node):
-        return self.DefaultBehaviour(node)
+        return """{i}Literal: {value}""".format(i=self.i(),
+                                                value=node.value.lexeme)

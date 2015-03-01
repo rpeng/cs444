@@ -7,6 +7,7 @@ rules_map = {
     'ArrayType': ArrayType,
     'ClassOrInterfaceType': ClassOrInterfaceType,
     'PrimitiveType': PrimitiveType,
+    'void': VoidType,
     'Name': Name,
     'Literal': Literal,
     '2147483648': Literal,

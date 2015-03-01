@@ -107,6 +107,16 @@ class PrimitiveType(Type):
         self.t_type = t_type  # token
 
 
+class VoidType(Type):
+    # void
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateVoidType(cls, node)
+
+    def visit(self, visitor):
+        return visitor.VisitVoidType(self)
+
+
 class Name(AbstractSyntaxNode):
     # a.b.c.d
 
@@ -134,5 +144,5 @@ class Literal(AbstractSyntaxNode):
     def visit(self, visitor):
         return visitor.VisitLiteral(self)
 
-    def __init__(self, token):
-        self.token = token  # token
+    def __init__(self, value):
+        self.value = value  # token
