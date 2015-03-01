@@ -8,6 +8,9 @@ class ASTVisitor(object):
         return self.DefaultBehaviour(node)
 
     # Base
+    def Visit(self, node):  # Entry point
+        return node.visit(self)
+
     def VisitCompilationUnit(self, node):
         return self.DefaultBehaviour(node)
 

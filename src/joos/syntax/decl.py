@@ -7,7 +7,7 @@ class PackageDecl(AbstractSyntaxNode):
         return visitor.CreatePackageDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitPackageDecl(self)
+        return visitor.VisitPackageDecl(self)
 
     def __init__(self, name):
         self.name = name  # Name
@@ -22,7 +22,7 @@ class ImportDecl(AbstractSyntaxNode):
         return visitor.CreateImportDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitImportDecl(self)
+        return visitor.VisitImportDecl(self)
 
     def __init__(self, name, import_type):
         self.name = name  # Name
@@ -42,7 +42,7 @@ class ClassDecl(TypeDecl):
         return visitor.CreateClassDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitClassDecl(self)
+        return visitor.VisitClassDecl(self)
 
     def __init__(self, modifiers, name, extends, interfaces, field_decls,
                  method_decls, constructor_decls):
@@ -61,7 +61,7 @@ class InterfaceDecl(TypeDecl):
         return visitor.CreateInterfaceDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitInterfaceDecl(self)
+        return visitor.VisitInterfaceDecl(self)
 
     def __init__(self, name, extends_interface, method_headers):
         self.name = name  # token
@@ -75,7 +75,7 @@ class MethodDecl(AbstractSyntaxNode):
         return visitor.CreateMethodDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitMethodDecl(self)
+        return visitor.VisitMethodDecl(self)
 
     def __init__(self, header, body_block):
         self.header = header  # MethodHeader
@@ -88,7 +88,7 @@ class MethodHeader(AbstractSyntaxNode):
         return visitor.CreateMethodHeader(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitMethodHeader(self)
+        return visitor.VisitMethodHeader(self)
 
     def __init__(self, modifiers, m_type, m_id, params):
         self.modifiers = modifiers  # token[]
@@ -103,7 +103,7 @@ class FieldDecl(AbstractSyntaxNode):
         return visitor.CreateFieldDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitFieldDecl(self)
+        return visitor.VisitFieldDecl(self)
 
     def __init__(self, modifiers, f_type, var_decl):
         self.modifiers = modifiers  # token[]
@@ -117,7 +117,7 @@ class ConstructorDecl(AbstractSyntaxNode):
         return visitor.CreateConstructorDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitConstructorDecl(self)
+        return visitor.VisitConstructorDecl(self)
 
     def __init__(self, modifiers, name, params, body):
         self.modifiers = modifiers  # token[]
@@ -132,7 +132,7 @@ class VariableDeclarator(AbstractSyntaxNode):
         return visitor.CreateVariableDeclarator(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitVariableDeclarator(self)
+        return visitor.VisitVariableDeclarator(self)
 
     def __init__(self, var_id, exp):
         self.var_id = var_id  # token
@@ -145,7 +145,7 @@ class LocalVarDecl(AbstractSyntaxNode):
         return visitor.CreateLocalVarDecl(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitLocalVarDecl(self)
+        return visitor.VisitLocalVarDecl(self)
 
     def __init__(self, l_type, var_decl):
         self.l_type = l_type  # Type
@@ -158,7 +158,7 @@ class Parameter(AbstractSyntaxNode):
         return visitor.CreateParameter(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitParameter(self)
+        return visitor.VisitParameter(self)
 
     def __init__(self, p_type, var_id):
         self.p_type = p_type  # Type

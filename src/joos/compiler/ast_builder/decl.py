@@ -21,28 +21,32 @@ class DeclBuilderMixin(object):
     def CreateClassDecl(self, klass, node):
         (modifiers, name, extends, interfaces, body) = self._resolve(
             node, '+Modifiers', 'ID', 'Super', 'Interfaces', 'ClassBody')
-        modifiers = [x[0].token for x in modifiers]  # Modifier
+        if modifiers:
+            modifiers = [x[0].token for x in modifiers]  # Modifier
         name = name.token
         # ClassType, ClassOrInterfaceType, Name
-        extends = extends[1][0].name
+        if extends:
+            extends = extends[1][0].name
 
-        (interfaces,) = self._resolve(interfaces, '+InterfaceTypeList')
-        # ClassOrInterfaceType, Name
-        interfaces = [x[0].name for x in interfaces]
+        if interfaces:
+            (interfaces,) = self._resolve(interfaces, '+InterfaceTypeList')
+            # ClassOrInterfaceType, Name
+            interfaces = [x[0].name for x in interfaces]
 
         (body,) = self._resolve(body, '+ClassBodyDeclarations')
         field_decls = []
         method_decls = []
         constructor_decls = []
-        for class_body in body:
-            if class_body.rule.rhs == ['ClassMemberDeclaration']:
-                decl = class_body[0]
-                if decl.rule.rhs == ['FieldDeclaration']:
-                    field_decls.append(decl[0])
-                else:  # MethodDeclaration
-                    method_decls.append(decl[0])
-            else:  # ConstructorDeclaration
-                constructor_decls.append(class_body[0])
+        if body:
+            for class_body in body:
+                if class_body.rule.rhs == ['ClassMemberDeclaration']:
+                    decl = class_body[0]
+                    if decl.rule.rhs == ['FieldDeclaration']:
+                        field_decls.append(decl[0])
+                    else:  # MethodDeclaration
+                        method_decls.append(decl[0])
+                else:  # ConstructorDeclaration
+                    constructor_decls.append(class_body[0])
         return klass(modifiers, name, extends, interfaces, field_decls,
                      method_decls, constructor_decls)
 

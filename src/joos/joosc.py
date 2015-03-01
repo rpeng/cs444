@@ -4,6 +4,7 @@ from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
 from joos.compiler.ast_builder import BuildAST
+from joos.compiler.printer import PrintAST
 from joos.compiler.weeder.weeder import WeederVisitor
 from lexer.errors import *
 from lexer import scanner, parser

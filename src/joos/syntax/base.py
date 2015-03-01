@@ -50,7 +50,7 @@ class CompilationUnit(AbstractSyntaxNode):
         return visitor.CreateCompilationUnit(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitCompilationUnit(self)
+        return visitor.VisitCompilationUnit(self)
 
     def __init__(self, pkg_decl, import_decls, type_decls):
         self.pkg_decl = pkg_decl  # Name
@@ -73,7 +73,7 @@ class ArrayType(Type):
         return visitor.CreateArrayType(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitArrayType(self)
+        return visitor.VisitArrayType(self)
 
     def __init__(self, type_or_name):
         self.type_or_name = type_or_name  # Type | Name
@@ -87,7 +87,7 @@ class ClassOrInterfaceType(Type):
         return visitor.CreateClassOrInterfaceType(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitClassOrInterfaceType(self)
+        return visitor.VisitClassOrInterfaceType(self)
 
     def __init__(self, name):
         self.name = name  # token[]
@@ -101,7 +101,7 @@ class PrimitiveType(Type):
         return visitor.CreatePrimitiveType(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitPrimitiveType(self)
+        return visitor.VisitPrimitiveType(self)
 
     def __init__(self, t_type):
         self.t_type = t_type  # token
@@ -115,10 +115,13 @@ class Name(AbstractSyntaxNode):
         return visitor.CreateName(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitName(self)
+        return visitor.VisitName(self)
 
     def __init__(self, name):
         self.name = name  # token[]
+
+    def __repr__(self):
+        return '.'.join([x.lexeme for x in self.name])
 
 
 class Literal(AbstractSyntaxNode):
@@ -129,7 +132,7 @@ class Literal(AbstractSyntaxNode):
         return visitor.CreateLiteral(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitLiteral(self)
+        return visitor.VisitLiteral(self)
 
     def __init__(self, token):
         self.token = token  # token

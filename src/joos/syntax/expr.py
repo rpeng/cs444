@@ -14,7 +14,7 @@ class AssignmentExpression(Expression):
         return visitor.CreateAssignmentExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitAssignmentExpression(self)
+        return visitor.VisitAssignmentExpression(self)
 
     def __init__(self, lhs, exp):
         self.lhs = lhs  # Name | FieldAccess | ArrayAccess
@@ -33,7 +33,7 @@ class BinaryExpression(Expression):
         return visitor.CreateBinaryExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitBinaryExpression(self)
+        return visitor.VisitBinaryExpression(self)
 
     def __init__(self, left, op, right):
         self.left = left  # Expression
@@ -50,7 +50,7 @@ class UnaryExpression(Expression):
         return visitor.CreateUnaryExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitUnaryExpression(self)
+        return visitor.VisitUnaryExpression(self)
 
     def __init__(self, sign, right):
         self.sign = sign  # token
@@ -63,7 +63,7 @@ class CastExpression(Expression):
         return visitor.CreateCastExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitCastExpression(self)
+        return visitor.VisitCastExpression(self)
 
     def __init__(self, cast_type, is_array, exp):
         self.cast_type = cast_type  # PrimitiveType | Expression | Name
@@ -77,7 +77,7 @@ class FieldAccess(Expression):
         return visitor.CreateFieldAccess(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitFieldAccess(self)
+        return visitor.VisitFieldAccess(self)
 
     def __init__(self, primary, name):
         self.primary = primary  # Primary
@@ -90,7 +90,7 @@ class ArrayAccess(Expression):
         return visitor.CreateArrayAccess(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitArrayAccess(self)
+        return visitor.VisitArrayAccess(self)
 
     def __init__(self, name_or_primary, exp):
         self.name_or_primary = name  # Name | Primary
@@ -110,7 +110,7 @@ class ThisExpression(Expression):
         return visitor.CreateThisExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitThisExpression(self)
+        return visitor.VisitThisExpression(self)
 
 
 class ArrayCreationExpression(Expression):
@@ -119,7 +119,7 @@ class ArrayCreationExpression(Expression):
         return visitor.CreateArrayCreationExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitArrayCreationExpression(self)
+        return visitor.VisitArrayCreationExpression(self)
 
     def __init__(self, a_type, exp):
         self.a_type = a_type  # PrimitiveType | ClassOrInterfaceType
@@ -139,7 +139,7 @@ class ClassInstanceCreationExpression(Expression):
         return visitor.CreateClassInstanceCreationExpression(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitClassInstanceCreationExpression(self)
+        return visitor.VisitClassInstanceCreationExpression(self)
 
     def __init__(self, class_type, args):
         self.class_type = class_type  # Name
@@ -152,7 +152,7 @@ class MethodInvocation(Expression):
         return visitor.CreateMethodInvocation(cls, node)
 
     def visit(self, visitor):
-        visitor.VisitMethodInvocation(self)
+        return visitor.VisitMethodInvocation(self)
 
     def __init__(self, name, primary, primary_id, args):
         # Methods are either Name, or primary + id

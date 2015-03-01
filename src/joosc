@@ -6,6 +6,7 @@ from joos.joosc import (ScanInput,
                         PrepareTokens,
                         Parse,
                         BuildAST,
+                        PrintAST,
                         Weed)
 
 JOOS_LR1_FILE = 'generated/joos.lr1'
@@ -22,6 +23,8 @@ def Main(input_file):
             ast = BuildAST(parse_tree)
             print "------ AST ------"
             print ast.StrTree()
+            print "------ Nice AST ------"
+            print PrintAST(ast)
             Weed(ast)
 #        except Exception, e:
 #            print >> sys.stderr, str(e)
