@@ -1,5 +1,5 @@
 from structs.cfg import Rule, CFG
-from compiler.errors import *
+from lexer.errors import *
 
 
 class ParseTreeNode(object):
@@ -26,6 +26,9 @@ class ParseTreeNode(object):
         for child in self.children:
             result += child.StrTree(indent + 2)
         return result
+
+    def Get(self, key):
+        return self.rhs_map.get(key)
 
     def __repr__(self):
         if not self.rule:

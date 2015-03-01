@@ -1,7 +1,7 @@
 from structs.regexp import *
 from structs.cfg import Token
-from compiler.errors import *
-from compiler.scanner import Scan
+from lexer.errors import *
+from lexer.scanner import Scan
 
 from nose.tools import *
 

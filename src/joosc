@@ -2,7 +2,11 @@
 
 import sys
 
-from joos.joosc import ScanInput, PrepareTokens, Parse, BuildAST, Weed
+from joos.joosc import (ScanInput,
+                        PrepareTokens,
+                        Parse,
+                        BuildAST,
+                        Weed)
 
 JOOS_LR1_FILE = 'generated/joos.lr1'
 
@@ -13,8 +17,11 @@ def Main(input_file):
             tokens = ScanInput(f.read())
             tokens = PrepareTokens(tokens)
             parse_tree = Parse(tokens, JOOS_LR1_FILE)
+            print "------ Parse tree ------"
             print parse_tree.StrTree()
             ast = BuildAST(parse_tree)
+            print "------ AST ------"
+            print ast.StrTree()
             Weed(ast)
 #        except Exception, e:
 #            print >> sys.stderr, str(e)

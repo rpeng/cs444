@@ -9,28 +9,12 @@ Start
 Start
 CompilationUnit
 PackageDeclaration
+LocalVariableDeclaration
 
 {{rules}}
 Start              -> BOF CompilationUnit EOF
 CompilationUnit    -> PackageDeclaration? ImportDeclarations? TypeDeclarations?
 PackageDeclaration -> package Name ;
-
-###### Static Initializer ######
-{{nonterminals}}
-Block
-BlockStatements
-BlockStatement
-LocalVariableDeclarationStatement
-LocalVariableDeclaration
-
-{{rules}}
-Block -> { BlockStatements? }
-BlockStatements -> BlockStatement
-BlockStatements -> BlockStatements BlockStatement
-BlockStatement -> LocalVariableDeclarationStatement
-BlockStatement -> Statement
-
-LocalVariableDeclarationStatement -> LocalVariableDeclaration ;
 LocalVariableDeclaration -> Type VariableDeclarator
 
 ### Modifiers ###

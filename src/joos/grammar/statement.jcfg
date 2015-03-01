@@ -1,6 +1,10 @@
 {{nonterminals}}
 Statement
 StatementWithoutTrailingSubstatement
+Block
+BlockStatements
+BlockStatement
+LocalVariableDeclarationStatement
 IfThenStatement
 IfThenElseStatement
 WhileStatement
@@ -11,11 +15,9 @@ ReturnStatement
 StatementNoShortIf
 ForInit
 ForUpdate
-StatementExpression
 IfThenElseStatementNoShortIf
 WhileStatementNoShortIf
 ForStatementNoShortIf
-StatementExpressionList
 
 {{rules}}
 Statement -> StatementWithoutTrailingSubstatement
@@ -28,6 +30,13 @@ StatementWithoutTrailingSubstatement -> Block
 StatementWithoutTrailingSubstatement -> EmptyStatement
 StatementWithoutTrailingSubstatement -> ExpressionStatement
 StatementWithoutTrailingSubstatement -> ReturnStatement
+
+Block -> { BlockStatements? }
+BlockStatements -> BlockStatement
+BlockStatements -> BlockStatements BlockStatement
+BlockStatement -> LocalVariableDeclarationStatement
+BlockStatement -> Statement
+LocalVariableDeclarationStatement -> LocalVariableDeclaration ;
 
 EmptyStatement -> ;
 
@@ -43,16 +52,12 @@ ExpressionStatement -> StatementExpression ;
 
 ReturnStatement -> return Expression? ;
 
-StatementExpression -> Assignment
-StatementExpression -> MethodInvocation
-StatementExpression -> ClassInstanceCreationExpression
-
 StatementNoShortIf -> StatementWithoutTrailingSubstatement
 StatementNoShortIf -> IfThenElseStatementNoShortIf
 StatementNoShortIf -> WhileStatementNoShortIf
 StatementNoShortIf -> ForStatementNoShortIf
 
-ForInit -> StatementExpressionList
+ForInit -> StatementExpression
 ForInit -> LocalVariableDeclaration
 
 ForUpdate -> StatementExpression
@@ -62,13 +67,3 @@ IfThenElseStatementNoShortIf -> if ( Expression ) StatementNoShortIf else Statem
 WhileStatementNoShortIf -> while ( Expression ) StatementNoShortIf
 
 ForStatementNoShortIf -> for ( ForInit? ; Expression? ; ForUpdate? ) StatementNoShortIf
-
-StatementExpressionList -> StatementExpression
-StatementExpressionList -> StatementExpressionList , StatementExpression
-
-
-
-
-
-
-

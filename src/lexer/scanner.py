@@ -1,6 +1,6 @@
 from structs.nfa import NFAExecutor
 from structs.cfg import Token
-from compiler.errors import *
+from lexer.errors import *
 
 
 class _MaximalMunchExecutor(object):

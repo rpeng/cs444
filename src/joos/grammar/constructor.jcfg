@@ -15,13 +15,13 @@ FormalParameterList -> FormalParameterList , FormalParameter
 
 FormalParameter -> Type VariableDeclaratorId
 
-ConstructorBody -> { BlockStatements? }
+ConstructorBody -> Block
 
 ### imports
 # SimpleName : names
 # Modifiers : main
 # VariableDeclaratorId : variable
 # Type : types
-# BlockStatements : main
+# Block : statement
 
 

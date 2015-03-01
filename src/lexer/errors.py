@@ -1,5 +1,3 @@
-
-
 class InvalidToken(Exception):
     def __init__(self, lexeme, row, col):
         self.lexeme = lexeme

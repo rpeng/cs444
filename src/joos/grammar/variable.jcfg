@@ -2,8 +2,6 @@
 VariableDeclarator
 VariableDeclaratorId
 VariableInitializer
-ArrayInitializer
-VariableInitializers
 
 {{rules}}
 VariableDeclarator -> VariableDeclaratorId
@@ -12,4 +10,3 @@ VariableDeclarator -> VariableDeclaratorId = VariableInitializer
 VariableDeclaratorId -> ID
 
 VariableInitializer -> Expression
-

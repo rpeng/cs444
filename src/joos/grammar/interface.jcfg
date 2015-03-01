@@ -7,7 +7,6 @@ ExtendsInterfaces
 InterfaceBody
 InterfaceMemberDeclarations
 InterfaceMemberDeclaration
-ConstantDeclaration
 
 {{rules}}
 Interfaces -> implements InterfaceTypeList

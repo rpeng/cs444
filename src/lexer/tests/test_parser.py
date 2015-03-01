@@ -1,10 +1,10 @@
 from structs.cfg import CFG, Token
-from compiler.parser import Parse, FromLr1
-from compiler.errors import *
+from lexer.parser import Parse, FromLr1
+from lexer.errors import *
 
 from nose.tools import *
 
-SAMPLE_LR1_PATH = 'compiler/tests/fixtures/sample.lr1'
+SAMPLE_LR1_PATH = 'lexer/tests/fixtures/sample.lr1'
 
 
 def _tokenate(a_list):

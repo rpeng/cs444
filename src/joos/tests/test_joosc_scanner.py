@@ -1,6 +1,6 @@
 from joos.joosc import ScanInput
 from structs.cfg import Token
-from compiler.errors import *
+from lexer.errors import *
 
 from nose.tools import *
 

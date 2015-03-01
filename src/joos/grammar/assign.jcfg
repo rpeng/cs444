@@ -2,7 +2,6 @@
 Assignment
 LeftHandSide
 AssignmentOperator
-AssignmentExpression
 
 {{rules}}
 Assignment -> LeftHandSide AssignmentOperator AssignmentExpression
@@ -12,6 +11,3 @@ LeftHandSide -> FieldAccess
 LeftHandSide -> ArrayAccess
 
 AssignmentOperator -> =
-
-AssignmentExpression -> ConditionalOrExpression
-AssignmentExpression -> Assignment

@@ -1,64 +1,80 @@
 from joos.syntax import *
 
 rules_map = {
-    # abstract ### ordered the same way as in abstract.py
+    # ----- Base -----
     'CompilationUnit': CompilationUnit,
-    'PackageDeclaration': PackageDecl,
-    'ImportDeclaration': ImportDecl,
-    'TypeDeclaration': TypeDecl,
-    'ClassDeclaration': ClassDecl,
-    'MethodDeclaration': MethodDecl,
-    'MethodHeader': MethodHeader,
-    'InterfaceDeclaration': InterfaceDecl,
-    'FieldDeclaration': FieldDecl,
-    'ConstructorDeclaration': ConstructorDecl,
-    'VariableDeclarator': VariableDecl,
-    'FormalParameter': Parameter,
-    'Type': Type,
+    'Type': Type,  # abstract
+    'ArrayType': ArrayType,
+    'ClassOrInterfaceType': ClassOrInterfaceType,
     'PrimitiveType': PrimitiveType,
     'Name': Name,
-    'MethodInvocation': MethodInvocation,
-    'Block': Block,
-
-    # statement
-    'BlockStatement': BlockStatement,
-    'Statement': Statement,
-    'StatementNoShortIf': Statement,
-    'StatementWithoutTrailingSubstatement':
-        StatementWithoutTrailingSubstatement,
-    'IfThenStatement': IfThenStatement,
-    'IfThenElseStatement': IfThenElseStatement,
-    'IfThenElseStatementNoShortIf': IfThenElseStatement,
-    'WhileStatement': WhileStatement,
-    'WhileStatementNoShortIf': WhileStatement,
-    'ForStatement': ForStatement,
-    'ForStatementNoShortIf': ForStatement,
-    'LocalVariableDeclarationStatement': LocalVarDecl,
-    'LocalVariableDeclaration': LocalVarDecl,
-
-    # expression
-    'Expression': Expression,
-    'Assignment': Assignment,
-    'ConditionalOrExpression': ConditionalOrExpression,
-    'ConditionalAndExpression': ConditionalAndExpression,
-    'InclusiveOrExpression': InclusiveOrExpression,
-    'AndExpression': AndExpression,
-    'EqualityExpression': EqualityExpression,
-    'RelationalExpression': RelationalExpression,
-    'AdditiveExpression': AdditiveExpression,
-    'MultiplicativeExpression': MultiplicativeExpression,
-    'UnaryExpression': UnaryExpression,
-    'UnaryExpressionNotPlusMinus': UnaryExpressionNotPlusMinus,
-    'CastExpression': CastExpression,
-    'StatementExpression': StatementExpression,
-    'FieldAccess': FieldAccess,
-    'ArrayAccess': ArrayAccess,
-    'Primary': Primary,
-    'PrimaryNoNewArray': PrimaryNoNewArray,
-    'ReferenceType': ReferenceType,
-    'ArrayType': ArrayType,
-    'ArrayCreationExpression': ArrayCreationExpression,
     'Literal': Literal,
     '2147483648': Literal,
+
+    # ----- Decl -----
+    'PackageDeclaration': PackageDecl,
+    'ImportDeclaration': ImportDecl,
+    'TypeDeclaration': TypeDecl,  # abstract
+    'ClassDeclaration': ClassDecl,
+    'InterfaceDeclaration': InterfaceDecl,
+    'MethodDeclaration': MethodDecl,
+    'MethodHeader': MethodHeader,
+    'FieldDeclaration': FieldDecl,
+    'ConstructorDeclaration': ConstructorDecl,
+    'VariableDeclarator': VariableDeclarator,
+    'LocalVariableDeclaration': LocalVarDecl,
+    'FormalParameter': Parameter,
+
+    # ----- Expression -----
+    'Expression': Expression,  # abstract
+
+    'AssignmentExpression': AssignmentExpression,
+    'Assignment': AssignmentExpression,
+
+    'ConditionalOrExpression': BinaryExpression,
+    'ConditionalAndExpression': BinaryExpression,
+    'InclusiveOrExpression': BinaryExpression,
+    'AndExpression': BinaryExpression,
+    'EqualityExpression': BinaryExpression,
+    'RelationalExpression': BinaryExpression,
+    'AdditiveExpression': BinaryExpression,
+    'MultiplicativeExpression': BinaryExpression,
+
+    'UnaryExpression': UnaryExpression,
+    'UnaryExpressionOrMaxInt': UnaryExpression,
+    'UnaryExpressionNotPlusMinus': UnaryExpression,
+
+    'CastExpression': CastExpression,
+    'FieldAccess': FieldAccess,
+    'ArrayAccess': ArrayAccess,
+
+    'Primary': Primary,  # Abstract
+    'PrimaryNoNewArray': Primary,
+
+    'this': ThisExpression,
+    'ArrayCreationExpression': ArrayCreationExpression,
+    'StatementExpression': StatementExpression,  # Abstract
     'ClassInstanceCreationExpression': ClassInstanceCreationExpression,
+    'MethodInvocation': MethodInvocation,
+
+    # ----- Statement -----
+    'Statement': Statement,  # Abstract
+    'ExpressionStatement': Statement,
+    'StatementWithoutTrailingSubstatement': Statement,
+    'StatementNoShortIf': Statement,
+    'EmptyStatement': Statement,
+
+    'Block': Block,
+
+    'IfThenElseStatement': IfThenElseStatement,
+    'IfThenStatement': IfThenElseStatement,
+    'IfThenElseStatementNoShortIf': IfThenElseStatement,
+
+    'WhileStatement': WhileStatement,
+    'WhileStatementNoShortIf': WhileStatement,
+
+    'ForStatement': ForStatement,
+    'ForStatementNoShortIf': ForStatement,
+
+    'LocalVariableDeclarationStatement': LocalVarDeclStatement,  # Abstract
 }
