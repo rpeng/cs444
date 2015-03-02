@@ -1,9 +1,12 @@
+from joos.syntax import *
+
+
 def _err(token, msg):
     string = "Row {} col {}: {}".format(token.row, token.col, msg)
     raise RuntimeError(string)
 
 
-class WeederVisitor(object):
+class WeederVisitor(ASTVisitor):
     def __init__(self, filename):
         self.filename = filename.split('/')[-1][:-5]
 
@@ -12,19 +15,21 @@ class WeederVisitor(object):
             if child:
                 child.visit(self)
 
-    def VisitCompilationUnit(self, node):
-        pass
+    def DefaultBehaviour(self, node):
+        for child in node.ASTChildren():
+            child.visit(self)
 
-    def VisitPackageDecl(self, node):
-        pass
-
-    def VisitImportDecl(self, node):
-        pass
-
-    def VisitTypeDecl(self, node):
-        pass
+    def _CheckModifiersCommon(self, modifiers):
+        # Check duplicate
+        hashed = set()
+        for modifier in modifiers:
+            if modifier.lexeme in hashed:
+                _err(modifier, "Duplicate modifier: " + modifier.lexeme)
+            hashed.add(modifier.lexeme)
 
     def VisitClassDecl(self, node):
+        self._CheckModifiersCommon(node.modifiers)
+
         modifiers = [x.lexeme for x in node.modifiers]
         if node.name.lexeme != self.filename:
             _err(node.name, "The class name must match the filename "
@@ -42,16 +47,21 @@ class WeederVisitor(object):
             cd.visit(self)
 
     def VisitMethodDecl(self, node):
+        node.header.visit(self)
+
         modifiers = [x.lexeme for x in node.header.modifiers]
         if (('abstract' in modifiers or 'native' in modifiers) and
-                node.body[0].token.lexeme is not ';'):
-            _err(node.modifiers[0],
+                node.body_block is not None):
+            _err(node.header.modifiers[0],
                  "A method has a body if and"
                  "only if it is neither abstract nor native")
-        if node is not None:
-            node.body.visit(self)
+        if node.body_block is not None:
+            for stmt in node.body_block.stmts:
+                stmt.visit(self)
 
     def VisitMethodHeader(self, node):
+        self._CheckModifiersCommon(node.modifiers)
+
         modifiers = [x.lexeme for x in node.modifiers]
         if 'abstract' in modifiers and ('static' in modifiers
                                         or 'final' in modifiers):
@@ -69,56 +79,36 @@ class WeederVisitor(object):
             _err(node.name, "The interface name must match the filename "
                  + self.filename)
         if node.method_headers:
-            modifiers = [x.lexeme for x in node.method_headers.modifiers]
-            if ('static' in modifiers or 'final' in modifiers
-                    or 'native' in modifiers):
-                _err(node.modifiers[0],
-                     'An interface method cannot be static, final, or native')
+            for header in node.method_headers:
+                modifiers = [x.lexeme for x in header.modifiers]
+                if ('static' in modifiers or 'final' in modifiers
+                        or 'native' in modifiers):
+                    _err(header.modifiers[0],
+                         ('An interface method cannot be '
+                          'static, final, or native'))
+                header.visit(self)
 
     def VisitFieldDecl(self, node):
+        self._CheckModifiersCommon(node.modifiers)
+
         modifiers = [x.lexeme for x in node.modifiers]
-        if 'final' in modifiers and node.var_decl is None:
+        if 'final' in modifiers and node.var_decl.exp is None:
             _err(node.modifiers[0], "A final field must be initialized")
         if 'public' not in modifiers and 'protected' not in modifiers:
             _err(node.f_type, "Package cannot have private field")
         if node.var_decl:
             node.var_decl.visit(self)
 
-    def VisitConstructorDecl(self, node):
-        pass
-
-    def VisitVariableDecl(self, node):
-        pass
-
-    def VisitParameter(self, node):
-        pass
-
-    def VisitType(self, node):
-        pass
-
-    def VisitName(self, node):
-        pass
-
-    # Statement
-    def VisitIfThenStatement(self, node):
-        pass
-
-    def VisitIfThenElseStatement(self, node):
-        pass
-
-    def VisitWhileStatement(self, node):
-        pass
-
-    def VisitForStatement(self, node):
-        pass
-
-    def VisitLocalVarDecl(self, node):
-        pass
-
     # Expression
     def VisitLiteral(self, node):
-        if node.token.token_type == 'INT' and node.token.lexeme > 2147483647:
-            _err(node.l_type, "Integer overflowed")
+        if (node.value.token_type == 'INT'
+                and int(node.value.lexeme) > 2147483647):
+            _err(node.value, "Integer overflowed")
 
-    def VisitExpression(self, node):
-        pass
+    def VisitCastExpression(self, node):
+        if not (isinstance(node.cast_type, PrimitiveType) or
+                isinstance(node.cast_type, ClassOrInterfaceType) or
+                isinstance(node.cast_type, Name) or
+                isinstance(node.cast_type, ArrayType)):
+            _err(node[0].token,
+                 "A cast must be of primitive or reference types")

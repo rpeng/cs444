@@ -93,6 +93,7 @@ ArrayCreationExpression -> new PrimitiveType DimExpr
 ArrayCreationExpression -> new ClassOrInterfaceType DimExpr
 
 DimExpr -> [ Expression ]
+Dims -> [ ]
 
 ClassInstanceCreationExpression -> new ClassType ( ArgumentList? )
 

@@ -15,6 +15,8 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
                 child = node.rhs_map.get(accessor)
                 if child:
                     child = self.VisitParseTreeNode(child)
+            if isinstance(child, list):
+                child.reverse()
             result.append(child)
         return tuple(result)
 
@@ -36,7 +38,7 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
         if node.rule and node.rule.lhs in rules_map:
             klass = rules_map[node.rule.lhs]
             new_node = klass.create(self, node)
-            if new_node:
+            if new_node and not new_node.IsInitialized():
                 new_node.InitializeDefaults(node)
             return new_node
         elif node.token and node.token.token_type in rules_map:
@@ -44,7 +46,7 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
             new_node = klass.create(self, node)
             if new_node:
                 new_node.InitializeDefaults(node)
-            return new_node 
+            return new_node
         else:
             children = []
             if node.children:

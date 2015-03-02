@@ -17,7 +17,7 @@ class Block(AbstractSyntaxNode):
         return visitor.VisitBlock(self)
 
     def __init__(self, stmts):
-        self.stmts = stmts  # Statement[]
+        self.stmts = stmts  # Statement[]?
 
 
 class IfThenElseStatement(AbstractSyntaxNode):
@@ -31,7 +31,7 @@ class IfThenElseStatement(AbstractSyntaxNode):
     def __init__(self, test_expr, stmt_true, stmt_false):
         self.test_expr = test_expr  # Expression
         self.stmt_true = stmt_true  # Statement
-        self.stmt_false = stmt_false  # Statement
+        self.stmt_false = stmt_false  # Statement?
 
 
 class WhileStatement(AbstractSyntaxNode):
@@ -56,9 +56,9 @@ class ForStatement(AbstractSyntaxNode):
         return visitor.VisitForStatement(self)
 
     def __init__(self, init, test_expr, update, body):
-        self.init = init  # Expression | LocalVariableDecl
-        self.test_expr = test_expr  # Expression
-        self.update = update  # Expression
+        self.init = init  # Expression? | LocalVariableDecl?
+        self.test_expr = test_expr  # Expression?
+        self.update = update  # Expression?
         self.body = body  # Statement
 
 
@@ -67,3 +67,24 @@ class LocalVarDeclStatement(AbstractSyntaxNode):
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateLocalVarDeclStatement(cls, node)
+
+
+class ReturnStatement(AbstractSyntaxNode):
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateReturnStatement(cls, node)
+
+    def visit(self, visitor):
+        return visitor.VisitReturnStatement(self)
+
+    def __init__(self, exp):
+        self.exp = exp  # Expression?
+
+
+class EmptyStatement(AbstractSyntaxNode):
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateEmptyStatement(cls, node)
+
+    def visit(self, visitor):
+        return visitor.VisitEmptyStatement(self)

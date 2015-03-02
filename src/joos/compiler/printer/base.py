@@ -1,7 +1,9 @@
 from joos.compiler.printer import *
 from joos.syntax import ASTVisitor
 
-class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin, ExprPrinterMixin, ASTVisitor):
+
+class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
+                 ExprPrinterMixin, ASTVisitor):
     def __init__(self, indent=0):
         self.indent = indent
 
@@ -39,16 +41,25 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin, ExprPrinterMixin, ASTVisito
         else:
             return "{i}None".format(i=self.i() + " "*indent_add)
 
+    def DefaultBehaviour(self, node):
+        return "{i} {node} NOT IMPLEMENTED".format(i=self.i(), node=node)
+
     # Base
     def VisitCompilationUnit(self, node):
+        pkg = None
+        imports = None
+        if node.pkg_decl:
+            pkg = node.pkg_decl.name
+        if node.import_decls:
+            imports = self.rs([x.name for x in node.import_decls])
         return """{i}CompilationUnit:
 {i}  Package Name: {pkg}
 {i}  Imports: {imports}
 {i}  Type Declarations:
 {type_decls}
 """.format(i=self.i(),
-           pkg=self.r(node.pkg_decl.name),
-           imports=self.rs([x.name for x in node.import_decls]),
+           pkg=pkg,
+           imports=imports,
            type_decls=self.ns(node.type_decls))
 
     def VisitArrayType(self, node):

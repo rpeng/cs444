@@ -71,6 +71,18 @@ class CastExpression(Expression):
         self.exp = exp  # Expression
 
 
+class ParensExpression(Expression):
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateParensExpression(cls, node)
+
+    def visit(self, visitor):
+        return visitor.VisitParensExpression(self)
+
+    def __init__(self, exp):
+        self.exp = exp  # Expression
+
+
 class FieldAccess(Expression):
     @classmethod
     def create(cls, visitor, node):
@@ -93,7 +105,7 @@ class ArrayAccess(Expression):
         return visitor.VisitArrayAccess(self)
 
     def __init__(self, name_or_primary, exp):
-        self.name_or_primary = name  # Name | Primary
+        self.name_or_primary = name_or_primary  # Name | Primary
         self.exp = exp  # Expression
 
 
@@ -143,7 +155,7 @@ class ClassInstanceCreationExpression(Expression):
 
     def __init__(self, class_type, args):
         self.class_type = class_type  # Name
-        self.args = args  # Expression[]
+        self.args = args  # Expression[]?
 
 
 class MethodInvocation(Expression):
@@ -156,7 +168,7 @@ class MethodInvocation(Expression):
 
     def __init__(self, name, primary, primary_id, args):
         # Methods are either Name, or primary + id
-        self.name = name  # Name
-        self.primary = primary  # Primary
-        self.primary_id = primary_id  # token
-        self.args = args  # Expression[]
+        self.name = name  # Name?
+        self.primary = primary  # Primary?
+        self.primary_id = primary_id  # token?
+        self.args = args  # Expression[]?

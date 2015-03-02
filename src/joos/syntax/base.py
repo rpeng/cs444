@@ -18,9 +18,24 @@ class AbstractSyntaxNode(object):
         self.rule = node.rule
         self.children = node.children
 
+    def IsInitialized(self):
+        return (hasattr(self, 'token')
+                or hasattr(self, 'rule')
+                or hasattr(self, 'children'))
+
     def NonDefaultKeys(self):
         default_keys = ['rule', 'token', 'children']
         return [x for x in self.__dict__.keys() if x not in default_keys]
+
+    def ASTChildren(self):
+        for key in self.NonDefaultKeys():
+            child = self.__dict__[key]
+            if isinstance(child, AbstractSyntaxNode):
+                yield child
+            elif isinstance(child, list):
+                for element in child:
+                    if isinstance(element, AbstractSyntaxNode):
+                        yield element
 
     def StrTree(self, indent=0):
         result = " "*indent
@@ -53,9 +68,9 @@ class CompilationUnit(AbstractSyntaxNode):
         return visitor.VisitCompilationUnit(self)
 
     def __init__(self, pkg_decl, import_decls, type_decls):
-        self.pkg_decl = pkg_decl  # Name
-        self.import_decls = import_decls  # Name[]
-        self.type_decls = type_decls  # Type[]
+        self.pkg_decl = pkg_decl  # Name?
+        self.import_decls = import_decls  # Name[]?
+        self.type_decls = type_decls  # Type[]?
 
 
 class Type(AbstractSyntaxNode):

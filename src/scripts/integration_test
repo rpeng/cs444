@@ -12,7 +12,7 @@ for file in $ALL_FILES; do
     fi
 
     printf "Processing $file..."
-    head -n3 $file | grep 'EXCEPTION\|INVALID'
+    grep `basename $file` scripts/should_fail
     EXC=$?
 
     ./joosc $file >/dev/null
@@ -21,12 +21,12 @@ for file in $ALL_FILES; do
     if [ $EXC -eq 0 ]; then
         if [ $JOOSC -ne 42 ]; then
             printf "FAILED, expected 42 but got 0\n"
-            continue
+            exit 1
         fi
     else
         if [ $JOOSC -ne 0 ]; then
             printf "FAILED, expected 0 but got 42\n"
-            continue
+            exit 1
         fi
     fi
     printf "OK\n"

@@ -27,7 +27,14 @@ class DeclPrinterMixin(object):
            cons=self.ns(node.constructor_decls))
 
     def VisitInterfaceDecl(self, node):
-        return self.DefaultBehaviour(node)
+        return """{i}InterfaceDeclaration:
+{i}  Name: {name}
+{i}  Extends: {extends}
+{i}  Headers:
+{headers}
+""".format(i=self.i(), name=node.name.lexeme,
+           extends=self.rs(node.extends_interface),
+           headers=self.ns(node.method_headers))
 
     def VisitMethodDecl(self, node):
         return """{i}Method:
@@ -48,16 +55,16 @@ class DeclPrinterMixin(object):
            m_id=node.m_id.lexeme,
            parameters=self.ns(node.params))
 
-
     def VisitFieldDecl(self, node):
         return """{i}FieldDeclaration:
 {i}  Modifiers: {modifiers}
 {i}  Type: {type}
 {i}  Variable Declaration:
-{vardecl}""".format(
-    i=self.i(), modifiers=self.j(node.modifiers),
-    vardecl=self.n(node.var_decl),
-    type=node.f_type.visit(self))
+{vardecl}
+""".format(i=self.i(),
+           modifiers=self.j(node.modifiers),
+           vardecl=self.n(node.var_decl),
+           type=node.f_type.visit(self))
 
     def VisitConstructorDecl(self, node):
         return """{i}ConstructorDeclaration:

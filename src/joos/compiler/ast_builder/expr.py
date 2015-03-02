@@ -25,9 +25,9 @@ class ExprBuilderMixin(object):
 
     def CreateUnaryExpression(self, klass, node):
         sign = node.Get('!') or node.Get('-')
-        if sign:
+        if sign is not None:
             expr = self.VisitParseTreeNode(node[1])
-            return klass(sign, expr)
+            return klass(sign.token, expr)
         else:
             return self.VisitParseTreeNode(node[0])
 
@@ -52,8 +52,11 @@ class ExprBuilderMixin(object):
             return klass(name, exp)
 
     def CreatePrimary(self, klass, node):
+        return self.VisitParseTreeNode(node[0])
+
+    def CreateParensExpression(self, klass, node):
         if node.rule.rhs[0] == '(':
-            return self.VisitParseTreeNode(node[1])
+            return klass(self.VisitParseTreeNode(node[1]))
         else:
             return self.VisitParseTreeNode(node[0])
 
@@ -61,16 +64,16 @@ class ExprBuilderMixin(object):
         return klass()
 
     def CreateArrayCreationExpression(self, klass, node):
-        (a_type, exp) = self._resolve(node[0], 'PrimitiveType', 'DimExpr')
+        (a_type, exp) = self._resolve(node, 'PrimitiveType', 'DimExpr')
         exp = exp[1]
-        return klass(p_type, exp)
+        return klass(a_type, exp)
 
     def CreateStatementExpression(self, klass, node):
         return self.VisitParseTreeNode(node[0])
 
     def CreateClassInstanceCreationExpression(self, klass, node):
         (class_type, args) = self._resolve(node, 'ClassType', '+ArgumentList')
-        class_type = class_type[0][0].name
+        class_type = class_type[0].name
         return klass(class_type, args)
 
     def CreateMethodInvocation(self, klass, node):

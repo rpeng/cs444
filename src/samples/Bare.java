@@ -13,6 +13,6 @@ public static class Bare extends org.one.One implements Two {
   public void doNothing(){
   }
 
-  protected Bare(int i, boolean j) {
+  protected Bare(int i, boolean j, Jane j) {
   }
 }

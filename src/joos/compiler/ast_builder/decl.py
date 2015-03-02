@@ -55,10 +55,11 @@ class DeclBuilderMixin(object):
             node, 'ID', '+ExtendsInterfaces', 'InterfaceBody')
         name = name.token
         # InterfaceType
-        extends_interface = [x[0][0].name for x in extends_interface]
+        if extends_interface:
+            extends_interface = [x[0].name for x in extends_interface]
         (method_headers,) = self._resolve(body, '+InterfaceMemberDeclarations')
         if method_headers:
-            method_headers = [x[0] for x in body]
+            method_headers = [x[0] for x in method_headers]
         return klass(name, extends_interface, method_headers)
 
     def CreateMethodDecl(self, klass, node):

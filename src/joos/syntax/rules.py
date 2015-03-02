@@ -46,11 +46,11 @@ rules_map = {
     'UnaryExpressionNotPlusMinus': UnaryExpression,
 
     'CastExpression': CastExpression,
+    'PrimaryNoNewArray': ParensExpression,
     'FieldAccess': FieldAccess,
     'ArrayAccess': ArrayAccess,
 
     'Primary': Primary,  # Abstract
-    'PrimaryNoNewArray': Primary,
 
     'this': ThisExpression,
     'ArrayCreationExpression': ArrayCreationExpression,
@@ -63,7 +63,8 @@ rules_map = {
     'ExpressionStatement': Statement,
     'StatementWithoutTrailingSubstatement': Statement,
     'StatementNoShortIf': Statement,
-    'EmptyStatement': Statement,
+    'ReturnStatement': ReturnStatement,
+    'EmptyStatement': EmptyStatement,
 
     'Block': Block,
 

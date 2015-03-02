@@ -79,6 +79,9 @@ class ASTVisitor(object):
     def VisitCastExpression(self, node):
         return self.DefaultBehaviour(node)
 
+    def VisitParensExpression(self, node):
+        return self.DefaultBehaviour(node)
+
     def VisitFieldAccess(self, node):
         return self.DefaultBehaviour(node)
 
@@ -114,4 +117,10 @@ class ASTVisitor(object):
         return self.DefaultBehaviour(node)
 
     def VisitLocalVarDeclStatement(self, node):
+        return self.DefaultBehaviour(node)
+
+    def VisitReturnStatement(self, node):
+        return self.DefaultBehaviour(node)
+
+    def VisitEmptyStatement(self, node):
         return self.DefaultBehaviour(node)

@@ -1,7 +1,5 @@
 class StmtBuilderMixin(object):
     def CreateStatement(self, klass, node):
-        if node.rule.lhs == 'EmptyStatement':
-            return None
         return self.VisitParseTreeNode(node[0])
 
     def CreateBlock(self, klass, node):
@@ -31,7 +29,13 @@ class StmtBuilderMixin(object):
             node, 'ForInit', 'Expression', 'ForUpdate',
             'Statement', 'StatementNoShortIf')
         stmt = stmt or stmt_no_if
-        return klass(init[0], exp, update[0], stmt)
+        return klass(init and init[0], exp, update and update[0], stmt)
 
     def CreateLocalVarDeclStatement(self, klass, node):
         return self.VisitParseTreeNode(node[0])
+
+    def CreateReturnStatement(self, klass, node):
+        return klass(node.Get('Expression'))
+
+    def CreateEmptyStatement(self, klass, node):
+        return klass()
