@@ -55,7 +55,7 @@ class WeederVisitor(ASTVisitor):
             _err(node.header.modifiers[0],
                  "A method has a body if and"
                  "only if it is neither abstract nor native")
-        if node.body_block is not None:
+        if node.body_block is not None and node.body_block.stmts is not None:
             for stmt in node.body_block.stmts:
                 stmt.visit(self)
 
@@ -112,3 +112,12 @@ class WeederVisitor(ASTVisitor):
                 isinstance(node.cast_type, ArrayType)):
             _err(node[0].token,
                  "A cast must be of primitive or reference types")
+
+    def VisitConstructorDecl(self, node):
+        self._CheckModifiersCommon(node.modifiers)
+
+        if node.name.lexeme != self.filename:
+            _err(node.name, "Constructor must have same name as base class")
+
+        if node.body:
+            node.body.visit(self)
