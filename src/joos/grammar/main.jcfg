@@ -13,7 +13,7 @@ LocalVariableDeclaration
 
 {{rules}}
 Start              -> BOF CompilationUnit EOF
-CompilationUnit    -> PackageDeclaration? ImportDeclarations? TypeDeclarations?
+CompilationUnit    -> PackageDeclaration? ImportDeclarations? TypeDeclaration?
 PackageDeclaration -> package Name ;
 LocalVariableDeclaration -> Type VariableDeclarator
 

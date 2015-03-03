@@ -35,7 +35,7 @@ class StmtBuilderMixin(object):
         return self.VisitParseTreeNode(node[0])
 
     def CreateReturnStatement(self, klass, node):
-        return klass(node.Get('Expression'))
+        return klass(self.VisitParseTreeNode(node.Get('Expression')))
 
     def CreateEmptyStatement(self, klass, node):
         return klass()

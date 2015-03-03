@@ -1,6 +1,5 @@
 {{nonterminals}}
 Type
-TypeDeclarations
 TypeDeclaration
 PrimitiveType
 ReferenceType
@@ -9,8 +8,6 @@ ClassOrInterfaceType
 ArrayType
 
 {{rules}}
-TypeDeclarations -> TypeDeclaration
-TypeDeclarations -> TypeDeclarations TypeDeclaration
 TypeDeclaration -> ClassDeclaration
 TypeDeclaration -> InterfaceDeclaration
 TypeDeclaration -> ;

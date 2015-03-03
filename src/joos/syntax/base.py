@@ -24,7 +24,7 @@ class AbstractSyntaxNode(object):
                 or hasattr(self, 'children'))
 
     def NonDefaultKeys(self):
-        default_keys = ['rule', 'token', 'children']
+        default_keys = AbstractSyntaxNode().__dict__.keys()
         return [x for x in self.__dict__.keys() if x not in default_keys]
 
     def ASTChildren(self):
@@ -67,10 +67,10 @@ class CompilationUnit(AbstractSyntaxNode):
     def visit(self, visitor):
         return visitor.VisitCompilationUnit(self)
 
-    def __init__(self, pkg_decl, import_decls, type_decls):
+    def __init__(self, pkg_decl, import_decls, type_decl):
         self.pkg_decl = pkg_decl  # Name?
         self.import_decls = import_decls  # Name[]?
-        self.type_decls = type_decls  # Type[]?
+        self.type_decl = type_decl  # ClassDecl? | InterfaceDecl?
 
 
 class Type(AbstractSyntaxNode):
@@ -80,7 +80,14 @@ class Type(AbstractSyntaxNode):
         return visitor.CreateType(cls, node)
 
 
-class ArrayType(Type):
+class ReferenceType(Type):
+    # Abstract
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateReferenceType(cls, node)
+
+
+class ArrayType(ReferenceType):
     # int[], Object[]
 
     @classmethod
@@ -94,7 +101,7 @@ class ArrayType(Type):
         self.type_or_name = type_or_name  # Type | Name
 
 
-class ClassOrInterfaceType(Type):
+class ClassOrInterfaceType(ReferenceType):
     # class x; interface x;
 
     @classmethod

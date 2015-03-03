@@ -4,6 +4,7 @@ rules_map = {
     # ----- Base -----
     'CompilationUnit': CompilationUnit,
     'Type': Type,  # abstract
+    'ReferenceType': ReferenceType,  # abstract
     'ArrayType': ArrayType,
     'ClassOrInterfaceType': ClassOrInterfaceType,
     'PrimitiveType': PrimitiveType,
@@ -54,7 +55,8 @@ rules_map = {
 
     'this': ThisExpression,
     'ArrayCreationExpression': ArrayCreationExpression,
-    'StatementExpression': StatementExpression,  # Abstract
+    'StatementExpression': StatementExpression,
+    'NameExpression': NameExpression,
     'ClassInstanceCreationExpression': ClassInstanceCreationExpression,
     'MethodInvocation': MethodInvocation,
 

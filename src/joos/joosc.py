@@ -3,11 +3,14 @@ import sys
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
-from joos.compiler.ast_builder import BuildAST
-from joos.compiler.printer import PrintAST
-from joos.compiler.weeder.weeder import WeederVisitor
+from joos.compiler import BuildAST, PrintAST, WeedAST, BuildEnv
 from lexer.errors import *
 from lexer import scanner, parser
+
+
+__all__ = ['ScanInput', 'PrepareTokens', 'Parse',
+           'BuildAST', 'PrintAST', 'WeedAST',
+           'BuildEnv']
 
 
 TOKEN_TO_LR1_REPR = dict([(k, v) for k, v in symbols_map])
@@ -59,8 +62,3 @@ def Parse(tokens, lr1_grammar_file):
                                     ' '.join(e.expected)))
         else:
             raise
-
-
-def Weed(parse_tree):
-    visitor = WeederVisitor(sys.argv[1])
-    parse_tree.visit(visitor)

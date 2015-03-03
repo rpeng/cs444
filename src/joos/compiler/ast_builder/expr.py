@@ -9,10 +9,7 @@ class ExprBuilderMixin(object):
             node = node[0]
         (lhs, exp) = self._resolve(
             node, 'LeftHandSide', 'AssignmentExpression')
-        if lhs.rule.rhs == ['Name']:
-            lhs = lhs[0].name
-        else:
-            lhs = lhs[0]  # FieldAccess ArrayAccess
+        lhs = lhs[0]  # FieldAccess ArrayAccess
         return klass(lhs, exp)
 
     def CreateBinaryExpression(self, klass, node):
@@ -24,7 +21,9 @@ class ExprBuilderMixin(object):
         return klass(left, op, right)
 
     def CreateUnaryExpression(self, klass, node):
-        sign = node.Get('!') or node.Get('-')
+        sign = node.Get('!')
+        if sign is None:
+            sign = node.Get('-')
         if sign is not None:
             expr = self.VisitParseTreeNode(node[1])
             return klass(sign.token, expr)
@@ -69,7 +68,10 @@ class ExprBuilderMixin(object):
         return klass(a_type, exp)
 
     def CreateStatementExpression(self, klass, node):
-        return self.VisitParseTreeNode(node[0])
+        return klass(self.VisitParseTreeNode(node[0]))
+
+    def CreateNameExpression(self, klass, node):
+        return klass(self.VisitParseTreeNode(node[0]))
 
     def CreateClassInstanceCreationExpression(self, klass, node):
         (class_type, args) = self._resolve(node, 'ClassType', '+ArgumentList')

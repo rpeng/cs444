@@ -78,15 +78,15 @@ class WeederVisitor(ASTVisitor):
         if node.name.lexeme != self.filename:
             _err(node.name, "The interface name must match the filename "
                  + self.filename)
-        if node.method_headers:
-            for header in node.method_headers:
-                modifiers = [x.lexeme for x in header.modifiers]
+        if node.method_decls:
+            for decl in node.method_decls:
+                modifiers = [x.lexeme for x in decl.header.modifiers]
                 if ('static' in modifiers or 'final' in modifiers
                         or 'native' in modifiers):
-                    _err(header.modifiers[0],
+                    _err(decl.header.modifiers[0],
                          ('An interface method cannot be '
                           'static, final, or native'))
-                header.visit(self)
+                decl.header.visit(self)
 
     def VisitFieldDecl(self, node):
         self._CheckModifiersCommon(node.modifiers)
@@ -108,8 +108,8 @@ class WeederVisitor(ASTVisitor):
     def VisitCastExpression(self, node):
         if not (isinstance(node.cast_type, PrimitiveType) or
                 isinstance(node.cast_type, ClassOrInterfaceType) or
-                isinstance(node.cast_type, Name) or
-                isinstance(node.cast_type, ArrayType)):
+                isinstance(node.cast_type, ArrayType) or
+                isinstance(node.cast_type, NameExpression)):
             _err(node[0].token,
                  "A cast must be of primitive or reference types")
 

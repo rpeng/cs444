@@ -17,7 +17,7 @@ class AssignmentExpression(Expression):
         return visitor.VisitAssignmentExpression(self)
 
     def __init__(self, lhs, exp):
-        self.lhs = lhs  # Name | FieldAccess | ArrayAccess
+        self.lhs = lhs  # NameExpression | FieldAccess | ArrayAccess
         self.exp = exp  # Expression
 
 
@@ -139,10 +139,28 @@ class ArrayCreationExpression(Expression):
 
 
 class StatementExpression(Expression):
-    # Abstract
     @classmethod
     def create(cls, visitor, node):
         return visitor.CreateStatementExpression(cls, node)
+
+    def visit(self, visitor):
+        return visitor.VisitStatementExpression(self)
+
+    def __init__(self, stmt):
+        # Assignment | MethodInvocation | ClassInstanceCreation
+        self.stmt = stmt
+
+
+class NameExpression(Expression):
+    @classmethod
+    def create(cls, visitor, node):
+        return visitor.CreateNameExpression(cls, node)
+
+    def visit(self, visitor):
+        return visitor.VisitNameExpression(self)
+
+    def __init__(self, name):
+        self.name = name  # Name
 
 
 class ClassInstanceCreationExpression(Expression):
@@ -154,7 +172,7 @@ class ClassInstanceCreationExpression(Expression):
         return visitor.VisitClassInstanceCreationExpression(self)
 
     def __init__(self, class_type, args):
-        self.class_type = class_type  # Name
+        self.class_type = class_type  # token[]
         self.args = args  # Expression[]?
 
 

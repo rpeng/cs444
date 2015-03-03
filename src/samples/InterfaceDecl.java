@@ -1,3 +1,3 @@
 public interface InterfaceDecl extends jano, richy {
-  public void foo();
+  public void foo(int i);
 }

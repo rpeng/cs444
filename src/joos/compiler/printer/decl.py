@@ -30,11 +30,11 @@ class DeclPrinterMixin(object):
         return """{i}InterfaceDeclaration:
 {i}  Name: {name}
 {i}  Extends: {extends}
-{i}  Headers:
-{headers}
+{i}  Methods:
+{methods}
 """.format(i=self.i(), name=node.name.lexeme,
            extends=self.rs(node.extends_interface),
-           headers=self.ns(node.method_headers))
+           methods=self.ns(node.method_decls))
 
     def VisitMethodDecl(self, node):
         return """{i}Method:

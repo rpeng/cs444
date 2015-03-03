@@ -1,3 +1,6 @@
+from joos.syntax import MethodDecl
+
+
 class DeclBuilderMixin(object):
     def CreatePackageDecl(self, klass, node):
         (name,) = self._resolve(node, 'Name')
@@ -58,13 +61,18 @@ class DeclBuilderMixin(object):
         if extends_interface:
             extends_interface = [x[0].name for x in extends_interface]
         (method_headers,) = self._resolve(body, '+InterfaceMemberDeclarations')
+
         if method_headers:
-            method_headers = [x[0] for x in method_headers]
+            method_headers = [self.CreateMethodDecl(MethodDecl, x)
+                              for x in method_headers]
         return klass(name, extends_interface, method_headers)
 
     def CreateMethodDecl(self, klass, node):
         (header, body) = self._resolve(node, 'MethodHeader', 'MethodBody')
-        (block,) = self._resolve(body, 'Block')
+        if body:
+            (block,) = self._resolve(body, 'Block')
+        else:
+            block = None
         return klass(header, block)
 
     def CreateMethodHeader(self, klass, node):

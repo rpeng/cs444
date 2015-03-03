@@ -1,36 +1,43 @@
 #!/usr/bin/python
 
 import sys
+import traceback
 
 from joos.joosc import (ScanInput,
                         PrepareTokens,
                         Parse,
                         BuildAST,
                         PrintAST,
-                        Weed)
+                        WeedAST,
+                        BuildEnv)
 
 JOOS_LR1_FILE = 'generated/joos.lr1'
 
 
-def Main(input_file):
+def ProcessFile(input_file):
+    units = []
     with open(input_file) as f:
-       try:
-            tokens = ScanInput(f.read())
-            tokens = PrepareTokens(tokens)
-            parse_tree = Parse(tokens, JOOS_LR1_FILE)
-            print parse_tree.StrTree()
-            ast = BuildAST(parse_tree)
-            print "------ Nice AST ------"
-            print PrintAST(ast)
-            Weed(ast)
-       except Exception, e:
-           print >> sys.stderr, str(e)
-           sys.exit(42)
+        tokens = ScanInput(f.read())
+        tokens = PrepareTokens(tokens)
+        parse_tree = Parse(tokens, JOOS_LR1_FILE)
+        ast = BuildAST(parse_tree)
+        WeedAST(ast, input_file)
+        BuildEnv(ast)
+        units.append(ast)
+
+
+def Main(input_files):
+    try:
+        for file in input_files:
+            ProcessFile(file)
+    except Exception, e:
+        print traceback.format_exc()
+        print >> sys.stderr, str(e)
+        sys.exit(42)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print "Usage: joosc [input_file]"
     else:
-        input_file = sys.argv[1]
-        Main(input_file)
+        Main(sys.argv[1:])

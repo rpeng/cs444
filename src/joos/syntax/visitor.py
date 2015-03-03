@@ -97,6 +97,9 @@ class ASTVisitor(object):
     def VisitStatementExpression(self, node):
         return self.DefaultBehaviour(node)
 
+    def VisitNameExpression(self, node):
+        return self.DefaultBehaviour(node)
+
     def VisitClassInstanceCreationExpression(self, node):
         return self.DefaultBehaviour(node)
 
@@ -114,9 +117,6 @@ class ASTVisitor(object):
         return self.DefaultBehaviour(node)
 
     def VisitForStatement(self, node):
-        return self.DefaultBehaviour(node)
-
-    def VisitLocalVarDeclStatement(self, node):
         return self.DefaultBehaviour(node)
 
     def VisitReturnStatement(self, node):

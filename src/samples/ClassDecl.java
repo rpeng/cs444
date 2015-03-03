@@ -28,7 +28,5 @@ public class ClassDecl extends nyan implements IRichy, ITest {
     public int i;
     public boolean j;
     public Nyan k;
-    public Nyan[] k;
     public int[] l;
-    public boolean[] l;
 }

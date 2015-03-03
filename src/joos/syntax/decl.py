@@ -10,7 +10,7 @@ class PackageDecl(AbstractSyntaxNode):
         return visitor.VisitPackageDecl(self)
 
     def __init__(self, name):
-        self.name = name  # Name
+        self.name = name  # token[]
 
 
 class ImportDecl(AbstractSyntaxNode):
@@ -25,7 +25,7 @@ class ImportDecl(AbstractSyntaxNode):
         return visitor.VisitImportDecl(self)
 
     def __init__(self, name, import_type):
-        self.name = name  # Name
+        self.name = name  # token[]
         self.import_type = import_type  # CLASS / PACKAGE
 
 
@@ -63,10 +63,10 @@ class InterfaceDecl(TypeDecl):
     def visit(self, visitor):
         return visitor.VisitInterfaceDecl(self)
 
-    def __init__(self, name, extends_interface, method_headers):
+    def __init__(self, name, extends_interface, method_decls):
         self.name = name  # token
         self.extends_interface = extends_interface  # Name[]?
-        self.method_headers = method_headers  # MethodHeader[]?
+        self.method_decls = method_decls  # MethodDecls[]?
 
 
 class MethodDecl(AbstractSyntaxNode):

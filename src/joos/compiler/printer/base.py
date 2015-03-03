@@ -49,18 +49,18 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
         pkg = None
         imports = None
         if node.pkg_decl:
-            pkg = node.pkg_decl.name
+            pkg = self.j(node.pkg_decl.name)
         if node.import_decls:
             imports = self.rs([x.name for x in node.import_decls])
         return """{i}CompilationUnit:
 {i}  Package Name: {pkg}
 {i}  Imports: {imports}
-{i}  Type Declarations:
-{type_decls}
+{i}  Type Declaration:
+{type_decl}
 """.format(i=self.i(),
            pkg=pkg,
            imports=imports,
-           type_decls=self.ns(node.type_decls))
+           type_decl=self.n(node.type_decl))
 
     def VisitArrayType(self, node):
         return node.type_or_name.visit(self) + "[]"

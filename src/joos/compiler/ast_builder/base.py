@@ -56,15 +56,16 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
             return new_node
 
     def CreateCompilationUnit(self, klass, node):
-        (pkg_decl, import_decls, type_decls) = self._resolve(
+        (pkg_decl, import_decls, type_decl) = self._resolve(
             node, 'PackageDeclaration', '+ImportDeclarations',
-            '+TypeDeclarations')
-        return klass(pkg_decl, import_decls, type_decls)
+            'TypeDeclaration')
+        return klass(pkg_decl, import_decls, type_decl)
 
     def CreateType(self, klass, node):
-        (primitive, reference) = self._resolve(
-            node, 'PrimitiveType', 'ReferenceType')
-        return primitive or reference[0]
+        return self.VisitParseTreeNode(node[0])
+
+    def CreateReferenceType(self, klass, node):
+        return self.VisitParseTreeNode(node[0])
 
     def CreateArrayType(self, klass, node):
         type_or_name = self.VisitParseTreeNode(node[0])  # Primitive or Name
