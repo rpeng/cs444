@@ -1,34 +1,45 @@
 #!/bin/sh
-ALL_FILES="extern/testcases/a1/*"
 
-touch generated/completed_tests
+if [ $# -eq 0 ]; then
+    echo "Please specifiy which test suite to run. For example, a1, a2.."
+    exit 1
+fi
+ALL_FILES="extern/testcases/$1/*"
+
+touch generated/completed_tests_$1
 
 for file in $ALL_FILES; do
-
-    grep $file generated/completed_tests >/dev/null
+    echo $file
+    grep $file generated/completed_tests_$1 >/dev/null
     SKIP=$?
     if [ $SKIP -eq 0 ]; then
       continue
     fi
 
     printf "Processing $file..."
-    grep `basename $file` scripts/should_fail
+    should_fail_check=${file##*/}
+    should_fail_check=${should_fail_check%.java}
+    grep $should_fail_check scripts/should_fail_$1
     EXC=$?
 
-    ./joosc $file >/dev/null
+    if [[ -d $file ]]; then # if the file is a directory
+        ./joosc `find $file -type f` >/dev/null
+    else
+        ./joosc $file >/dev/null
+    fi
     JOOSC=$?
 
     if [ $EXC -eq 0 ]; then
         if [ $JOOSC -ne 42 ]; then
-            printf "FAILED, expected 42 but got 0\n"
+            printf "FAILED, expected 42\n"
             exit 1
         fi
     else
         if [ $JOOSC -ne 0 ]; then
-            printf "FAILED, expected 0 but got 42\n"
+            printf "FAILED, expected 0\n"
             exit 1
         fi
     fi
     printf "OK\n"
-    echo $file >> generated/completed_tests
+    echo $file >> generated/completed_tests_$1
 done
