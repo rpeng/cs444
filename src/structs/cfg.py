@@ -33,12 +33,11 @@ class Token(object):
 
 
 class CFG(object):
-
     def __init__(self,
                  terminals,
                  nonterminals,
-                 start_symbol,   # must be a nonterminal
-                 rules):         # list of (lhs, [rhs...])
+                 start_symbol,  # must be a nonterminal
+                 rules):  # list of (lhs, [rhs...])
 
         self.terminals = terminals
         self.nonterminals = nonterminals
@@ -53,8 +52,8 @@ class CFG(object):
 
         self.all_symbols = self.terminals + self.nonterminals
         self._ComputeNullables()  # self.nullables
-        self._ComputeFirsts()     # self.firsts
-        self._ComputeFollows()    # self.follows
+        self._ComputeFirsts()  # self.firsts
+        self._ComputeFollows()  # self.follows
 
     def _ComputeNullables(self):
         self.nullables = dict((symbol, False) for symbol in self.nonterminals)
@@ -115,11 +114,11 @@ class CFG(object):
                     if token in self.terminals:
                         continue
                     old = self.follows[token]
-                    new = old | self.Firsts(r.rhs[i+1:])
+                    new = old | self.Firsts(r.rhs[i + 1:])
                     if old != new:
                         self.follows[token] = new
                         changed = True
-                    if self.AllNullable(r.rhs[i+1:]):
+                    if self.AllNullable(r.rhs[i + 1:]):
                         new = old | self.follows[r.lhs]
                         if old != new:
                             self.follows[token] = new

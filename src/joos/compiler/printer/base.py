@@ -9,7 +9,7 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
 
     def i(self):
         # Adds an indent
-        return " "*self.indent
+        return " " * self.indent
 
     def r(self, name):
         # Resolves a name
@@ -29,17 +29,17 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
     def n(self, node, indent_add=4):
         # Resolves an AST node
         if node:
-            return ASTPrinter(self.indent+indent_add).Visit(node)
+            return ASTPrinter(self.indent + indent_add).Visit(node)
         else:
-            return "{i}None".format(i=self.i() + " "*indent_add)
+            return "{i}None".format(i=self.i() + " " * indent_add)
 
     def ns(self, list_to_check, indent_add=4):
         # Resolves a list of AST nodes
         if list_to_check:
-            return '\n'.join([ASTPrinter(self.indent+indent_add).Visit(x)
+            return '\n'.join([ASTPrinter(self.indent + indent_add).Visit(x)
                               for x in list_to_check])
         else:
-            return "{i}None".format(i=self.i() + " "*indent_add)
+            return "{i}None".format(i=self.i() + " " * indent_add)
 
     def DefaultBehaviour(self, node):
         return "{i} {node} NOT IMPLEMENTED".format(i=self.i(), node=node)

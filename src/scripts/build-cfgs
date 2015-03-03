@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import glob
 import sys
 
 
@@ -33,15 +32,15 @@ def Main(paths, output_path):
                 elif line.startswith('{{'):
                     new_state = line[2:-2]
                     if new_state not in ACCEPTED_STATES:
-                        _err('Invalid tag '+new_state)
+                        _err('Invalid tag ' + new_state)
                     if state == 'skip':
                         break
                     state = new_state
                 elif state is None:
-                    _err('Missing start tag before '+line)
+                    _err('Missing start tag before ' + line)
                 elif state == 'terminals':
                     if (line in result['terminals'] or line in
-                            result['nonterminals']):
+                        result['nonterminals']):
                         _err('Duplicate token ' + line)
                     result['terminals'].append(line)
                 elif state == 'start_symbol':
@@ -50,7 +49,7 @@ def Main(paths, output_path):
                     result['start_symbol'] = line
                 elif state == 'nonterminals':
                     if (line in result['terminals'] or line in
-                            result['nonterminals']):
+                        result['nonterminals']):
                         _err('Duplicate token ' + line)
                     result['nonterminals'].append(line)
                 elif state == 'rules':
@@ -84,8 +83,8 @@ def Main(paths, output_path):
                         worklist.append(item[1:])
                         worklist.append([t[:-1]] + item[1:])
                     else:
-                        worklist.append(item[0:i] + item[i+1:])
-                        worklist.append(item[0:i] + [t[:-1]] + item[i+1:])
+                        worklist.append(item[0:i] + item[i + 1:])
+                        worklist.append(item[0:i] + [t[:-1]] + item[i + 1:])
             if not has_optional:
                 if (lhs, item) not in result['rules']:
                     result['rules'].append((lhs, item))
@@ -97,7 +96,7 @@ def Main(paths, output_path):
                 lhs, ' '.join(rhs)))
         for symbol in rhs:
             if (symbol not in result['terminals']
-                    and symbol not in result['nonterminals']):
+                and symbol not in result['nonterminals']):
                 _err('Your rhs must be a valid terminal or non terminal: '
                      + ' '.join(rhs))
 
@@ -116,6 +115,7 @@ def Main(paths, output_path):
                 f.write(lhs + '\n')
             else:
                 f.write('{} {}\n'.format(lhs, ' '.join(rhs)))
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

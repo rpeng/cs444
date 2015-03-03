@@ -17,7 +17,7 @@ class ParseTreeNode(object):
                  if i < len(self.children)])
 
     def StrTree(self, indent=0):
-        result = " "*indent
+        result = " " * indent
         if self.rule:
             result += str(self.rule)
         else:

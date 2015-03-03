@@ -1,8 +1,8 @@
+from nose.tools import *
+
 from joos.joosc import ScanInput
 from structs.cfg import Token
 from lexer.errors import *
-
-from nose.tools import *
 
 
 class TestJooscScanner(object):

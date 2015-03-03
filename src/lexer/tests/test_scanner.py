@@ -1,9 +1,9 @@
+from nose.tools import *
+
 from structs.regexp import *
 from structs.cfg import Token
 from lexer.errors import *
 from lexer.scanner import Scan
-
-from nose.tools import *
 
 
 def CatchException(method, *args, **kwargs):

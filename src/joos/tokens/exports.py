@@ -128,7 +128,6 @@ symbols_map = (keyword_map +
                operator_map +
                common_map)
 
-
 all_exports = (keyword_exports +
                literal_exports +
                separator_exports +

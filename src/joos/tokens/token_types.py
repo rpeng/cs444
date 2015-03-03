@@ -3,6 +3,7 @@ def _enum(*sequential, **named):
     enums['from_str'] = enums
     return type('Enum', (), enums)
 
+
 COMMON = ['WHITESPACE', 'NEWLINE', 'ID', 'COMMENT', 'BOF', 'EOF']
 
 KEYWORDS = ['ABSTRACT', 'DEFAULT', 'BOOLEAN', 'DO', 'BREAK', 'DOUBLE', 'BYTE',

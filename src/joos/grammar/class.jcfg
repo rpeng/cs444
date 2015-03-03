@@ -10,7 +10,7 @@ FieldDeclaration
 ClassType
 
 {{rules}}
-ClassDeclaration -> Modifiers? class ID Super? Interfaces? ClassBody
+ClassDeclaration -> Modifiers class ID Super? Interfaces? ClassBody
 
 Super -> extends ClassType
 
@@ -26,7 +26,7 @@ ClassBodyDeclaration -> ConstructorDeclaration
 ClassMemberDeclaration -> FieldDeclaration
 ClassMemberDeclaration -> MethodDeclaration
 
-FieldDeclaration -> Modifiers? Type VariableDeclarator ;
+FieldDeclaration -> Modifiers Type VariableDeclarator ;
 
 ## imports
 # VariableDeclarator : variable

@@ -1,4 +1,7 @@
-class InvalidToken(Exception):
+from joos.errors import JoosError
+
+
+class InvalidToken(JoosError):
     def __init__(self, lexeme, row, col):
         self.lexeme = lexeme
         self.row = row
@@ -8,15 +11,15 @@ class InvalidToken(Exception):
         super(Exception, self).__init__(self.message)
 
 
-class EmptyInput(Exception):
+class EmptyInput(JoosError):
     pass
 
 
-class ParseError(Exception):
+class ParseError(JoosError):
     pass
 
 
-class ParseErrorWithToken(ParseError):
+class ParseErrorWithToken(JoosError):
     def __init__(self, token, expected):
         self.token = token
         self.expected = expected

@@ -38,7 +38,7 @@ class AbstractSyntaxNode(object):
                         yield element
 
     def StrTree(self, indent=0):
-        result = " "*indent
+        result = " " * indent
         result += repr(self) + ": " + " ".join(self.NonDefaultKeys())
         result += '\n'
         for key in self.NonDefaultKeys():
@@ -46,7 +46,7 @@ class AbstractSyntaxNode(object):
             if isinstance(child, AbstractSyntaxNode):
                 result += child.StrTree(indent + 2)
             elif isinstance(child, list):
-                result += " "*(indent + 2) + key + " list:" + "\n"
+                result += " " * (indent + 2) + key + " list:" + "\n"
                 for node in child:
                     if isinstance(node, AbstractSyntaxNode):
                         result += node.StrTree(indent + 4)

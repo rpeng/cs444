@@ -9,6 +9,7 @@ def SingleCharacterMatcher(ch):
 def StringCharacterMatcher(ch):
     return InputCharacterMatcher(ch) and ch not in '"\\'
 
+
 single_quote = Character("'")
 double_quote = Character('"')
 backslash = Character("\\")

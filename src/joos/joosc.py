@@ -1,5 +1,3 @@
-import sys
-
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
@@ -11,7 +9,6 @@ from lexer import scanner, parser
 __all__ = ['ScanInput', 'PrepareTokens', 'Parse',
            'BuildAST', 'PrintAST', 'WeedAST',
            'BuildEnv']
-
 
 TOKEN_TO_LR1_REPR = dict([(k, v) for k, v in symbols_map])
 LR1_REPR_TO_TOKEN = dict([(v, k) for k, v in symbols_map])
@@ -38,10 +35,8 @@ def PrepareTokens(tokens):
         if token.token_type in SKIP_TOKEN_TYPES:
             continue
         if token.token_type in unsupported:
-            raise RuntimeError(("Unsupported token '{}' "
-                               "on row {} col {}".format(
-                                   token.lexeme, token.row, token.col
-                               )))
+            raise JoosError("Unsupported token '{}' on row {} col {}".format(
+                token.lexeme, token.row, token.col))
         # Convert to token representations
         token.token_type = TOKEN_TO_LR1_REPR[token.token_type]
         filtered.append(token)
@@ -57,8 +52,8 @@ def Parse(tokens, lr1_grammar_file):
         return parser.Parse(cfg, parse_table, tokens)[1]
     except ParseErrorWithToken, e:
         if e.token.token_type == t.EOF:
-            raise RuntimeError(("Unexpected token at end of file. "
-                                "Expecting one of: {}").format(
-                                    ' '.join(e.expected)))
+            raise JoosError("Unexpected token at end of file. "
+                            "Expecting one of: {}".format(
+                                ' '.join(e.expected)))
         else:
             raise

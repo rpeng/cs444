@@ -6,7 +6,7 @@ FormalParameterList
 FormalParameter
 
 {{rules}}
-ConstructorDeclaration -> Modifiers? ConstructorDeclarator ConstructorBody
+ConstructorDeclaration -> Modifiers ConstructorDeclarator ConstructorBody
 
 ConstructorDeclarator -> SimpleName ( FormalParameterList? )
 

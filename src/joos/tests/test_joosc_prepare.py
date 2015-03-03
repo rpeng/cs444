@@ -1,7 +1,7 @@
+from nose.tools import *
+
 from joos.joosc import PrepareTokens
 from structs.cfg import Token
-
-from nose.tools import *
 
 
 class TestJooscPrepare(object):

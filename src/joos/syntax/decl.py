@@ -46,7 +46,7 @@ class ClassDecl(TypeDecl):
 
     def __init__(self, modifiers, name, extends, interfaces, field_decls,
                  method_decls, constructor_decls):
-        self.modifiers = modifiers  # token[]?
+        self.modifiers = modifiers  # token[]
         self.name = name  # token
         self.extends = extends  # Name?
         self.interfaces = interfaces  # Name[]?
@@ -91,7 +91,7 @@ class MethodHeader(AbstractSyntaxNode):
         return visitor.VisitMethodHeader(self)
 
     def __init__(self, modifiers, m_type, m_id, params):
-        self.modifiers = modifiers  # token[]?
+        self.modifiers = modifiers  # token[]
         self.m_type = m_type  # Type
         self.m_id = m_id  # token
         self.params = params  # Parameter[]?
@@ -106,7 +106,7 @@ class FieldDecl(AbstractSyntaxNode):
         return visitor.VisitFieldDecl(self)
 
     def __init__(self, modifiers, f_type, var_decl):
-        self.modifiers = modifiers  # token[]?
+        self.modifiers = modifiers  # token[]
         self.f_type = f_type  # Type
         self.var_decl = var_decl  # VariableDeclarator
 
@@ -120,7 +120,7 @@ class ConstructorDecl(AbstractSyntaxNode):
         return visitor.VisitConstructorDecl(self)
 
     def __init__(self, modifiers, name, params, body):
-        self.modifiers = modifiers  # token[]?
+        self.modifiers = modifiers  # token[]
         self.name = name  # token
         self.params = params  # Parameter[]?
         self.body = body  # Block?

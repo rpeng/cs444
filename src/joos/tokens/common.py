@@ -12,6 +12,7 @@ def JavaDigitMatcher(ch):
 def NonZeroDigitMatcher(ch):
     return ch.isdigit() and ch != '0'
 
+
 CR = '\x0d'
 LF = '\x0a'
 
@@ -26,6 +27,7 @@ def LineTerminatorMatcher(ch):
 
 def InputCharacterMatcher(ch):
     return ValidCharacterMatcher(ch) and not LineTerminatorMatcher(ch)
+
 
 java_letter = Character(JavaLetterMatcher)
 java_digit = Character(JavaDigitMatcher)

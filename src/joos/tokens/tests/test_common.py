@@ -2,7 +2,6 @@ from joos.tokens.common import *
 
 
 class TestCommon(object):
-
     def AssertAcceptsRange(self, re, string):
         for x in string:
             assert re.ShouldAccept(x)

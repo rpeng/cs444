@@ -1,8 +1,9 @@
-from structs.cfg import CFG, Token
+from nose.tools import *
+
+from structs.cfg import Token
 from lexer.parser import Parse, FromLr1
 from lexer.errors import *
 
-from nose.tools import *
 
 SAMPLE_LR1_PATH = 'lexer/tests/fixtures/sample.lr1'
 

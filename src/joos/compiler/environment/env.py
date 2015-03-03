@@ -1,9 +1,6 @@
 import collections
 
-
-def _err(token, msg):
-    string = "Row {} col {}: {}".format(token.row, token.col, msg)
-    raise RuntimeError(string)
+from joos.errors import err
 
 
 class Environment(object):
@@ -91,7 +88,7 @@ class Environment(object):
 
     def AddField(self, name, node):
         if self.LookupField(name) is not None:
-            _err(node.var_decl.var_id, "Duplicate field name: " + name)
+            err(node.var_decl.var_id, "Duplicate field name: " + name)
         self.fields[name] = node
 
     def AddMethod(self, name, node):
@@ -99,13 +96,13 @@ class Environment(object):
 
     def AddParameter(self, name, node):
         if self.LookupParameter(name) is not None:
-            _err(node.var_id, "Duplicate parameter: " + name)
+            err(node.var_id, "Duplicate parameter: " + name)
         self.parameters[name] = node
 
     def AddLocalVar(self, name, node):
         if self.LookupLocalVar(name) is not None:
-            _err(node.var_decl.var_id,
-                 "Duplicate variable in overlapping scope: " + name)
+            err(node.var_decl.var_id,
+                "Duplicate variable in overlapping scope: " + name)
         self.local_vars[name] = node
 
     def _join(self):
