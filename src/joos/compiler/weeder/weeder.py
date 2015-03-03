@@ -35,6 +35,8 @@ class WeederVisitor(ASTVisitor):
         if node.name.lexeme != self.filename:
             err(node.name, "The class name must match the filename "
                 + self.filename)
+        if 'static' in modifiers:
+            err(node.modifiers[0], "A class cannot be static")
         if 'abstract' in modifiers and 'final' in modifiers:
             err(node.modifiers[0],
                 "A class cannot be both abstract and final")

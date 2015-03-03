@@ -1,3 +1,4 @@
+from joos.errors import err
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
@@ -22,11 +23,11 @@ def ScanInput(inputs):
                         newline_token=t.NEWLINE)
 
 
-def PrepareTokens(tokens):
+def PrepareTokens(tokens, filename):
     """ Prepares scanned tokens for parsing.
     1. remove whitespace, line terminators, comments
     2. check for unsupported input types
-    3. inserts BOF, EOF
+    3. inserts BOF, EOF, and filename
     4. converts token_types to match lr1 strings
     """
     filtered = []
@@ -39,6 +40,7 @@ def PrepareTokens(tokens):
                 token.lexeme, token.row, token.col))
         # Convert to token representations
         token.token_type = TOKEN_TO_LR1_REPR[token.token_type]
+        token.filename = filename
         filtered.append(token)
     filtered.append(Token(t.EOF, 'EOF'))
     return filtered
@@ -57,3 +59,20 @@ def Parse(tokens, lr1_grammar_file):
                                 ' '.join(e.expected)))
         else:
             raise
+
+
+def CheckEnv(nodes):
+    """ Checks the environemnt for canonical name clashes """
+    canons = set()
+    for node in nodes:
+        env = node.env
+        if env.class_or_interface is not None:
+            if env.package:
+                canon_name = env.package[0] + '.' + env.class_or_interface[0]
+            else:
+                canon_name = env.class_or_interface[0]
+            if canon_name in canons:
+                err(env.class_or_interface[1].name,
+                    "Duplicate definition of " + canon_name)
+            else:
+                canons.add(canon_name)

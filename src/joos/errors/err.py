@@ -3,5 +3,6 @@ class JoosError(RuntimeError):
 
 
 def err(token, msg):
-    string = "Row {} col {}: {}".format(token.row, token.col, msg)
+    string = "File: {}\nRow {} col {}: {}".format(
+        token.filename, token.row, token.col, msg)
     raise JoosError(string)

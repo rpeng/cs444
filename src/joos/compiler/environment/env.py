@@ -11,7 +11,6 @@ class Environment(object):
         self.methods = collections.defaultdict(list)  # (name -> MethodDecl[])
         self.parameters = {}  # (name -> Parameter)
         self.local_vars = {}  # (name -> LocalVariableDecl)
-
         self.upstream = upstream
 
     @classmethod

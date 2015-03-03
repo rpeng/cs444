@@ -1,39 +1,41 @@
 #!/usr/bin/python
 
 import sys
-import traceback
 
 from joos.errors import JoosError
+
 from joos.joosc import (ScanInput,
                         PrepareTokens,
                         Parse,
                         BuildAST,
                         PrintAST,
                         WeedAST,
-                        BuildEnv)
+                        BuildEnv,
+                        CheckEnv)
 
 
 JOOS_LR1_FILE = 'generated/joos.lr1'
 
 
 def ProcessFile(input_file):
-    units = []
     with open(input_file) as f:
         tokens = ScanInput(f.read())
-        tokens = PrepareTokens(tokens)
+        tokens = PrepareTokens(tokens, input_file)
         parse_tree = Parse(tokens, JOOS_LR1_FILE)
         ast = BuildAST(parse_tree)
         WeedAST(ast, input_file)
         BuildEnv(ast)
-        units.append(ast)
+        return ast
+
 
 
 def Main(input_files):
     try:
+        units = []
         for file in input_files:
-            ProcessFile(file)
+            units.append(ProcessFile(file))
+        CheckEnv(units)
     except JoosError, e:
-        print traceback.format_exc()
         print >> sys.stderr, str(e)
         sys.exit(42)
 
