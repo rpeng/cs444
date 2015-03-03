@@ -69,7 +69,7 @@ class CompilationUnit(AbstractSyntaxNode):
 
     def __init__(self, pkg_decl, import_decls, type_decl):
         self.pkg_decl = pkg_decl  # Name?
-        self.import_decls = import_decls  # Name[]?
+        self.import_decls = import_decls  # ImportDecl[]?
         self.type_decl = type_decl  # ClassDecl? | InterfaceDecl?
 
 
@@ -112,7 +112,7 @@ class ClassOrInterfaceType(ReferenceType):
         return visitor.VisitClassOrInterfaceType(self)
 
     def __init__(self, name):
-        self.name = name  # token[]
+        self.name = name  # Name
 
 
 class PrimitiveType(Type):
@@ -149,11 +149,25 @@ class Name(AbstractSyntaxNode):
     def visit(self, visitor):
         return visitor.VisitName(self)
 
-    def __init__(self, name):
-        self.name = name  # token[]
+    def Prefix(self):
+        return '.'.join([x.lexeme for x in self.tokens[:-1]])
+
+    def Last(self):
+        return self.tokens[-1].lexeme
+
+    def Split(self):
+        return [x.lexeme for x in self.tokens]
+
+    def AsString(self):
+        return '.'.join([x.lexeme for x in self.tokens])
+
+    def __init__(self, tokens):
+        self.tokens = tokens  # token[]
+        self.linked_type = None  # For linking
 
     def __repr__(self):
-        return '.'.join([x.lexeme for x in self.name])
+        return """Name: {name}, Linked: {type}""".format(
+            name=self.AsString(), type=self.linked_type)
 
 
 class Literal(AbstractSyntaxNode):

@@ -1,8 +1,7 @@
 package org.example;
 
-import org.one.One;
-import org.two.Two;
-import org.three.*;
+import org.another.Bare2;
+import org.another.*;
 
 public class Bare extends org.one.One implements Two {
   public void doNothing(int i, Jane j){

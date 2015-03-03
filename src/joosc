@@ -11,7 +11,7 @@ from joos.joosc import (ScanInput,
                         PrintAST,
                         WeedAST,
                         BuildEnv,
-                        CheckEnv)
+                        LinkTypes)
 
 
 JOOS_LR1_FILE = 'generated/joos.lr1'
@@ -34,7 +34,7 @@ def Main(input_files):
         units = []
         for file in input_files:
             units.append(ProcessFile(file))
-        CheckEnv(units)
+        LinkTypes(units)
     except JoosError, e:
         print >> sys.stderr, str(e)
         sys.exit(42)

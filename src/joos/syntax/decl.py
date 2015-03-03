@@ -10,7 +10,7 @@ class PackageDecl(AbstractSyntaxNode):
         return visitor.VisitPackageDecl(self)
 
     def __init__(self, name):
-        self.name = name  # token[]
+        self.name = name  # Name
 
 
 class ImportDecl(AbstractSyntaxNode):
@@ -25,7 +25,7 @@ class ImportDecl(AbstractSyntaxNode):
         return visitor.VisitImportDecl(self)
 
     def __init__(self, name, import_type):
-        self.name = name  # token[]
+        self.name = name  # Name -> Type
         self.import_type = import_type  # CLASS / PACKAGE
 
 

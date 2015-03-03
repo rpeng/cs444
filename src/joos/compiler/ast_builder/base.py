@@ -73,7 +73,7 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
 
     def CreateClassOrInterfaceType(self, klass, node):
         name = self.VisitParseTreeNode(node.Get('Name'))
-        return klass(name.name)
+        return klass(name)
 
     def CreatePrimitiveType(self, klass, node):
         (integral_type, boolean) = self._resolve(
@@ -93,7 +93,7 @@ class ASTBuilder(ExprBuilderMixin, DeclBuilderMixin, StmtBuilderMixin):
             return klass([node[0].token])
         else:
             lhs = self.CreateName(klass, node[0])
-            return klass(lhs.name + [node[-1].token])
+            return klass(lhs.tokens + [node[-1].token])
 
     def CreateLiteral(self, klass, node):
         if node.token:  # 2147483648

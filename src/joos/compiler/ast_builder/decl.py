@@ -4,7 +4,7 @@ from joos.syntax import MethodDecl
 class DeclBuilderMixin(object):
     def CreatePackageDecl(self, klass, node):
         (name,) = self._resolve(node, 'Name')
-        return klass(name.name)
+        return klass(name)
 
     def CreateImportDecl(self, klass, node):
         (class_import, pkg_import) = self._resolve(
@@ -14,7 +14,7 @@ class DeclBuilderMixin(object):
             import_type = klass.CLASS_IMPORT
         else:
             import_type = klass.PACKAGE_IMPORT
-        return klass(name.name, import_type)
+        return klass(name, import_type)
 
     def CreateTypeDecl(self, klass, node):
         class_decl, interface_decl = self._resolve(

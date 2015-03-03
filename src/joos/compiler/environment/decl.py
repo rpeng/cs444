@@ -4,8 +4,7 @@ from joos.compiler.environment import Environment
 class DeclEnvMixin(object):
     def VisitPackageDecl(self, node):
         env = Environment()
-        name = '.'.join([x.lexeme for x in node.name])
-        env.AddPackage(name, node)
+        env.AddPackage(node.name.AsString(), node)
         return env
 
     def VisitImportDecl(self, node):

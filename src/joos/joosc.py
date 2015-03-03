@@ -2,14 +2,18 @@ from joos.errors import err
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
-from joos.compiler import BuildAST, PrintAST, WeedAST, BuildEnv
+from joos.compiler import (BuildAST,
+                           PrintAST,
+                           WeedAST,
+                           BuildEnv,
+                           LinkTypes)
 from lexer.errors import *
 from lexer import scanner, parser
 
 
 __all__ = ['ScanInput', 'PrepareTokens', 'Parse',
            'BuildAST', 'PrintAST', 'WeedAST',
-           'BuildEnv']
+           'BuildEnv', 'LinkTypes']
 
 TOKEN_TO_LR1_REPR = dict([(k, v) for k, v in symbols_map])
 LR1_REPR_TO_TOKEN = dict([(v, k) for k, v in symbols_map])
@@ -59,20 +63,3 @@ def Parse(tokens, lr1_grammar_file):
                                 ' '.join(e.expected)))
         else:
             raise
-
-
-def CheckEnv(nodes):
-    """ Checks the environemnt for canonical name clashes """
-    canons = set()
-    for node in nodes:
-        env = node.env
-        if env.class_or_interface is not None:
-            if env.package:
-                canon_name = env.package[0] + '.' + env.class_or_interface[0]
-            else:
-                canon_name = env.class_or_interface[0]
-            if canon_name in canons:
-                err(env.class_or_interface[1].name,
-                    "Duplicate definition of " + canon_name)
-            else:
-                canons.add(canon_name)

@@ -1,5 +1,5 @@
 package org.another;
 
-public interface Bare {
+public interface Bare2 {
 
 }

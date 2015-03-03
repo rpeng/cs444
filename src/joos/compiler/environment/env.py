@@ -11,6 +11,9 @@ class Environment(object):
         self.methods = collections.defaultdict(list)  # (name -> MethodDecl[])
         self.parameters = {}  # (name -> Parameter)
         self.local_vars = {}  # (name -> LocalVariableDecl)
+
+        self.class_imports = {}  # (name -> (name_node, ClassOrInterfaceDecl))
+        self.package_imports = {}  # (name -> type_map[name])
         self.upstream = upstream
 
     @classmethod
@@ -20,11 +23,11 @@ class Environment(object):
     def Fork(self):
         return Environment(self)
 
-    def LookupClassOrInterface(self, name):
+    def LookupClassOrInterface(self):
         if self.class_or_interface is not None:
             return self.class_or_interface
         elif self.upstream is not None:
-            return self.upstream.LookupClassOrInterface(name)
+            return self.upstream.LookupClassOrInterface()
         return None
 
     def LookupPackage(self):
@@ -62,6 +65,20 @@ class Environment(object):
             return self.upstream.LookupLocalVar(name)
         return None
 
+    def LookupClassImport(self, name):
+        if name in self.class_imports:
+            return self.class_imports[name]
+        elif self.upstream is not None:
+            return self.upstream.LookupClassImport(name)
+        return None
+
+    def LookupPackageImport(self, name):
+        if name in self.package_imports:
+            return self.package_imports[name]
+        elif self.upstream is not None:
+            return self.upstream.LookupPackageImport(name)
+        return None
+
     def Update(self, update_env):
         if update_env.upstream is not None:
             self.Update(update_env.upstream)
@@ -78,6 +95,10 @@ class Environment(object):
             self.AddParameter(name, node)
         for name, node in update_env.local_vars.items():
             self.AddLocalVar(name, node)
+        for name, (node, decl) in update_env.class_imports.items():
+            self.AddClassImport(node, decl)
+        for name, pkg in update_env.package_imports.items():
+            self.AddPackageImport(name, pkg)
 
     def AddPackage(self, name, node):
         self.package = (name, node)
@@ -104,25 +125,44 @@ class Environment(object):
                 "Duplicate variable in overlapping scope: " + name)
         self.local_vars[name] = node
 
+    def AddClassImport(self, node, decl):
+        # node : Name
+        name = node.Last()
+        type = self.LookupClassOrInterface()
+        if type is not None and name == type[0]:
+            err(node.name[0], "Import clashes with class decl: " + name)
+        if self.LookupClassImport(name) is not None:
+            err(node.name[0], "Import clashes with another: " + name)
+        self.class_imports[name] = (node, decl)
+
+    def AddPackageImport(self, name, pkg):
+        self.package_imports[name] = pkg
+
     def _join(self):
         if self.upstream:
-            (pkg, type, fields, methods, params, vars) = self.upstream._join()
+            (pkg, type, fields, methods, params, vars,
+             class_imports, pkg_imports) = self.upstream._join()
             return (self.package and self.package[0] or pkg,
                     self.class_or_interface or type,
                     self.fields.keys() + fields,
                     self.methods.keys() + methods,
                     self.parameters.keys() + params,
-                    self.local_vars.keys() + vars)
+                    self.local_vars.keys() + vars,
+                    self.class_imports.keys() + class_imports,
+                    self.package_imports.keys() + pkg_imports)
         else:
             return (self.package and self.package[0],
                     self.class_or_interface and self.class_or_interface[0],
                     self.fields.keys(),
                     self.methods.keys(),
                     self.parameters.keys(),
-                    self.local_vars.keys())
+                    self.local_vars.keys(),
+                    self.class_imports.keys(),
+                    self.package_imports.keys())
 
     def __repr__(self):
-        pkg, type, fields, methods, params, vars = self._join()
+        (pkg, type, fields, methods,
+            params, vars, class_imports, pkg_imports) = self._join()
         return """Environment:
   package: {pkg}
   type: {type}
@@ -130,9 +170,13 @@ class Environment(object):
   methods: {methods}
   params: {params}
   vars: {vars}
+  class imports: {class_imports}
+  pkg imports: {pkg_imports}
 """.format(pkg=pkg,
            type=type,
            fields=', '.join(fields),
            methods=', '.join(methods),
            params=', '.join(params),
-           vars=', '.join(vars))
+           vars=', '.join(vars),
+           class_imports=', '.join(class_imports),
+           pkg_imports=', '.join(pkg_imports))
