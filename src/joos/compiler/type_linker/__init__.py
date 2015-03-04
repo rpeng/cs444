@@ -1,3 +1,4 @@
+from joos.application import JoosApplication
 from joos.compiler.type_linker.type_map import TypeMap
 from type_linker import TypeLinker
 
@@ -12,3 +13,4 @@ def LinkTypes(list_of_nodes):
     linker = TypeLinker(map)
     for node in list_of_nodes:
         node.visit(linker)
+    return JoosApplication(map, list_of_nodes)

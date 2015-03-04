@@ -49,8 +49,8 @@ def MultiProcessFiles(input_files):
 def Main(input_files):
     try:
         units = MultiProcessFiles(input_files)
-        LinkTypes(units)
-        CheckHierarchy(units)
+        app = LinkTypes(units)
+        CheckHierarchy(app)
     except JoosError, e:
         print >> sys.stderr, str(e)
         sys.exit(42)

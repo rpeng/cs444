@@ -4,7 +4,7 @@ from joos.errors import JoosError
 class InvalidToken(JoosError):
     def __init__(self, lexeme=None, row=None, col=None):
         if row is None and col is None:
-            super(InvalidToken, self).__init__(self.lexeme)
+            super(InvalidToken, self).__init__(lexeme)
         else:
             self.lexeme = lexeme
             self.row = row
