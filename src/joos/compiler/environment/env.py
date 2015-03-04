@@ -128,7 +128,7 @@ class Environment(object):
 
     def AddLocalVar(self, name, node):
         if (self.LookupLocalVar(name) is not None or
-                    self.LookupParameter(name) is not None):
+                self.LookupParameter(name) is not None):
             err(node.var_decl.var_id,
                 "Duplicate variable in overlapping scope: " + name)
         self.local_vars[name] = node

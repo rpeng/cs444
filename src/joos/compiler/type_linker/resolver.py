@@ -12,9 +12,9 @@ class Resolver(object):
             prefix = '.'.join(split[:i])
             if self._ResolveCanon(prefix, name):
                 err(name.tokens[0],
-                        "Prefix of qualified type should "
-                        "not resolve to a type: " + canon +
-                        ' prefix: ' + prefix)
+                    "Prefix of qualified type should "
+                    "not resolve to a type: " + canon +
+                    ' prefix: ' + prefix)
 
     def _ResolveSelfName(self, canon, name):
         # Look in own class name
