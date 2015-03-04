@@ -1,5 +1,6 @@
 from joos.errors import err
 from joos.syntax import *
+from structs.utils import memoize
 
 
 acyclic_class_nodes = set()
@@ -25,6 +26,9 @@ def _CheckInterfaceSimple(node):
 
 
 def _CheckClassSimple(node):
+    class_modifiers = [x.lexeme for x in node.modifiers]
+    isAbstract = 'abstract' in class_modifiers
+
     if node.extends is not None:
         if not isinstance(
                 node.extends.linked_type, ClassDecl):
@@ -34,11 +38,68 @@ def _CheckClassSimple(node):
             if 'final' in modifiers:
                 err(node.name, "A class must not extend a final class")
 
+        # get method_decls that is not implemented in super class
+        super_methods = node.extends.linked_type.method_decls
+        super_abstract_methods = []
+        if super_methods is not None:
+            for decl in super_methods:
+                modifiers = [x.lexeme for x in decl.header.modifiers]
+                if 'abstract' in modifiers:
+                    sig = tuple(_MakeMethodSig(decl.header))
+                    super_abstract_methods.append(sig)
+        # get implemented methods in current class
+        current_implemented_methods = []
+        if node.method_decls is not None:
+            for decl in node.method_decls:
+                if decl.body_block is not None:
+                    sig = tuple(_MakeMethodSig(decl.header))
+                    current_implemented_methods.append(sig)
+        # check if super_abstract_methods are implemented in current class
+        for sig in super_abstract_methods:
+            if sig not in current_implemented_methods and not isAbstract:
+                err(node.name,
+                    "Inherited abstract method not implemented")
+
     if node.interfaces is not None:
         _CheckInterfaces(node.name, node.interfaces)
         for interface in node.interfaces:
             if not isinstance(interface.linked_type, InterfaceDecl):
                 err(node.name, "A class must implement an interface.")
+
+        # get method_decls that is not implemented in super interface
+        super_abstract_methods = set()
+        for interface in node.interfaces:
+            super_abstract_methods |= _GetMethodDeclsFromInterfaces(
+                interface.linked_type)
+        # get implemented methods in current class
+        current_implemented_methods = []
+        if node.method_decls is not None:
+            for decl in node.method_decls:
+                sig = tuple(_MakeMethodSig(decl.header))
+                current_implemented_methods.append(sig)
+        # check if super_abstract_methods are implemented in current class
+        for sig in super_abstract_methods:
+            if sig not in current_implemented_methods and not isAbstract:
+                err(node.name,
+                    "Inherited interface method not declared or implemented")
+
+
+@memoize
+# get method_decls that is not implemented in super interface
+def _GetMethodDeclsFromInterfaces(node):
+    super_abstract_methods = set()
+
+    if node.extends_interface is not None:
+        for interface in node.extends_interface:
+            super_methods = interface.linked_type.method_decls
+            if super_methods is not None:
+                for decl in super_methods:
+                    sig = tuple(_MakeMethodSig(decl.header))
+                    super_abstract_methods.add(sig)
+            super_abstract_methods |= _GetMethodDeclsFromInterfaces(
+                interface.linked_type)
+
+    return super_abstract_methods
 
 
 def _CheckClassNoCycles(node):
@@ -130,11 +191,27 @@ def _CheckConstructors(constructor_decls):
         sigs.add(sig)
 
 
+def _CheckClassMethods(node, method_decls):
+    if method_decls is None:
+        return
+
+    class_modifiers = [x.lexeme for x in node.modifiers]
+    isAbstract = 'abstract' in class_modifiers
+
+    for decl in method_decls:
+        modifiers = [x.lexeme for x in decl.header.modifiers]
+        if 'abstract' in modifiers and not isAbstract:
+            err(decl.header.m_id,
+                "Abstract method " + decl.header.m_id.lexeme
+                + " in a non abstract class")
+
+
 def _CheckClass(node):
     _CheckClassSimple(node)
     _CheckClassNoCycles(node)
     _CheckMethods(node.method_decls)
     _CheckConstructors(node.constructor_decls)
+    _CheckClassMethods(node, node.method_decls)
 
 
 def _CheckInterface(node):
