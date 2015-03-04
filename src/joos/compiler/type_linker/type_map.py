@@ -14,16 +14,22 @@ class TypeMap(object):
         self.packages = packages
 
     def RecursiveAddNode(self, pkg_list, decl_tuple):
+        (name, decl) = decl_tuple
         if pkg_list:
             first, last = pkg_list[0], pkg_list[1:]
             if first not in self.packages:
+                if first in self.decls:
+                    err(decl.name,
+                        'Attempted to redefine type with package: ' + name)
                 self.packages[first] = TypeMap()
             self.packages[first].RecursiveAddNode(last, decl_tuple)
         else:
-            (name, decl) = decl_tuple
             if name in self.decls:
                 err(decl.name,
                     "Duplicate definition of " + name)
+            if name in self.packages and not self.default:
+                err(decl.name,
+                    "Attempted to redefine package with type: " + name)
             self.decls[name] = decl
 
     def RecursiveLookupPackage(self, names):

@@ -33,12 +33,12 @@ for file in $ALL_FILES; do
     if [ $EXC -eq 0 ]; then
         if [ $JOOSC -ne 42 ]; then
             printf "FAILED, expected 42\n"
-            exit 1
+            continue
         fi
     else
         if [ $JOOSC -ne 0 ]; then
             printf "FAILED, expected 0\n"
-            exit 1
+            continue
         fi
     fi
     printf "OK\n"

@@ -1,7 +1,4 @@
-package org.example;
+package y.a.Bare;
 
 public interface Bare2 {
-
-    public void method2();
-
 }

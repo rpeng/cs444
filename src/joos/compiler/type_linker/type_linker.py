@@ -13,16 +13,6 @@ class TypeLinker(ASTVisitor):
         split = name.Split()
         canon = name.AsString()
 
-        for i in range(1, len(split)):
-            prefix = '.'.join(split[:i])
-            # Allow default package prefix
-            if prefix not in self.type_map.decls:
-                if self.type_map.LookupType(prefix) is not None:
-                    err(name.tokens[0],
-                        "Prefix of qualified type should "
-                        "not resolve to a type: " + canon +
-                        ' prefix: ' + prefix)
-
         type = self.type_map.LookupType(canon)
         if type is None:
             err(name.tokens[0], "Type does not exist: " + canon)
