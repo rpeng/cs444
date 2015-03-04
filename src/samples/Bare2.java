@@ -1,4 +1,4 @@
-package y.a.Bare;
+package org.example;
 
 public interface Bare2 {
 }

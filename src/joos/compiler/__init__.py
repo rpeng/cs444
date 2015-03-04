@@ -3,3 +3,4 @@ from printer import PrintAST
 from weeder import WeedAST
 from environment import BuildEnv
 from type_linker import LinkTypes
+from hierarchy_check import CheckHierarchy

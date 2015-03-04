@@ -6,7 +6,8 @@ from joos.compiler import (BuildAST,
                            PrintAST,
                            WeedAST,
                            BuildEnv,
-                           LinkTypes)
+                           LinkTypes,
+                           CheckHierarchy)
 from lexer.errors import *
 from lexer import scanner, parser
 
@@ -40,8 +41,9 @@ def PrepareTokens(tokens, filename):
         if token.token_type in SKIP_TOKEN_TYPES:
             continue
         if token.token_type in unsupported:
-            raise JoosError("Unsupported token '{}' on row {} col {}".format(
-                token.lexeme, token.row, token.col))
+            raise JoosError(
+                "File: {} \nUnsupported token '{}' on row {} col {}"
+                .format(token.filename, token.lexeme, token.row, token.col))
         # Convert to token representations
         token.token_type = TOKEN_TO_LR1_REPR[token.token_type]
         token.filename = filename
@@ -58,8 +60,9 @@ def Parse(tokens, lr1_grammar_file):
         return parser.Parse(cfg, parse_table, tokens)[1]
     except ParseErrorWithToken, e:
         if e.token.token_type == t.EOF:
-            raise JoosError("Unexpected token at end of file. "
+            raise JoosError("File: {} \nUnexpected token at end of file. "
                             "Expecting one of: {}".format(
+                                e.token.filename,
                                 ' '.join(e.expected)))
         else:
             raise

@@ -1,4 +1,4 @@
-class JoosError(RuntimeError):
+class JoosError(Exception):
     pass
 
 

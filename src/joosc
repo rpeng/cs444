@@ -13,7 +13,8 @@ from joos.joosc import (ScanInput,
                         PrintAST,
                         WeedAST,
                         BuildEnv,
-                        LinkTypes)
+                        LinkTypes,
+                        CheckHierarchy)
 
 
 JOOS_CACHE = 'generated/joos.cache'
@@ -49,6 +50,7 @@ def Main(input_files):
     try:
         units = MultiProcessFiles(input_files)
         LinkTypes(units)
+        CheckHierarchy(units)
     except JoosError, e:
         print >> sys.stderr, str(e)
         sys.exit(42)
