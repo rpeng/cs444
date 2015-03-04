@@ -51,6 +51,7 @@ class ExprEnvMixin(object):
         return Environment.Empty()
 
     def VisitClassInstanceCreationExpression(self, node):
+        self.PassVisit(node.env, node.class_type)
         self.PassVisit(node.env, node.args)
         return Environment.Empty()
 

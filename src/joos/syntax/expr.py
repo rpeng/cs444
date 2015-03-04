@@ -172,7 +172,7 @@ class ClassInstanceCreationExpression(Expression):
         return visitor.VisitClassInstanceCreationExpression(self)
 
     def __init__(self, class_type, args):
-        self.class_type = class_type  # token[]
+        self.class_type = class_type  # Name
         self.args = args  # Expression[]?
 
 

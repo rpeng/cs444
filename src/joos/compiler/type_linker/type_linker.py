@@ -210,7 +210,7 @@ class TypeLinker(ASTVisitor):
         return Environment.Empty()
 
     def VisitClassInstanceCreationExpression(self, node):
-        self.Visit(node.class_type)
+        self.Resolve(node.class_type)
         self.Visit(node.args)
         return Environment.Empty()
 
