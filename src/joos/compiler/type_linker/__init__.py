@@ -6,7 +6,7 @@ __all__ = ['LinkTypes']
 
 
 def LinkTypes(list_of_nodes):
-    map = TypeMap()
+    map = TypeMap(default=True)
     for node in list_of_nodes:
         map.AddNode(node)
     linker = TypeLinker(map)

@@ -52,6 +52,7 @@ class EnvBuilder(DeclEnvMixin, ExprEnvMixin, StmtEnvMixin, ASTVisitor):
         return Environment.Empty()
 
     def VisitClassOrInterfaceType(self, node):
+        self.PassVisit(node.env, node.name)
         return Environment.Empty()
 
     def VisitVoidType(self, node):

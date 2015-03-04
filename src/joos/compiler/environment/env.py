@@ -72,12 +72,19 @@ class Environment(object):
             return self.upstream.LookupClassImport(name)
         return None
 
-    def LookupPackageImport(self, name):
-        if name in self.package_imports:
-            return self.package_imports[name]
-        elif self.upstream is not None:
-            return self.upstream.LookupPackageImport(name)
-        return None
+    def LookupNameInPackages(self, name):
+        if not self.package_imports:
+            if self.upstream is not None:
+                return self.upstream.LookupNameInPackages(name)
+            else:
+                return None
+
+        results = []
+        for type_map in self.package_imports.values():
+            type = type_map.LookupType(name)
+            if type:
+                results.append(type)
+        return results
 
     def Update(self, update_env):
         if update_env.upstream is not None:
@@ -130,9 +137,20 @@ class Environment(object):
         name = node.Last()
         type = self.LookupClassOrInterface()
         if type is not None and name == type[0]:
-            err(node.name[0], "Import clashes with class decl: " + name)
-        if self.LookupClassImport(name) is not None:
-            err(node.name[0], "Import clashes with another: " + name)
+            pkg = self.LookupPackage()
+            decl = self.LookupClassOrInterface()
+            if pkg and decl:
+                pkg = pkg[0]
+                decl = decl[0]
+            # You are allowed to import yourself
+            if not (node.Prefix() == pkg and node.Last() == decl):
+                err(node.tokens[0], "Import clashes with class decl: " + name)
+        class_import = self.LookupClassImport(name)
+        if class_import is not None:
+            class_name = class_import[0]
+            # You can include the same thing twice
+            if node.AsString() != class_name.AsString():
+                err(node.tokens[0], "Import clashes with another: " + name)
         self.class_imports[name] = (node, decl)
 
     def AddPackageImport(self, name, pkg):

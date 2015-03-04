@@ -8,8 +8,9 @@ ALL_FILES="extern/testcases/$1/*"
 
 touch generated/completed_tests_$1
 
+stdlib=`find extern/stdlib/2.0/ -iname *.java`
+
 for file in $ALL_FILES; do
-    echo $file
     grep $file generated/completed_tests_$1 >/dev/null
     SKIP=$?
     if [ $SKIP -eq 0 ]; then
@@ -23,9 +24,9 @@ for file in $ALL_FILES; do
     EXC=$?
 
     if [[ -d $file ]]; then # if the file is a directory
-        ./joosc `find $file -type f` >/dev/null
+        ./joosc $stdlib `find $file -type f`
     else
-        ./joosc $file >/dev/null
+        ./joosc $stdlib $file
     fi
     JOOSC=$?
 

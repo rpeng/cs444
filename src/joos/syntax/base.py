@@ -149,6 +149,9 @@ class Name(AbstractSyntaxNode):
     def visit(self, visitor):
         return visitor.VisitName(self)
 
+    def IsSimple(self):
+        return len(self.tokens) == 1
+
     def Prefix(self):
         return '.'.join([x.lexeme for x in self.tokens[:-1]])
 

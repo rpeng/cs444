@@ -1,6 +1,8 @@
 #!/usr/bin/python
+from multiprocessing import Pool
 
 import sys
+import os.path
 
 from joos.errors import JoosError
 
@@ -14,6 +16,7 @@ from joos.joosc import (ScanInput,
                         LinkTypes)
 
 
+JOOS_CACHE = 'generated/joos.cache'
 JOOS_LR1_FILE = 'generated/joos.lr1'
 
 
@@ -28,12 +31,23 @@ def ProcessFile(input_file):
         return ast
 
 
+def ProcessFiles(input_files):
+    units = []
+    for file in input_files:
+        ast = ProcessFile(file)
+        units.append(ProcessFile(file))
+    return units
+
+
+def MultiProcessFiles(input_files):
+    pool = Pool(processes=4)
+    units = pool.map(ProcessFile, input_files)
+    return units
+
 
 def Main(input_files):
     try:
-        units = []
-        for file in input_files:
-            units.append(ProcessFile(file))
+        units = MultiProcessFiles(input_files)
         LinkTypes(units)
     except JoosError, e:
         print >> sys.stderr, str(e)

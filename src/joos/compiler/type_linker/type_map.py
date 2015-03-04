@@ -2,35 +2,66 @@ from joos.errors import err
 
 
 class TypeMap(object):
-    def __init__(self):
-        self.type_map = {}
+    def __init__(self, default=False,
+                 decls=None,
+                 packages=None):
+        if decls is None:
+            decls = {}
+        if packages is None:
+            packages = {}
+        self.default = default
+        self.decls = decls
+        self.packages = packages
+
+    def RecursiveAddNode(self, pkg_list, decl_tuple):
+        if pkg_list:
+            first, last = pkg_list[0], pkg_list[1:]
+            if first not in self.packages:
+                self.packages[first] = TypeMap()
+            self.packages[first].RecursiveAddNode(last, decl_tuple)
+        else:
+            (name, decl) = decl_tuple
+            if name in self.decls:
+                err(decl.name,
+                    "Duplicate definition of " + name)
+            self.decls[name] = decl
+
+    def RecursiveLookupPackage(self, names):
+        if names:
+            first, last = names[0], names[1:]
+            if first in self.packages:
+                return self.packages[first].RecursiveLookupPackage(last)
+            else:
+                return None
+        return self
+
+    def RecursiveLookupType(self, names):
+        if len(names) > 1:
+            first, last = names[0], names[1:]
+            if first in self.packages:
+                return self.packages[first].RecursiveLookupType(last)
+            else:
+                return None
+        elif len(names) == 1:
+            return self.decls.get(names[0])
 
     def AddNode(self, node):
         pkg = node.env.LookupPackage()
+        pkg = pkg and pkg[0].split('.')
         decl_tuple = node.env.LookupClassOrInterface()
-        if pkg is not None:
-            pkg = pkg[0]
-        else:
-            pkg = ''
         if decl_tuple is not None:
-            (name, decl) = decl_tuple
-            if pkg not in self.type_map:
-                self.type_map[pkg] = {}
-            if name in self.type_map[pkg]:
-                err(decl.name,
-                    "Duplicate definition of " + name)
-            self.type_map[pkg][name] = decl
+            self.RecursiveAddNode(pkg, decl_tuple)
 
     def LookupPackage(self, pkg):
-        return self.type_map.get(pkg)
+        if not pkg:
+            return self
+        names = pkg.split('.')
+        return self.RecursiveLookupPackage(names)
 
     def LookupType(self, canon_name):
         names = canon_name.split(".")
-        pkg_name = ".".join(names[:-1])
-        type_name = names[-1]
-
-        pkg = self.LookupPackage(pkg_name)
-        return pkg and pkg.get(type_name)
+        return self.RecursiveLookupType(names)
 
     def __repr__(self):
-        return str(self.type_map)
+        return 'Packages: {}, Decls: {}'.format(
+            self.packages.keys(), self.decls.keys())
