@@ -68,3 +68,4 @@ def MakeMethodSig(header):
         for param in header.params:
             sig.append(MakeTypeSig(param.p_type))
     return tuple(sig)
+

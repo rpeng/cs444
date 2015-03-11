@@ -77,6 +77,10 @@ class MethodDecl(AbstractSyntaxNode):
     def visit(self, visitor):
         return visitor.VisitMethodDecl(self)
 
+    def IsAbstract(self):
+        modifiers = [x.lexeme for x in self.header.modifiers]
+        return self.body_block is None and 'native' not in modifiers
+
     def __init__(self, header, body_block):
         self.header = header  # MethodHeader
         self.body_block = body_block  # Block?
