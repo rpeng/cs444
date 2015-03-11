@@ -1,5 +1,5 @@
 from .common import *
-from joos.compiler.hierarchy_check.interfaces import ResolveInterfaceDecls, AddDecls
+from .interfaces import ResolveInterfaceDecls, AddDecls
 from joos.errors import err
 from joos.syntax import *
 
@@ -95,4 +95,3 @@ def CheckClass(node):
     CheckConstructors(node.constructor_decls)
     CheckDuplicateMethods(node.method_decls)
     ResolveClassMethods(node)
-

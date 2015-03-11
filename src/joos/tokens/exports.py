@@ -136,4 +136,4 @@ all_exports = (keyword_exports +
                common_exports)
 
 # Convert Exports to DFAs
-all_exports = [ (x[0], NFAToDFA(x[1])) for x in all_exports ]
+all_exports = [(x[0], NFAToDFA(x[1])) for x in all_exports]
