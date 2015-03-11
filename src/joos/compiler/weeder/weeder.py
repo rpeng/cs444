@@ -37,6 +37,8 @@ class WeederVisitor(ASTVisitor):
                 + self.filename)
         if 'static' in modifiers:
             err(node.modifiers[0], "A class cannot be static")
+        if 'native' in modifiers:
+            err(node.modifiers[0], "A class cannot be native")
         if 'abstract' in modifiers and 'final' in modifiers:
             err(node.modifiers[0],
                 "A class cannot be both abstract and final")
@@ -124,3 +126,7 @@ class WeederVisitor(ASTVisitor):
 
         if node.body:
             node.body.visit(self)
+
+    def VisitLocalVarDecl(self, node):
+        if not node.var_decl.exp:
+            err(node.name, "Local variable declarations must be initialized.")

@@ -82,7 +82,7 @@ def ResolveClassMethods(node):
         for decl in decl_map.values():
             if decl.IsAbstract():
                 err(node.name,
-                    "Non abstract class must implement all methods: " + decl)
+                    "Non abstract class must implement all methods: " + decl.header.m_id)
 
     return set(decl_map.values())
 
