@@ -1,9 +1,10 @@
 from joos.tokens.strings import *
+from structs.converter import NFAToDFA
 
 
 class TestStrings(object):
     def test_character_literal(self):
-        re = character_literal
+        re = NFAToDFA(character_literal)
         assert re.ShouldAccept(r"'a'")
         assert re.ShouldAccept(r"'z'")
         assert re.ShouldAccept(r"'0'")
@@ -16,7 +17,7 @@ class TestStrings(object):
         assert not re.ShouldAccept(r"'2\n'")
 
     def test_string_literal(self):
-        re = string_literal
+        re = NFAToDFA(string_literal)
         assert re.ShouldAccept(r'"a"')
         assert re.ShouldAccept(r'"jano\ni\"s\ta\012bot"')
         assert re.ShouldAccept(r'""')

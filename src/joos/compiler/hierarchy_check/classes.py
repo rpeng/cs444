@@ -75,14 +75,16 @@ def ResolveClassMethods(node):
     else:
         AddDecls(GetObject().method_decls, decl_map)
 
-    AddDecls(node.method_decls, decl_map)
+    if node is not GetObject():
+        AddDecls(node.method_decls, decl_map)
 
     class_modifiers = [x.lexeme for x in node.modifiers]
     if 'abstract' not in class_modifiers:
         for decl in decl_map.values():
             if decl.IsAbstract():
                 err(node.name,
-                    "Non abstract class must implement all methods: " + decl.header.m_id)
+                    "Non abstract class must implement all methods: " +
+                    decl.header.m_id.lexeme)
 
     return set(decl_map.values())
 

@@ -1,4 +1,5 @@
 from nose.tools import *
+from joos.errors import JoosError
 
 from joos.joosc import PrepareTokens
 from structs.cfg import Token
@@ -9,7 +10,7 @@ class TestJooscPrepare(object):
         tokens = [Token('PUBLIC', 'public', 1, 1),
                   Token('WHITESPACE', ' ', 1, 7),
                   Token('VOID', 'void', 1, 8)]
-        result = PrepareTokens(tokens)
+        result = PrepareTokens(tokens, None)
         assert_equal(result, [
             Token('BOF', 'BOF'),
             Token('public', 'public', 1, 1),
@@ -22,7 +23,7 @@ class TestJooscPrepare(object):
                   Token('ID', 'Richard', 1, 7),
                   Token('LPAREN', '(', 1, 13),
                   Token('STRING', '"asdf"', 1, 17)]
-        result = PrepareTokens(tokens)
+        result = PrepareTokens(tokens, None)
         assert_equal(result, [
             Token('BOF', 'BOF'),
             Token('public', 'public', 1, 1),
@@ -36,4 +37,4 @@ class TestJooscPrepare(object):
         tokens = [Token('PUBLIC', 'public', 1, 1),
                   Token('WHITESPACE', ' ', 1, 7),
                   Token('DO', 'do', 1, 8)]
-        assert_raises(RuntimeError, PrepareTokens, tokens)
+        assert_raises(JoosError, PrepareTokens, tokens, None)

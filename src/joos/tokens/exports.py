@@ -1,3 +1,4 @@
+from structs.converter import NFAToDFA
 from structs.regexp import *
 from joos.tokens.token_types import KEYWORDS, Types as t
 from joos.tokens import common, comments, integers, small, strings
@@ -133,3 +134,6 @@ all_exports = (keyword_exports +
                separator_exports +
                operator_exports +
                common_exports)
+
+# Convert Exports to DFAs
+all_exports = [ (x[0], NFAToDFA(x[1])) for x in all_exports ]

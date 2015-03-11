@@ -1,5 +1,6 @@
 from structs.cfg import Rule, CFG
 from lexer.errors import *
+from structs.utils import memoize
 
 
 class ParseTreeNode(object):

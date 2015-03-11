@@ -1,4 +1,5 @@
 from structs import nfa
+from structs.converter import NFAToDFA
 
 
 class TestNFA(object):
@@ -52,3 +53,7 @@ class TestNFA(object):
         assert self.nfa.ShouldAccept('0010')
         assert self.nfa.ShouldAccept('111')
         assert not self.nfa.ShouldAccept('1011')
+
+    def test_convert(self):
+        self.nfa = NFAToDFA(self.nfa)
+        self.test_accept()

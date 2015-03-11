@@ -94,8 +94,8 @@ def Character(c):
 
 
 def OneOf(chars):
-    matcher = lambda x: x in chars
-    return Character(matcher)
+    res = [Character(x) for x in chars]
+    return UnionsOf(*res)
 
 
 def Exact(string):

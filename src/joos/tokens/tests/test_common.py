@@ -1,4 +1,5 @@
 from joos.tokens.common import *
+from structs.converter import NFAToDFA
 
 
 class TestCommon(object):
@@ -25,7 +26,7 @@ class TestCommon(object):
         self.AssertNotAcceptsRange(java_digit, '()abcABC$_')
 
     def test_digits(self):
-        re = digits
+        re = NFAToDFA(digits)
         assert re.ShouldAccept('01231')
         assert re.ShouldAccept('120')
         assert re.ShouldAccept('000')
@@ -33,7 +34,7 @@ class TestCommon(object):
         assert not re.ShouldAccept('')
 
     def test_java_identifier(self):
-        re = identifier
+        re = NFAToDFA(identifier)
         assert re.ShouldAccept('j')
         assert re.ShouldAccept('jane123')
         assert re.ShouldAccept('$_123')
@@ -42,7 +43,7 @@ class TestCommon(object):
         self.AssertNotAcceptsRange(re, '&*@!#')
 
     def test_whitespace(self):
-        re = whitespace
+        re = NFAToDFA(whitespace)
         assert re.ShouldAccept(' ')
         assert re.ShouldAccept('\x09')
         assert not re.ShouldAccept('j ')
@@ -50,7 +51,7 @@ class TestCommon(object):
         assert not re.ShouldAccept('kasdjf')
 
     def test_line_terminator(self):
-        re = line_terminator
+        re = NFAToDFA(line_terminator)
         assert re.ShouldAccept('\x0a')
         assert re.ShouldAccept('\x0d\x0a')
         assert not re.ShouldAccept(' ')

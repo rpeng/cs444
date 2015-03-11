@@ -58,10 +58,13 @@ class NFA(object):
         """Runs the automaton on the given inputs
 
         Returns True if the input is accepted by the atomaton."""
-        executor = NFAExecutor(self)
+        executor = self.Executor()
         for input_token in inputs:
             executor = executor.Consume(input_token)
         return executor.IsAccepting()
+
+    def Executor(self):
+        return NFAExecutor(self)
 
 
 class NFAExecutor(object):

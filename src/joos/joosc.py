@@ -1,4 +1,3 @@
-from joos.errors import err
 from structs.cfg import Token
 from joos.tokens.exports import all_exports, unsupported, symbols_map
 from joos.tokens.token_types import Types as t
@@ -14,11 +13,15 @@ from lexer import scanner, parser
 
 __all__ = ['ScanInput', 'PrepareTokens', 'Parse',
            'BuildAST', 'PrintAST', 'WeedAST',
-           'BuildEnv', 'LinkTypes']
+           'BuildEnv', 'LinkTypes', 'CheckHierarchy']
 
 TOKEN_TO_LR1_REPR = dict([(k, v) for k, v in symbols_map])
 LR1_REPR_TO_TOKEN = dict([(v, k) for k, v in symbols_map])
 SKIP_TOKEN_TYPES = [t.WHITESPACE, t.NEWLINE, t.COMMENT]
+
+
+cfg = None
+parse_table = None
 
 
 def ScanInput(inputs):
@@ -53,9 +56,11 @@ def PrepareTokens(tokens, filename):
 
 
 def Parse(tokens, lr1_grammar_file):
+    global cfg, parse_table
     """Parses a set of tokens"""
-    with open(lr1_grammar_file) as f:
-        cfg, parse_table = parser.FromLr1(f)
+    if not cfg or not parse_table:
+        with open(lr1_grammar_file) as f:
+            cfg, parse_table = parser.FromLr1(f)
     try:
         return parser.Parse(cfg, parse_table, tokens)[1]
     except ParseErrorWithToken, e:

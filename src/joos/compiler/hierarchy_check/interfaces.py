@@ -15,36 +15,6 @@ def CheckInterfaceSimple(node):
                     interface.AsString())
 
 
-@memoize
-def GetUpstreamInterfaceMethod(node, sig):
-    if node.extends_interface:
-        for iface in node.extends_interface:
-            decl = GetInterfaceMethod(iface.linked_type, sig)
-            if decl is not None:
-                return decl
-    else:
-        return GetInterfaceMethod(GetObject(), sig)
-
-
-@memoize
-def GetInterfaceMethod(node, sig):
-    method_decls = node.method_decls
-    if method_decls is not None:
-        for decl in method_decls:
-            obj_sig = tuple(MakeMethodSig(decl.header))
-            if obj_sig == sig:
-                return decl
-
-    if isinstance(node, InterfaceDecl):
-        if node.extends_interface:
-            for interface in node.extends_interface:
-                method = GetInterfaceMethod(interface.linked_type, sig)
-                if method is not None:
-                    return method
-        else:
-            return GetInterfaceMethod(GetObject(), sig)
-    return None
-
 def CheckInterfaceNoCycles(node, path=None):
     if node in acyclic_interface_nodes:
         return
@@ -69,7 +39,7 @@ def AddDecls(new_decls, decls_map):
 
     for decl in new_decls:
         sig = MakeMethodSig(decl.header)
-        if sig in decls_map:
+        if sig in decls_map and decls_map[sig] != decl:
             VerifyReplaceDecl(decls_map[sig], decl)
         decls_map[sig] = decl
 
@@ -98,6 +68,10 @@ def VerifyReplaceDecl(old_decl, new_decl):
     # Check public -> protected
     if 'public' in old_modifiers and 'protected' in new_modifiers:
         err(new_header.m_id, "Public replaced with protected in: " + m_name)
+
+    # Check override final
+    if 'final' in old_modifiers:
+        err(new_header.m_id, "Attempt to override final method: " + m_name)
 
 
 @memoize

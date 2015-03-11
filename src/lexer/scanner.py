@@ -1,4 +1,3 @@
-from structs.nfa import NFAExecutor
 from structs.cfg import Token
 from lexer.errors import *
 
@@ -30,7 +29,7 @@ class _MaximalMunchExecutor(object):
     def NewStates(self):
         states = []
         for emit, nfa in self.nfa_exports:
-            states.append((emit, NFAExecutor(nfa)))
+            states.append((emit, nfa.Executor()))
         return states
 
     def Consume(self, inputs):

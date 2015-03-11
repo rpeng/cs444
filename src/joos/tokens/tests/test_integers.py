@@ -1,9 +1,10 @@
 from joos.tokens.integers import *
+from structs.converter import NFAToDFA
 
 
 class TestIntegers(object):
     def test_decimal_integer_literal(self):
-        re = decimal_integer_literal
+        re = NFAToDFA(decimal_integer_literal)
         assert re.ShouldAccept('0')
         # assert re.ShouldAccept('0l')
         assert re.ShouldAccept('1')
