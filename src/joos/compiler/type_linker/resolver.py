@@ -65,4 +65,4 @@ class Resolver(object):
         if resolved:
             name.linked_type = resolved
         else:
-            err(name.tokens[0], "Type does not exist: " + canon)
+            err(name.tokens[0], "Resolver: Type does not exist: " + canon)
