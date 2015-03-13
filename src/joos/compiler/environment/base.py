@@ -1,5 +1,5 @@
 from joos.compiler.environment import *
-from joos.syntax import ASTVisitor
+from joos.syntax import ASTVisitor, ArrayType
 
 
 class EnvBuilder(DeclEnvMixin, ExprEnvMixin, StmtEnvMixin, ASTVisitor):
@@ -48,7 +48,7 @@ class EnvBuilder(DeclEnvMixin, ExprEnvMixin, StmtEnvMixin, ASTVisitor):
         return Environment.Empty()
 
     def VisitArrayType(self, node):
-        self.PassVisit(node.env, node.type_or_name)
+        self.PassVisit(node.env.upstream, node.type_or_name)
         return Environment.Empty()
 
     def VisitClassOrInterfaceType(self, node):

@@ -44,6 +44,11 @@ class ClassDecl(TypeDecl):
     def visit(self, visitor):
         return visitor.VisitClassDecl(self)
 
+    def NonDefaultKeys(self):
+        return ['extends', 'interfaces', 'field_decls', 'method_decls',
+                'constructor_decls']
+        pass
+
     def __init__(self, modifiers, name, extends, interfaces, field_decls,
                  method_decls, constructor_decls):
         self.modifiers = modifiers  # token[]
@@ -140,7 +145,7 @@ class VariableDeclarator(AbstractSyntaxNode):
 
     def __init__(self, var_id, exp):
         self.var_id = var_id  # token
-        self.exp = exp  # Expression?
+        self.exp = exp  # Expression
 
 
 class LocalVarDecl(AbstractSyntaxNode):

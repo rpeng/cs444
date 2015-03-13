@@ -113,8 +113,8 @@ class WeederVisitor(ASTVisitor):
     def VisitCastExpression(self, node):
         if not (isinstance(node.cast_type, PrimitiveType) or
                 isinstance(node.cast_type, ClassOrInterfaceType) or
-                isinstance(node.cast_type, ArrayType) or
-                isinstance(node.cast_type, NameExpression)):
+                isinstance(node.cast_type, NameExpression) or
+                node.is_array):
             err(node[0].token,
                 "A cast must be of primitive or reference types")
 

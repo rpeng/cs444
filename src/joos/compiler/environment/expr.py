@@ -32,6 +32,7 @@ class ExprEnvMixin(object):
 
     def VisitArrayAccess(self, node):
         self.PassVisit(node.env, node.name_or_primary)
+        self.PassVisit(node.env, node.exp)
         return Environment.Empty()
 
     def VisitThisExpression(self, node):

@@ -81,7 +81,7 @@ def ResolveInterfaceDecls(node):
         for name in node.extends_interface:
             new_decls = ResolveInterfaceDecls(name.linked_type)
             AddDecls(new_decls, decls_map)
-    else:
+    elif GetObject():
         AddDecls(GetObject().method_decls, decls_map)
     AddDecls(node.method_decls, decls_map)
     return set(decls_map.values())

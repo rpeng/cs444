@@ -1,20 +1,10 @@
 #!/usr/bin/python
 from multiprocessing.pool import Pool
-
 import sys
-import os.path
 
 from joos.errors import JoosError
-
-from joos.joosc import (ScanInput,
-                        PrepareTokens,
-                        Parse,
-                        BuildAST,
-                        PrintAST,
-                        WeedAST,
-                        BuildEnv,
-                        LinkTypes,
-                        CheckHierarchy)
+from joos.lex import (ScanInput, PrepareTokens, Parse)
+from joos.compiler import *
 
 
 JOOS_CACHE = 'generated/joos.cache'
@@ -51,6 +41,7 @@ def Main(input_files):
         units = MultiProcessFiles(input_files)
         app = LinkTypes(units)
         CheckHierarchy(app)
+        LinkNames(app)
     except JoosError, e:
         print >> sys.stderr, str(e)
         sys.exit(42)

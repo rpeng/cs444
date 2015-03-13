@@ -1,7 +1,7 @@
 from joos.compiler.environment import Environment
 from joos.compiler.type_linker.resolver import Resolver
 from joos.errors import err
-from joos.syntax import ASTVisitor, ImportDecl, Name
+from joos.syntax import *
 
 
 class TypeLinker(ASTVisitor):
@@ -54,6 +54,7 @@ class TypeLinker(ASTVisitor):
             node.env.AddPackageImport('java.lang', types)
 
         self.Visit(node.type_decl)
+        node.env.AddTypeMap(self.type_map)
         return Environment.Empty()
 
     def VisitArrayType(self, node):
@@ -107,6 +108,9 @@ class TypeLinker(ASTVisitor):
         self.Visit(node.field_decls)
         self.Visit(node.method_decls)
         self.Visit(node.constructor_decls)
+        if node.extends:
+            node.env.AddInherited(
+                node.extends.linked_type.env)
         return Environment.Empty()
 
     def VisitInterfaceDecl(self, node):

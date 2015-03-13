@@ -1,7 +1,7 @@
 from nose.tools import *
 from joos.errors import JoosError
 
-from joos.joosc import PrepareTokens
+from joos.lex import PrepareTokens
 from structs.cfg import Token
 
 

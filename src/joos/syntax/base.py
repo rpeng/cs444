@@ -29,6 +29,8 @@ class AbstractSyntaxNode(object):
 
     def ASTChildren(self):
         for key in self.NonDefaultKeys():
+            if key is None:
+                continue
             child = self.__dict__[key]
             if isinstance(child, AbstractSyntaxNode):
                 yield child
@@ -89,6 +91,8 @@ class ReferenceType(Type):
 
 class ArrayType(ReferenceType):
     # int[], Object[]
+
+    LengthDecl = object()
 
     @classmethod
     def create(cls, visitor, node):
@@ -163,6 +167,9 @@ class Name(AbstractSyntaxNode):
 
     def AsString(self):
         return '.'.join([x.lexeme for x in self.tokens])
+
+    def NonDefaultKeys(self):
+        return []
 
     def __init__(self, tokens):
         self.tokens = tokens  # token[]

@@ -66,7 +66,7 @@ class CastExpression(Expression):
         return visitor.VisitCastExpression(self)
 
     def __init__(self, cast_type, is_array, exp):
-        self.cast_type = cast_type  # PrimitiveType | Expression | Name
+        self.cast_type = cast_type  # PrimitiveType | ReferenceType
         self.is_array = is_array  # boolean
         self.exp = exp  # Expression
 

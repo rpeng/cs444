@@ -50,4 +50,3 @@ def NFAToDFA(nfa):
                start_state=new_states[start_state],
                end_states=end_states,
                transitions=numbered_transitions)
-

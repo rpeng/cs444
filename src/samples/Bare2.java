@@ -1,4 +1,5 @@
 package org.example;
 
-public interface Bare2 {
+public class Bare2 {
+    public static int bar = 4;
 }

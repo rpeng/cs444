@@ -9,9 +9,9 @@ class TypeMap(object):
             decls = {}
         if packages is None:
             packages = {}
-        self.default = default
-        self.decls = decls
-        self.packages = packages
+        self.default = default  # boolean - is default package
+        self.decls = decls  # Name -> TypeDecl
+        self.packages = packages  # name -> TypeMap
 
     def RecursiveAddNode(self, pkg_list, decl_tuple):
         (name, decl) = decl_tuple

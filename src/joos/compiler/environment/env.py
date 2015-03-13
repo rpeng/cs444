@@ -7,11 +7,13 @@ class Environment(object):
     def __init__(self, upstream=None):
         self.package = None  # (name, PackageDecl)
         self.class_or_interface = None  # (name, ClassOrInterfaceDecl)
-        self.fields = {}  # (name -> FieldDecl)
+        self.fields = collections.OrderedDict()  # (name -> FieldDecl)
         self.methods = collections.defaultdict(list)  # (name -> MethodDecl[])
         self.parameters = {}  # (name -> Parameter)
         self.local_vars = {}  # (name -> LocalVariableDecl)
 
+        self.inherited_env = None
+        self.type_map = None
         self.class_imports = {}  # (name -> (name_node, ClassOrInterfaceDecl))
         self.package_imports = {}  # (name -> type_map[name])
         self.upstream = upstream
@@ -23,54 +25,79 @@ class Environment(object):
     def Fork(self):
         return Environment(self)
 
+    def VisibleTypes(self):
+        pkg = self.LookupPackage()
+        type_map = self.LookupTypeMap()
+        if pkg:
+            return type_map.LookupPackage(pkg[0])
+        return type_map
+
+    def LookupInherited(self):
+        if self.inherited_env is not None:
+            return self.inherited_env
+        if self.upstream is not None:
+            return self.upstream.LookupInherited()
+
+    def LookupTypeMap(self):
+        if self.type_map is not None:
+            return self.type_map
+        if self.upstream is not None:
+            return self.upstream.LookupTypeMap()
+
     def LookupClassOrInterface(self):
         if self.class_or_interface is not None:
             return self.class_or_interface
-        elif self.upstream is not None:
+        if self.upstream is not None:
             return self.upstream.LookupClassOrInterface()
-        return None
 
     def LookupPackage(self):
         if self.package is not None:
             return self.package
-        elif self.upstream is not None:
+        if self.upstream is not None:
             return self.upstream.LookupPackage()
-        return None
 
     def LookupField(self, name):
         if name in self.fields:
             return self.fields[name]
-        elif self.upstream is not None:
-            return self.upstream.LookupField(name)
-        return None
+        if self.upstream is not None:
+            field = self.upstream.LookupField(name)
+            if field is not None:
+                return field
+        inherited = self.LookupInherited()
+        if inherited is not None:
+            return inherited.LookupField(name)
+
+    def FieldIndex(self, name):
+        if not self.fields:
+            if self.upstream:
+                return self.upstream.FieldIndex(name)
+        else:
+            if name in self.fields:
+                return self.fields.keys().index(name)
 
     def LookupMethod(self, name):
         if name in self.methods:
             return self.methods[name]
-        elif self.upstream is not None:
+        if self.upstream is not None:
             return self.upstream.LookupMethod(name)
-        return None
 
     def LookupParameter(self, name):
         if name in self.parameters:
             return self.parameters[name]
-        elif self.upstream is not None:
+        if self.upstream is not None:
             return self.upstream.LookupParameter(name)
-        return None
 
     def LookupLocalVar(self, name):
         if name in self.local_vars:
             return self.local_vars[name]
-        elif self.upstream is not None:
+        if self.upstream is not None:
             return self.upstream.LookupLocalVar(name)
-        return None
 
     def LookupClassImport(self, name):
         if name in self.class_imports:
             return self.class_imports[name]
-        elif self.upstream is not None:
+        if self.upstream is not None:
             return self.upstream.LookupClassImport(name)
-        return None
 
     def LookupNameInPackages(self, name):
         if not self.package_imports:
@@ -110,6 +137,9 @@ class Environment(object):
     def AddPackage(self, name, node):
         self.package = (name, node)
 
+    def AddTypeMap(self, type_map):
+        self.type_map = type_map
+
     def AddClassOrInterface(self, name, node):
         self.class_or_interface = (name, node)
 
@@ -132,6 +162,9 @@ class Environment(object):
             err(node.var_decl.var_id,
                 "Duplicate variable in overlapping scope: " + name)
         self.local_vars[name] = node
+
+    def AddInherited(self, env):
+        self.inherited_env = env
 
     def AddClassImport(self, node, decl):
         # node : Name

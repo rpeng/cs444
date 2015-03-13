@@ -72,7 +72,7 @@ def ResolveClassMethods(node):
     if node.extends:
         decls = ResolveClassMethods(node.extends.linked_type)
         AddDecls(decls, decl_map)
-    else:
+    elif GetObject():
         AddDecls(GetObject().method_decls, decl_map)
 
     if node is not GetObject():

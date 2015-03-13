@@ -11,19 +11,11 @@ class DeclEnvMixin(object):
         return Environment.Empty()
 
     def VisitClassDecl(self, node):
-        env = node.env.upstream.Fork()
-        self.PassVisit(env, node.extends)
-        self.PassVisit(env, node.interfaces)
-        env.Update(self.ForkVisit(env, node.method_decls))
-        env.Update(self.ForkVisit(env, node.constructor_decls))
-
-        if node.field_decls:
-            for decl in node.field_decls:
-                update = self.PassVisit(env, decl)
-                env = env.Fork()
-                env.Update(update)
-
-        node.env = env
+        self.PassVisit(node.env, node.extends)
+        self.PassVisit(node.env, node.interfaces)
+        node.env.Update(self.ForkVisit(node.env, node.method_decls))
+        node.env.Update(self.ForkVisit(node.env, node.constructor_decls))
+        node.env.Update(self.ForkVisit(node.env, node.field_decls))
 
         env = Environment()
         env.AddClassOrInterface(node.name.lexeme, node)
