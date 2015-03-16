@@ -129,4 +129,5 @@ class WeederVisitor(ASTVisitor):
 
     def VisitLocalVarDecl(self, node):
         if not node.var_decl.exp:
-            err(node.name, "Local variable declarations must be initialized.")
+            err(node.var_decl.var_id,
+                "Local variable declarations must be initialized.")

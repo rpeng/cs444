@@ -1,5 +1,5 @@
 from joos.compiler.type_checker.assignable import *
-from joos.syntax import ASTVisitor
+from joos.syntax import ASTVisitor, Type, Name, UnaryExpression, BinaryExpression
 
 
 class TypeChecker(ASTVisitor):
@@ -29,10 +29,15 @@ class TypeChecker(ASTVisitor):
         return None
 
     def VisitArrayType(self, node):
-        return self.DefaultBehaviour(node)
+        if isinstance(node.type_or_name, Type):
+            context = self.Visit(node.type_or_name)
+            return TypeKind(TypeKind.ARRAY, context)
+        elif isinstance(node.type_or_name, Name):
+            return TypeKind(TypeKind.ARRAY,
+                            TypeKind(TypeKind.REF, node.type_or_name.linked_type))
 
     def VisitClassOrInterfaceType(self, node):
-        return self.DefaultBehaviour(node)
+        return TypeKind(TypeKind.REF, node.name.linked_type)
 
     def VisitVoidType(self, node):
         return TypeKind(TypeKind.VOID)
@@ -53,7 +58,7 @@ class TypeChecker(ASTVisitor):
             return TypeKind(TypeKind.VOID)
 
     def VisitName(self, node):
-        return self.DefaultBehaviour(node)
+        return self.Visit(node.linked_type)
 
     def VisitLiteral(self, node):
         token_type = node.value.token_type
@@ -70,31 +75,33 @@ class TypeChecker(ASTVisitor):
 
     # Decl
     def VisitPackageDecl(self, node):
-        return self.DefaultBehaviour(node)
+        return None
 
     def VisitImportDecl(self, node):
-        return self.DefaultBehaviour(node)
+        return None
 
     def VisitClassDecl(self, node):
         self.Visit(node.field_decls)
         self.Visit(node.method_decls)
         self.Visit(node.constructor_decls)
-        return None
+        return TypeKind(TypeKind.REF, node)
 
     def VisitInterfaceDecl(self, node):
-        return None
+        return TypeKind(TypeKind.REF, node)
 
     def VisitMethodDecl(self, node):
         self.ret_type = self.Visit(node.header.m_type)
+        result = self.ret_type
         self.Visit(node.body_block)
         self.ret_type = None
-        return None
+        return result
 
     def VisitFieldDecl(self, node):
         lhs = self.Visit(node.f_type)
         rhs = self.Visit(node.var_decl)
-        CheckAssignable(node.modifiers[0], lhs, rhs)
-        return None
+        if rhs is not None:
+            CheckAssignable(node.modifiers[0], lhs, rhs)
+        return lhs
 
     def VisitConstructorDecl(self, node):
         return self.DefaultBehaviour(node)
@@ -103,44 +110,104 @@ class TypeChecker(ASTVisitor):
         return self.Visit(node.exp)
 
     def VisitLocalVarDecl(self, node):
-        return self.DefaultBehaviour(node)
+        lhs = self.Visit(node.l_type)
+        rhs = self.Visit(node.var_decl)
+        CheckAssignable(node.var_decl.var_id, lhs, rhs)
+        return lhs
 
     def VisitParameter(self, node):
-        return self.DefaultBehaviour(node)
+        return self.Visit(node.p_type)
 
     # Expression
     def VisitAssignmentExpression(self, node):
-        return self.DefaultBehaviour(node)
+        lhs = self.Visit(node.lhs)
+        exp = self.Visit(node.exp)
+        CheckAssignable(node[1].token, lhs, exp)
+        return lhs
 
     def VisitBinaryExpression(self, node):
+        op = node.op.lexeme
+        left = self.Visit(node.left)
+        right = self.Visit(node.right)
+        if op in BinaryExpression.CONDITIONAL or op in BinaryExpression.INCLUSIVE:
+            CheckAssignable(node[1].token, TypeKind.BOOL, left)
+            CheckAssignable(node[1].token, TypeKind.BOOL, right)
+            return TypeKind(TypeKind.BOOL)
+        elif op in BinaryExpression.RELATIONAL:
+            CheckAssignable(node[1].token, TypeKind.INT, left)
+            CheckAssignable(node[1].token, TypeKind.INT, right)
+            return TypeKind(TypeKind.BOOL)
+        elif op == BinaryExpression.INSTANCEOF:
+            CheckComparable(node[1].token, left, right)
+            return TypeKind(TypeKind.BOOL)
+        if op in BinaryExpression.EQUALITY:
+            if ((left.kind in TypeKind.numerics and right.kind in TypeKind.numerics)
+                or (left.kind == TypeKind.BOOL and right.kind == TypeKind.BOOL)):
+                return TypeKind(TypeKind.BOOL)
+            if left.kind in TypeKind.references and right.kind in TypeKind.references:
+                CheckComparable(node[1].token, left, right)
+                return TypeKind(TypeKind.BOOL)
+            else:
+                err(node[1].token, "Cannot compare {} and {}".format(left, right))
+
         return self.DefaultBehaviour(node)
 
     def VisitUnaryExpression(self, node):
-        return self.DefaultBehaviour(node)
+        sign = node.sign.lexeme
+        if sign == UnaryExpression.NEGATE:
+            right = self.Visit(node.right)
+            CheckAssignable(node[0].token, TypeKind.BOOL, right)
+            return TypeKind(TypeKind.BOOL)
+        elif sign == UnaryExpression.MINUS:
+            right = self.Visit(node.right)
+            CheckAssignable(node[0].token, TypeKind.INT, right)
+            return TypeKind(TypeKind.INT)
 
     def VisitCastExpression(self, node):
         return self.DefaultBehaviour(node)
 
     def VisitParensExpression(self, node):
-        return self.DefaultBehaviour(node)
+        return self.Visit(node.exp)
 
     def VisitFieldAccess(self, node):
+        prim = self.Visit(node.primary)
+        if prim.kind == TypeKind.REF:
+            name = node.name.lexeme
+            decl = prim.context.env.LookupField(name)
+            node.linked_type = decl
+            return self.Visit(decl.f_type)
+        elif prim.kind == TypeKind.ARRAY:
+            if node.name.lexeme == "length":
+                return TypeKind(TypeKind.INT)
+            else:
+                err(node.name, "Invalid access on array "+node.name.lexeme)
+        else:
+            pass
         return self.DefaultBehaviour(node)
 
     def VisitArrayAccess(self, node):
-        return self.DefaultBehaviour(node)
+        lhs = self.Visit(node.name_or_primary)
+        if lhs.kind != TypeKind.ARRAY:
+            err(node[1].token, "Primary must be an array")
+        exp = self.Visit(node.exp)
+        CheckAssignable(node[1].token, TypeKind.INT, exp)
+        return lhs.context
 
     def VisitThisExpression(self, node):
-        return self.DefaultBehaviour(node)
+        decl = node.env.LookupClassOrInterface()
+        return TypeKind(TypeKind.REF, decl[1])
 
     def VisitArrayCreationExpression(self, node):
-        return self.DefaultBehaviour(node)
+        array_kind = self.Visit(node.a_type)
+        exp_kind = self.Visit(node.exp)
+        CheckAssignable(node[0].token, TypeKind.INT, exp_kind)
+        return TypeKind(TypeKind.ARRAY, array_kind)
 
     def VisitStatementExpression(self, node):
-        return self.DefaultBehaviour(node)
+        return self.Visit(node.stmt)
 
     def VisitNameExpression(self, node):
-        return self.DefaultBehaviour(node)
+        return self.Visit(node.name.linked_type)
 
     def VisitClassInstanceCreationExpression(self, node):
         return self.DefaultBehaviour(node)
@@ -156,7 +223,7 @@ class TypeChecker(ASTVisitor):
     def VisitIfThenElseStatement(self, node):
         test_type = self.Visit(node.test_expr)
         if test_type.kind != TypeKind.BOOL:
-            err(node[0].token, "Expected boolean in if statement")
+            err(node[0].token, "Expected boolean in if test")
         self.Visit(node.stmt_true)
         self.Visit(node.stmt_false)
         return None
@@ -164,14 +231,14 @@ class TypeChecker(ASTVisitor):
     def VisitWhileStatement(self, node):
         test_type = self.Visit(node.test_expr)
         if test_type.kind != TypeKind.BOOL:
-            err(node[0].token, "Expected boolean in if statement")
+            err(node[0].token, "Expected boolean in while test")
         self.Visit(node.body)
         return None
 
     def VisitForStatement(self, node):
         test_type = self.Visit(node.test_expr)
         if test_type.kind != TypeKind.BOOL:
-            err(node[0].token, "Expected boolean in if statement")
+            err(node[0].token, "Expected boolean in for test")
         self.Visit(node.init)
         self.Visit(node.update)
         self.Visit(node.body)

@@ -25,7 +25,8 @@ class BinaryExpression(Expression):
     CONDITIONAL = ['||', '&&']
     INCLUSIVE = ['|', '&']
     EQUALITY = ['==', '!=']
-    RELATIONAL = ['<', '>', '<=', '>=', 'instanceof']
+    RELATIONAL = ['<', '>', '<=', '>=']
+    INSTANCEOF = 'instanceof'
     ARITHMETIC = ['+', '-', '*', '/', '%']
 
     @classmethod
@@ -91,9 +92,13 @@ class FieldAccess(Expression):
     def visit(self, visitor):
         return visitor.VisitFieldAccess(self)
 
+    def NonDefaultKeys(self):
+        return ['primary']
+
     def __init__(self, primary, name):
         self.primary = primary  # Primary
         self.name = name  # token
+        self.linked_type = None
 
 
 class ArrayAccess(Expression):

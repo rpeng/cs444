@@ -3,7 +3,7 @@ class ExprPrinterMixin(object):
         return self.DefaultBehaviour(node)
 
     def VisitBinaryExpression(self, node):
-        return """{i}BinaryExpression
+        return """{i}BinaryExpression:
 {i}  Operator: {op}
 {i}  Left:
 {leftexpr}
@@ -39,3 +39,7 @@ class ExprPrinterMixin(object):
 
     def VisitMethodInvocation(self, node):
         return self.DefaultBehaviour(node)
+
+    def VisitNameExpression(self, node):
+        return """{i}Name: {name} Type: {type}""".format(
+            i=self.i(), name=node.name.AsString(), type=node.name.linked_type)

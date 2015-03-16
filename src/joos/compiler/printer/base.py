@@ -14,7 +14,7 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
     def r(self, name):
         # Resolves a name
         if name:
-            return ".".join([x.lexeme for x in name])
+            return name.AsString()
 
     def rs(self, names):
         # Joins a list of names
@@ -36,7 +36,7 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
     def ns(self, list_to_check, indent_add=4):
         # Resolves a list of AST nodes
         if list_to_check:
-            return '\n'.join([ASTPrinter(self.indent + indent_add).Visit(x)
+            return ''.join([ASTPrinter(self.indent + indent_add).Visit(x)
                               for x in list_to_check])
         else:
             return "{i}None".format(i=self.i() + " " * indent_add)
@@ -49,7 +49,7 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
         pkg = None
         imports = None
         if node.pkg_decl:
-            pkg = self.j(node.pkg_decl.name)
+            pkg = node.pkg_decl.name.AsString()
         if node.import_decls:
             imports = self.rs([x.name for x in node.import_decls])
         return """{i}CompilationUnit:
@@ -75,7 +75,7 @@ class ASTPrinter(DeclPrinterMixin, StmtPrinterMixin,
         return node.t_type.lexeme
 
     def VisitName(self, node):
-        return self.r(node.name)
+        return self.r(node)
 
     def VisitLiteral(self, node):
         return """{i}Literal: {value}""".format(i=self.i(),

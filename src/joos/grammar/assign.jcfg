@@ -1,13 +1,10 @@
 {{nonterminals}}
 Assignment
 LeftHandSide
-AssignmentOperator
 
 {{rules}}
-Assignment -> LeftHandSide AssignmentOperator AssignmentExpression
+Assignment -> LeftHandSide = AssignmentExpression
 
 LeftHandSide -> Name
 LeftHandSide -> FieldAccess
 LeftHandSide -> ArrayAccess
-
-AssignmentOperator -> =

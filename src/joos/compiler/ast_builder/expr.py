@@ -64,6 +64,8 @@ class ExprBuilderMixin(object):
 
     def CreateArrayCreationExpression(self, klass, node):
         (a_type, exp) = self._resolve(node, 'PrimitiveType', 'DimExpr')
+        if a_type is None:
+            (a_type,) = self._resolve(node, 'ClassOrInterfaceType')
         exp = exp[1]
         return klass(a_type, exp)
 

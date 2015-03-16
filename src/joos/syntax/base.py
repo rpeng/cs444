@@ -181,7 +181,7 @@ class Name(AbstractSyntaxNode):
 
 
 class Literal(AbstractSyntaxNode):
-    # 1, 'hi', 'a'
+    # 1, 'hi', 'a', null
 
     @classmethod
     def create(cls, visitor, node):

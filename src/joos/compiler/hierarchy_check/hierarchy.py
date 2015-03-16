@@ -13,6 +13,6 @@ def CheckNode(node):
 
 
 def CheckHierarchy(app):
-    PopulateObject(app)
+    PopulateObjects(app)
     for node in app.compilation_units:
         CheckNode(node)

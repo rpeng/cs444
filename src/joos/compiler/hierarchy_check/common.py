@@ -29,7 +29,7 @@ def CheckDuplicateInterfaces(name, nodes):
         decls.add(interface.linked_type)
 
 
-def PopulateObject(app):
+def PopulateObjects(app):
     global object_sigs, object_decl
     object_decl = app.type_map.LookupType("java.lang.Object")
     if object_decl and object_decl.method_decls:

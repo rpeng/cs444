@@ -90,8 +90,9 @@ class Disambiguator(object):
                 if not next:
                     err(node.tokens[0], "Name " + node.AsString() + " not found.")
                 name_type, decl_or_pkg = next
+            if name_type == NameType.PACKAGE:
+                err(node.tokens[0], "Unexpected package")
+            node.linked_type = decl_or_pkg
         else:
             err(node.tokens[0], "Name " + node.AsString() + " not found.")
 
-        if name_type == NameType.PACKAGE:
-            err(node.tokens[0], "Unexpected package")
