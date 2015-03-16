@@ -47,7 +47,6 @@ class ClassDecl(TypeDecl):
     def NonDefaultKeys(self):
         return ['extends', 'interfaces', 'field_decls', 'method_decls',
                 'constructor_decls']
-        pass
 
     def __init__(self, modifiers, name, extends, interfaces, field_decls,
                  method_decls, constructor_decls):

@@ -1,3 +1,4 @@
+from joos.compiler.hierarchy_check.common import GetStringDecl
 from joos.compiler.type_checker.assignable import *
 from joos.syntax import ASTVisitor, Type, Name, UnaryExpression, BinaryExpression
 
@@ -11,6 +12,8 @@ class TypeChecker(ASTVisitor):
         self.comp = comp
         self.type_map = type_map
         self.ret_type = None
+
+        self.string_type = TypeKind(TypeKind.REF, GetStringDecl())
 
     def Start(self):
         self.comp.visit(self)
@@ -67,7 +70,7 @@ class TypeChecker(ASTVisitor):
         elif token_type == 'CHAR':
             return TypeKind(TypeKind.CHAR)
         elif token_type == 'STRING':
-            return TypeKind(TypeKind.STRING)
+            return self.string_type
         elif token_type == 'true' or token_type == 'false':
             return TypeKind(TypeKind.BOOL)
         elif token_type == 'null':
@@ -137,6 +140,21 @@ class TypeChecker(ASTVisitor):
             CheckAssignable(node[1].token, TypeKind.INT, left)
             CheckAssignable(node[1].token, TypeKind.INT, right)
             return TypeKind(TypeKind.BOOL)
+        elif op in BinaryExpression.ARITHMETIC:
+            if op == '+':
+                # For implicit String concatenations
+                if (IsAssignable(TypeKind.INT, left)
+                    and IsAssignable(TypeKind.INT, right)):
+                    return TypeKind(TypeKind.INT)
+                elif (IsAssignable(self.string_type, left) or
+                      IsAssignable(self.string_type, right)):
+                    return self.string_type
+                else:
+                    err(node[1].token, "Invalid operands to + operator")
+            else:
+                CheckAssignable(node[1].token, TypeKind.INT, left)
+                CheckAssignable(node[1].token, TypeKind.INT, right)
+                return TypeKind(TypeKind.INT)
         elif op == BinaryExpression.INSTANCEOF:
             CheckComparable(node[1].token, left, right)
             return TypeKind(TypeKind.BOOL)
@@ -149,8 +167,6 @@ class TypeChecker(ASTVisitor):
                 return TypeKind(TypeKind.BOOL)
             else:
                 err(node[1].token, "Cannot compare {} and {}".format(left, right))
-
-        return self.DefaultBehaviour(node)
 
     def VisitUnaryExpression(self, node):
         sign = node.sign.lexeme
@@ -253,4 +269,3 @@ class TypeChecker(ASTVisitor):
 
     def VisitEmptyStatement(self, node):
         return None
-

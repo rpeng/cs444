@@ -4,6 +4,7 @@ from structs.utils import memoize
 
 object_sigs = set()
 object_decl = None
+string_decl = None
 
 
 def CheckDuplicateMethods(method_decls):
@@ -30,8 +31,9 @@ def CheckDuplicateInterfaces(name, nodes):
 
 
 def PopulateObjects(app):
-    global object_sigs, object_decl
+    global object_sigs, object_decl, string_decl
     object_decl = app.type_map.LookupType("java.lang.Object")
+    string_decl = app.type_map.LookupType("java.lang.String")
     if object_decl and object_decl.method_decls:
         for method in object_decl.method_decls:
             object_sigs.add(MakeMethodSig(method.header))
@@ -39,6 +41,10 @@ def PopulateObjects(app):
 
 def GetObject():
     return object_decl
+
+
+def GetStringDecl():
+    return string_decl
 
 
 @memoize

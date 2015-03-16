@@ -1,6 +1,6 @@
 from joos.compiler.type_checker.type_kind import TypeKind
 from joos.errors import err
-from joos.syntax import ClassDecl
+from joos.syntax import ClassDecl, InterfaceDecl
 
 valid_mappings = {
     TypeKind.BOOL: [TypeKind.BOOL],
@@ -25,6 +25,29 @@ def _IsClassAssignable(left, right):
     else:
         return False
 
+
+def _IsInterfaceAssignable(left, right):
+    seen = set()
+    work_list = [right.context]
+
+    while work_list:
+        decl = work_list.pop()
+        if decl == left.context:
+            return True
+        seen.add(decl)
+        if isinstance(decl, ClassDecl):
+            interfaces = decl.interfaces
+        elif isinstance(decl, InterfaceDecl):
+            interfaces = decl.extends_interface
+        else:
+            return False
+        if interfaces:
+            for node in interfaces:
+                if node.linked_type not in seen:
+                    work_list.append(node.linked_type)
+    return False
+
+
 def IsAssignable(left, right):
     if isinstance(left, str):
         left = TypeKind(left)
@@ -44,9 +67,10 @@ def IsAssignable(left, right):
             return True
         if isinstance(left.context, ClassDecl):
             return _IsClassAssignable(left, right)
+        elif isinstance(left.context, InterfaceDecl):
+            return _IsInterfaceAssignable(left, right)
 
     return left.kind == right.kind
-
 
 
 def CheckAssignable(token, left, right):

@@ -9,12 +9,11 @@ class TypeKind(object):
     SHORT = 'short'
     NULL = 'null'
     VOID = 'void'
-    STRING = 'string'
     REF = 'ref'
     ARRAY = 'array'
 
     numerics = [BYTE, CHAR, SHORT, INT]
-    references = [NULL, REF, ARRAY, STRING]
+    references = [NULL, REF, ARRAY]
 
     def __init__(self, kind, context=None):
         self.kind = kind
