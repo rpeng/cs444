@@ -2,7 +2,7 @@ from joos.syntax import Type
 
 
 class TypeKind(object):
-    BOOL = 'bool'
+    BOOL = 'boolean'
     BYTE = 'byte'
     CHAR = 'char'
     INT = 'int'
@@ -13,6 +13,7 @@ class TypeKind(object):
     ARRAY = 'array'
 
     numerics = [BYTE, CHAR, SHORT, INT]
+    primitives = numerics + [BOOL, NULL]
     references = [NULL, REF, ARRAY]
 
     def __init__(self, kind, context=None):
@@ -38,6 +39,17 @@ class TypeKind(object):
 
     def IsReference(self):
         return self.kind in TypeKind.references
+
+    def AsSig(self):
+        sig = []
+        if self.kind in TypeKind.primitives:
+            sig.append(self.kind)
+        elif self.kind == TypeKind.ARRAY:
+            sig.extend(self.context.AsSig())
+            sig.append('[]')
+        elif self.kind == TypeKind.REF:
+            sig.append(self.context)
+        return tuple(sig)
 
     def __repr__(self):
         if self.kind == TypeKind.ARRAY:

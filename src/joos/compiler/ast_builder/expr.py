@@ -10,7 +10,9 @@ class ExprBuilderMixin(object):
         (lhs, exp) = self._resolve(
             node, 'LeftHandSide', 'AssignmentExpression')
         lhs = lhs[0]  # FieldAccess ArrayAccess
-        return klass(lhs, exp)
+        result = klass(lhs, exp)
+        result.debug_token = node[1].token
+        return result
 
     def CreateBinaryExpression(self, klass, node):
         if node.rule.lhs != node.rule.rhs[0]:
@@ -83,6 +85,6 @@ class ExprBuilderMixin(object):
     def CreateMethodInvocation(self, klass, node):
         (name, primary, primary_id, args) = self._resolve(
             node, 'Name', 'Primary', 'ID', '+ArgumentList')
-        if primary_id:
+        if primary_id is not None:
             primary_id = primary_id.token
         return klass(name, primary, primary_id, args)

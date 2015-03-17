@@ -5,19 +5,21 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 ALL_FILES="extern/testcases/$1/*"
-
+count=`ls extern/testcases/$1/ | wc -l | awk '{print $1}'`
 touch generated/completed_tests_$1
 
 stdlib=`find extern/stdlib/2.0/ -iname *.java`
+counter=0
 
 for file in $ALL_FILES; do
+    counter=$((counter + 1))
     grep $file generated/completed_tests_$1 >/dev/null
     SKIP=$?
     if [ $SKIP -eq 0 ]; then
       continue
     fi
 
-    printf "Processing $file..."
+    printf "[$counter/$count]Processing $file..."
     should_fail_check=${file##*/}
     should_fail_check=${should_fail_check%.java}
     grep $should_fail_check scripts/should_fail_$1
@@ -44,3 +46,6 @@ for file in $ALL_FILES; do
     printf "OK\n"
     echo $file >> generated/completed_tests_$1
 done
+
+passed=`wc -l < generated/completed_tests_$1`
+echo "Passed $passed/$count"

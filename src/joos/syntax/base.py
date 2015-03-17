@@ -10,6 +10,8 @@ class AbstractSyntaxNode(object):
         self.rule = None
         self.children = None
 
+        # For debugging
+        self.debug_token = None
         # For environment building
         self.env = None
 
@@ -101,8 +103,14 @@ class ArrayType(ReferenceType):
     def visit(self, visitor):
         return visitor.VisitArrayType(self)
 
+    def NonDefaultKeys(self):
+        return ['type_or_name']
+
     def __init__(self, type_or_name):
         self.type_or_name = type_or_name  # Type | Name
+
+        # Linked
+        self.method_map = {}
 
 
 class ClassOrInterfaceType(ReferenceType):
@@ -174,6 +182,7 @@ class Name(AbstractSyntaxNode):
     def __init__(self, tokens):
         self.tokens = tokens  # token[]
         self.linked_type = None  # For linking
+        self.linked_decl = None
 
     def __repr__(self):
         return """Name: {name}, Linked: {type}""".format(

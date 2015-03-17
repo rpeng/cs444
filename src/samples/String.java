@@ -1,3 +1,6 @@
 package java.lang;
 
-public class String {}
+public class String {
+    public String() {}
+}
+

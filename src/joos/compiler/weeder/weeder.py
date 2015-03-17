@@ -32,6 +32,8 @@ class WeederVisitor(ASTVisitor):
     def VisitClassDecl(self, node):
         self._CheckModifiersCommon(node.name, node.modifiers)
         modifiers = [x.lexeme for x in node.modifiers]
+        if not node.constructor_decls:
+            err(node.name, "The class is missing a constructor")
         if node.name.lexeme != self.filename:
             err(node.name, "The class name must match the filename "
                 + self.filename)

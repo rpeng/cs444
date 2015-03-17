@@ -1,5 +1,5 @@
 from .common import *
-from .interfaces import ResolveInterfaceDecls, AddDecls
+from .interfaces import ResolveLinkInterfaceDecls, AddDecls
 from joos.errors import err
 from joos.syntax import *
 
@@ -25,18 +25,20 @@ def CheckClassNoCycles(node):
     acyclic_class_nodes.add(node)
 
 
-def CheckConstructors(constructor_decls):
-    if constructor_decls is None:
+def CheckLinkConstructors(node):
+    if node.constructor_decls is None:
         return
 
-    sigs = set()
-    for decl in constructor_decls:
+    cons_map = {}
+    for decl in node.constructor_decls:
         sig = tuple(MakeMethodSig(decl))
-        if sig in sigs:
+        if sig in cons_map:
             err(decl.name,
                 "Duplicate constructor definition: "
                 + decl.name.lexeme)
-        sigs.add(sig)
+        cons_map[sig] = decl
+
+    node.cons_map = cons_map
 
 
 def CheckClassSimple(node):
@@ -60,38 +62,56 @@ def CheckClassSimple(node):
 
 
 @memoize
-def ResolveClassMethods(node):
+def ResolveLinkClassMethods(node):
     # Returns decls: set(MethodDecls)
     decl_map = {}
+    class_modifiers = [x.lexeme for x in node.modifiers]
+    is_abstract = 'abstract' in class_modifiers
 
     if node.interfaces:
         for interface in node.interfaces:
-            decls = ResolveInterfaceDecls(interface.linked_type)
+            decls = ResolveLinkInterfaceDecls(interface.linked_type)
             AddDecls(decls, decl_map)
 
     if node.extends:
-        decls = ResolveClassMethods(node.extends.linked_type)
-        AddDecls(decls, decl_map)
+        decls = ResolveLinkClassMethods(node.extends.linked_type)
+        AddDecls(decls, decl_map, is_abstract)
     elif GetObject():
-        AddDecls(GetObject().method_decls, decl_map)
+        AddDecls(GetObject().method_decls, decl_map, is_abstract)
 
     if node is not GetObject():
-        AddDecls(node.method_decls, decl_map)
+        AddDecls(node.method_decls, decl_map, is_abstract)
 
-    class_modifiers = [x.lexeme for x in node.modifiers]
-    if 'abstract' not in class_modifiers:
+    if not is_abstract:
         for decl in decl_map.values():
             if decl.IsAbstract():
                 err(node.name,
                     "Non abstract class must implement all methods: " +
                     decl.header.m_id.lexeme)
 
+    node.method_map = decl_map
     return set(decl_map.values())
+
+
+def LinkClass(node):
+    ifaces = set()
+    if node.interfaces:
+        for name in node.interfaces:
+            ifaces |= LinkInterfaceDecls(name.linked_type)
+    node.linked_interfaces = ifaces
+
+    supers = [node]
+    current = node.extends and node.extends.linked_type
+    while current:
+        supers.append(current)
+        current = current.extends and current.extends.linked_type
+    node.linked_supers = supers
 
 
 def CheckClass(node):
     CheckClassSimple(node)
     CheckClassNoCycles(node)
-    CheckConstructors(node.constructor_decls)
+    CheckLinkConstructors(node)
     CheckDuplicateMethods(node.method_decls)
-    ResolveClassMethods(node)
+    ResolveLinkClassMethods(node)
+    LinkClass(node)

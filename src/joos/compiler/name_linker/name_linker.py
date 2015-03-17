@@ -1,3 +1,4 @@
+from joos.compiler.hierarchy_check.common import GetObject
 from joos.compiler.name_linker.disambiguator import Disambiguator
 from joos.errors import err
 from joos.syntax import ASTVisitor
@@ -21,18 +22,30 @@ class NameLinker(ASTVisitor):
         for child in node.ASTChildren():
             child.visit(self)
 
+    def VisitArrayType(self, node):
+        node.method_map = GetObject().method_map
+        self.DefaultBehaviour(node)
+
     def VisitPackageDecl(self, node):
         pass
 
-    def VisitMethodInvocation(self, node):
+    def VisitImportDecl(self, node):
         pass
 
-    def VisitFieldAccess(self, node):
-        pass
+    def VisitMethodInvocation(self, node):
+        if node.name:
+            self.linker.DisambiguateAndLinkMethod(node)
+        self.Visit(node.primary)
+        self.Visit(node.args)
 
     # Base
-    def Visit(self, node):  # Entry point
-        return node.visit(self)
+    def Visit(self, node_or_list):
+        if node_or_list is not None:
+            if isinstance(node_or_list, list):
+                for node in node_or_list:
+                    node.visit(self)
+            else:
+                return node_or_list.visit(self)
 
     def VisitFieldDecl(self, node):
         self.decl = node.env.FieldIndex(node.var_decl.var_id.lexeme)

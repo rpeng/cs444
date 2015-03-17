@@ -176,9 +176,14 @@ class ClassInstanceCreationExpression(Expression):
     def visit(self, visitor):
         return visitor.VisitClassInstanceCreationExpression(self)
 
+    def NonDefaultKeys(self):
+        return ['class_type', 'args']
+
     def __init__(self, class_type, args):
         self.class_type = class_type  # Name
         self.args = args  # Expression[]?
+
+        self.linked_type = None
 
 
 class MethodInvocation(Expression):
@@ -189,9 +194,17 @@ class MethodInvocation(Expression):
     def visit(self, visitor):
         return visitor.VisitMethodInvocation(self)
 
+    def NonDefaultKeys(self):
+        return ['name', 'primary', 'args']
+
     def __init__(self, name, primary, primary_id, args):
         # Methods are either Name, or primary + id
         self.name = name  # Name?
         self.primary = primary  # Primary?
         self.primary_id = primary_id  # token?
         self.args = args  # Expression[]?
+
+        # linked in disambiguation
+        self.linked_decl = None  # ClassOrInterfaceDecl
+        # linked in type checking
+        self.linked_method = None  # MethodDecl

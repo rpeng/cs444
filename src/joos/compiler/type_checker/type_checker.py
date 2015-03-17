@@ -1,10 +1,10 @@
-from joos.compiler.hierarchy_check.common import GetStringDecl
+from joos.compiler.hierarchy_check.common import GetStringDecl, StrSig
+from joos.compiler.type_checker.access_check import CheckAccess
 from joos.compiler.type_checker.assignable import *
-from joos.syntax import ASTVisitor, Type, Name, UnaryExpression, BinaryExpression
+from joos.syntax import *
 
 
 class TypeChecker(ASTVisitor):
-
     def DefaultBehaviour(self, node):
         raise NotImplementedError
 
@@ -12,8 +12,27 @@ class TypeChecker(ASTVisitor):
         self.comp = comp
         self.type_map = type_map
         self.ret_type = None
+        self.is_static = None
+        self.class_decl = None
 
         self.string_type = TypeKind(TypeKind.REF, GetStringDecl())
+
+    def ArgsSig(self, args):
+        sig = []
+        if args:
+            for arg in args:
+                kind = self.Visit(arg)
+                sig.append(kind.AsSig())
+        return tuple(sig)
+
+    def MethodSig(self, node):
+        sig = []
+        if node.name:
+            sig.append(node.name.Last())
+        else:
+            sig.append(node.primary_id.lexeme)
+        sig.extend(self.ArgsSig(node.args))
+        return tuple(sig)
 
     def Start(self):
         self.comp.visit(self)
@@ -61,7 +80,15 @@ class TypeChecker(ASTVisitor):
             return TypeKind(TypeKind.VOID)
 
     def VisitName(self, node):
-        return self.Visit(node.linked_type)
+        #  CheckAccess(node, self.class_decl, self.is_static)
+        if node.linked_type is ArrayType.LengthDecl:
+            return TypeKind(TypeKind.INT)
+        elif isinstance(node.linked_type, TypeDecl):
+            return TypeKind(TypeKind.REF, node.linked_type)
+        elif isinstance(node.linked_type, TypeDecl):
+            return TypeKind(TypeKind.REF, node.linked_type)
+        else:
+            return self.Visit(node.linked_type)
 
     def VisitLiteral(self, node):
         token_type = node.value.token_type
@@ -84,9 +111,11 @@ class TypeChecker(ASTVisitor):
         return None
 
     def VisitClassDecl(self, node):
+        self.class_decl = node
         self.Visit(node.field_decls)
         self.Visit(node.method_decls)
         self.Visit(node.constructor_decls)
+        self.class_decl = None
         return TypeKind(TypeKind.REF, node)
 
     def VisitInterfaceDecl(self, node):
@@ -95,19 +124,27 @@ class TypeChecker(ASTVisitor):
     def VisitMethodDecl(self, node):
         self.ret_type = self.Visit(node.header.m_type)
         result = self.ret_type
+
+        self.is_static = node.IsStatic()
         self.Visit(node.body_block)
         self.ret_type = None
+        self.is_static = None
         return result
 
     def VisitFieldDecl(self, node):
         lhs = self.Visit(node.f_type)
+
+        self.is_static = node.IsStatic()
         rhs = self.Visit(node.var_decl)
         if rhs is not None:
             CheckAssignable(node.modifiers[0], lhs, rhs)
+
+        self.is_static = None
         return lhs
 
     def VisitConstructorDecl(self, node):
-        return self.DefaultBehaviour(node)
+        decl = node.env.LookupClassOrInterface()
+        return TypeKind(TypeKind.REF, decl[1])
 
     def VisitVariableDeclarator(self, node):
         return self.Visit(node.exp)
@@ -125,7 +162,7 @@ class TypeChecker(ASTVisitor):
     def VisitAssignmentExpression(self, node):
         lhs = self.Visit(node.lhs)
         exp = self.Visit(node.exp)
-        CheckAssignable(node[1].token, lhs, exp)
+        CheckAssignable(node.debug_token, lhs, exp)
         return lhs
 
     def VisitBinaryExpression(self, node):
@@ -180,7 +217,12 @@ class TypeChecker(ASTVisitor):
             return TypeKind(TypeKind.INT)
 
     def VisitCastExpression(self, node):
-        return self.DefaultBehaviour(node)
+        cast_type = self.Visit(node.cast_type)
+        if node.is_array:
+            cast_type = TypeKind(TypeKind.ARRAY, cast_type)
+        exp = self.Visit(node.exp)
+        CheckComparable(node[0].token, cast_type, exp)
+        return cast_type
 
     def VisitParensExpression(self, node):
         return self.Visit(node.exp)
@@ -190,16 +232,17 @@ class TypeChecker(ASTVisitor):
         if prim.kind == TypeKind.REF:
             name = node.name.lexeme
             decl = prim.context.env.LookupField(name)
+            if not decl:
+                err(node.name, "Type {} has no field {}".format(prim, name))
             node.linked_type = decl
             return self.Visit(decl.f_type)
         elif prim.kind == TypeKind.ARRAY:
             if node.name.lexeme == "length":
                 return TypeKind(TypeKind.INT)
             else:
-                err(node.name, "Invalid access on array "+node.name.lexeme)
+                err(node.name, "Invalid field access on array "+node.name.lexeme)
         else:
-            pass
-        return self.DefaultBehaviour(node)
+            err(node.name, "Invalid field access")
 
     def VisitArrayAccess(self, node):
         lhs = self.Visit(node.name_or_primary)
@@ -223,13 +266,40 @@ class TypeChecker(ASTVisitor):
         return self.Visit(node.stmt)
 
     def VisitNameExpression(self, node):
-        return self.Visit(node.name.linked_type)
+        return self.Visit(node.name)
 
     def VisitClassInstanceCreationExpression(self, node):
-        return self.DefaultBehaviour(node)
+        sig = self.ArgsSig(node.args)
+        decl = node.class_type.linked_type
+        linked = decl.cons_map.get(sig)
+        if linked:
+            node.linked_type = linked
+        else:
+            err(node[0].token, "Constructor not found matching sig: {}"
+                .format(StrSig(sig)))
+        return TypeKind(TypeKind.REF, decl)
 
     def VisitMethodInvocation(self, node):
-        return self.DefaultBehaviour(node)
+        if node.name:  # Name method
+            sig = self.MethodSig(node)
+            linked = node.linked_decl.method_map.get(sig)
+            if not linked:
+                err(node[1].token, "Method not found matching sig: {}"
+                    .format(StrSig(sig)))
+            node.linked_method = linked
+        else:  # Primary + ID
+            type_kind = self.Visit(node.primary)
+            if type_kind.kind not in TypeKind.references:
+                err(node[1].token, "{} cannot be dereferenced"
+                    .format(type_kind.kind))
+            sig = self.MethodSig(node)
+            linked = type_kind.context.method_map.get(sig)
+            if not linked:
+                err(node[1].token, "Method not found matching sig: {}"
+                    .format(StrSig(sig)))
+            node.linked_method = linked
+            node.linked_decl = type_kind.context
+        return self.Visit(linked.header.m_type)
 
     # Statement
     def VisitBlock(self, node):
@@ -264,7 +334,11 @@ class TypeChecker(ASTVisitor):
         ret = self.Visit(node.exp)
         if ret is None:
             ret = TypeKind(TypeKind.VOID)
-        CheckAssignable(node[0].token, self.ret_type, ret)
+        if self.ret_type is None:
+            # assume no return type means it comes from cons_decl
+            CheckAssignable(node[0].token, TypeKind.VOID, ret)
+        else:
+            CheckAssignable(node[0].token, self.ret_type, ret)
         return None
 
     def VisitEmptyStatement(self, node):

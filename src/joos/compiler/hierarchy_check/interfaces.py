@@ -33,18 +33,18 @@ def CheckInterfaceNoCycles(node, path=None):
     acyclic_interface_nodes.add(node)
 
 
-def AddDecls(new_decls, decls_map):
+def AddDecls(new_decls, decls_map, abstract=False):
     if new_decls is None:
         return
 
     for decl in new_decls:
         sig = MakeMethodSig(decl.header)
         if sig in decls_map and decls_map[sig] != decl:
-            VerifyReplaceDecl(decls_map[sig], decl)
+            VerifyReplaceDecl(decls_map[sig], decl, abstract)
         decls_map[sig] = decl
 
 
-def VerifyReplaceDecl(old_decl, new_decl):
+def VerifyReplaceDecl(old_decl, new_decl, abstract=False):
     old_header = old_decl.header
     new_header = new_decl.header
 
@@ -65,9 +65,10 @@ def VerifyReplaceDecl(old_decl, new_decl):
     if 'static' not in old_modifiers and 'static' in new_modifiers:
         err(new_header.m_id, "Non-static replaced with static in: " + m_name)
 
-    # Check public -> protected
-    if 'public' in old_modifiers and 'protected' in new_modifiers:
-        err(new_header.m_id, "Public replaced with protected in: " + m_name)
+    if not abstract:
+        # Check public -> protected
+        if 'public' in old_modifiers and 'protected' in new_modifiers:
+            err(new_header.m_id, "Public replaced with protected in: " + m_name)
 
     # Check override final
     if 'final' in old_modifiers:
@@ -75,15 +76,16 @@ def VerifyReplaceDecl(old_decl, new_decl):
 
 
 @memoize
-def ResolveInterfaceDecls(node):
+def ResolveLinkInterfaceDecls(node):
     decls_map = {}
     if node.extends_interface:
         for name in node.extends_interface:
-            new_decls = ResolveInterfaceDecls(name.linked_type)
+            new_decls = ResolveLinkInterfaceDecls(name.linked_type)
             AddDecls(new_decls, decls_map)
     elif GetObject():
         AddDecls(GetObject().method_decls, decls_map)
     AddDecls(node.method_decls, decls_map)
+    node.method_map = decls_map
     return set(decls_map.values())
 
 
@@ -91,4 +93,5 @@ def CheckInterface(node):
     CheckInterfaceSimple(node)
     CheckInterfaceNoCycles(node)
     CheckDuplicateMethods(node.method_decls)
-    ResolveInterfaceDecls(node)
+    ResolveLinkInterfaceDecls(node)
+    LinkInterfaceDecls(node)

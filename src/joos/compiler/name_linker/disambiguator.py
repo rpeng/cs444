@@ -1,5 +1,5 @@
 from joos.errors import err
-from joos.syntax import ArrayType
+from joos.syntax import *
 
 
 class NameType(object):
@@ -11,38 +11,43 @@ class Disambiguator(object):
     def __init__(self, type_map):
         self.type_map = type_map
 
+    def TypeToDecl(self, type):
+        if isinstance(type, ClassOrInterfaceType):
+            return type.name.linked_type
+        return type
+
     def CheckLocalVars(self, name, env):
         decl = env.LookupLocalVar(name)
-        if decl is not None:
-            return (NameType.EXPR, decl.l_type)
+        if decl:
+            return (NameType.EXPR, self.TypeToDecl(decl.l_type))
 
     def CheckParams(self, name, env):
         decl = env.LookupParameter(name)
-        if decl is not None:
-            return (NameType.EXPR, decl.p_type)
+        if decl:
+            return (NameType.EXPR, self.TypeToDecl(decl.p_type))
 
     def CheckFields(self, name, env):
         decl = env.LookupField(name)
         if decl is ArrayType.LengthDecl:
             return (NameType.EXPR, decl)
-        elif decl is not None:
-            return (NameType.EXPR, decl.f_type)
+        elif decl:
+            return (NameType.EXPR, self.TypeToDecl(decl.f_type))
 
     def CheckClassImport(self, name, env):
         decl = env.LookupClassImport(name)
-        if decl is not None:
-            return (NameType.TYPE, decl)
+        if decl:
+            return (NameType.TYPE, decl[1])
 
     def CheckOwnPackage(self, name, env):
         type_map = env.VisibleTypes()
         decl = type_map.LookupType(name)
-        if decl is not None:
+        if decl:
             return (NameType.TYPE, decl)
 
     def CheckPackageImport(self, name, env):
         decl = env.LookupNameInPackages(name)
-        if decl is not None:
-            return (NameType.TYPE, decl)
+        if decl:
+            return (NameType.TYPE, decl[0])
 
     def CheckPackage(self, name, env):
         pkg = self.type_map.LookupPackage(name)
@@ -68,14 +73,27 @@ class Disambiguator(object):
                 self.CheckPackageImport(name, env) or
                 self.CheckPackage(name, env))
 
-    def DisambiguateAndLink(self, node):
-        first = node.Split()[0]
+    def DisambiguateAndLinkMethod(self, node):
+        tokens = node.name.Split()
+        prefix = tokens[:-1]
+        if prefix:
+            self.DisambiguateAndLink(node.name, prefix)
+        else:
+            node.name.linked_type = node.env.LookupClassOrInterface()[1]
+            node.name.linked_decl = node.name.linked_type
+        node.linked_decl = node.name.linked_type
+
+    def DisambiguateAndLink(self, node, name_tokens=None):
+        tokens = name_tokens
+        if not name_tokens:
+            tokens = node.Split()
+        first = tokens[0]
         env = node.env
         result = self.CheckNameAndEnv(first, env)
 
         if result:
             name_type, decl_or_pkg = result
-            for name in node.Split()[1:]:
+            for name in tokens[1:]:
                 if decl_or_pkg is None:
                     err(node.tokens[0], "Name " + node.AsString() + " not found.")
                 if name_type == NameType.PACKAGE:
@@ -85,6 +103,8 @@ class Disambiguator(object):
                     if isinstance(decl_or_pkg, ArrayType):
                         if name == 'length':
                             next = (NameType.TYPE, ArrayType.LengthDecl)
+                    elif isinstance(decl_or_pkg, PrimitiveType):
+                        err(node.tokens[0], "Cannot dereference primitive type")
                     else:
                         next = (self.CheckFields(name, decl_or_pkg.env))
                 if not next:

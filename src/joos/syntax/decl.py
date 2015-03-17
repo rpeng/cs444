@@ -56,8 +56,16 @@ class ClassDecl(TypeDecl):
         self.interfaces = interfaces  # Name[]?
         self.field_decls = field_decls  # FieldDecl[]?
         self.method_decls = method_decls  # MethodDecl[]?
-        self.constructor_decls = constructor_decls  # ConstructorDecl[]?
+        self.constructor_decls = constructor_decls  # ConstructorDecl[]
 
+        # linked
+        self.linked_interfaces = set()
+        self.linked_supers = []
+        self.method_map = {}  # Methods [sig -> decl]
+        self.cons_map = {}  # Constructors [sig -> decl]
+
+    def __str__(self):
+        return self.name.lexeme
 
 class InterfaceDecl(TypeDecl):
     @classmethod
@@ -67,10 +75,17 @@ class InterfaceDecl(TypeDecl):
     def visit(self, visitor):
         return visitor.VisitInterfaceDecl(self)
 
+    def NonDefaultKeys(self):
+        return ['name', 'extends_interface', 'method_decls']
+
     def __init__(self, name, extends_interface, method_decls):
         self.name = name  # token
         self.extends_interface = extends_interface  # Name[]?
         self.method_decls = method_decls  # MethodDecls[]?
+
+        # linked
+        self.linked_interfaces = set()
+        self.method_map = {}
 
 
 class MethodDecl(AbstractSyntaxNode):
@@ -84,6 +99,10 @@ class MethodDecl(AbstractSyntaxNode):
     def IsAbstract(self):
         modifiers = [x.lexeme for x in self.header.modifiers]
         return self.body_block is None and 'native' not in modifiers
+
+    def IsStatic(self):
+        modifiers = [x.lexeme for x in self.header.modifiers]
+        return 'static' in modifiers
 
     def __init__(self, header, body_block):
         self.header = header  # MethodHeader
@@ -112,6 +131,10 @@ class FieldDecl(AbstractSyntaxNode):
 
     def visit(self, visitor):
         return visitor.VisitFieldDecl(self)
+
+    def IsStatic(self):
+        modifiers = [x.lexeme for x in self.modifiers]
+        return 'static' in modifiers
 
     def __init__(self, modifiers, f_type, var_decl):
         self.modifiers = modifiers  # token[]

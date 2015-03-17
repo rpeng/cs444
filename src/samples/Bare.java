@@ -5,7 +5,10 @@ public class Bare {
     public int c = 4;
     public Bare d;
 
-    public int method(){
-        return d + d;
+    public Bare(int b) {
+    }
+
+    public static int test() {
+        Bare2.boo = 4;
     }
 }

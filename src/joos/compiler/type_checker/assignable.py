@@ -1,50 +1,30 @@
+from joos.compiler.hierarchy_check.common import GetObject, GetCloneable, GetSerializable
 from joos.compiler.type_checker.type_kind import TypeKind
 from joos.errors import err
 from joos.syntax import ClassDecl, InterfaceDecl
 
 valid_mappings = {
     TypeKind.BOOL: [TypeKind.BOOL],
-    TypeKind.BYTE: [TypeKind.BYTE],
-    TypeKind.CHAR: [TypeKind.CHAR],
+    TypeKind.BYTE: [TypeKind.BYTE, TypeKind.CHAR],
+    TypeKind.CHAR: [TypeKind.CHAR, TypeKind.BYTE],
     TypeKind.INT: [TypeKind.BYTE, TypeKind.SHORT, TypeKind.INT, TypeKind.CHAR],
-    TypeKind.SHORT: [TypeKind.BYTE, TypeKind.SHORT],
+    TypeKind.SHORT: [TypeKind.BYTE, TypeKind.SHORT, TypeKind.CHAR],
     TypeKind.VOID: [TypeKind.VOID]
 }
 
 
 def _IsClassAssignable(left, right):
-    if isinstance(right.context, ClassDecl):
-        current = right.context
-        while True:
-            if current == left.context:
-                return True
-            if right.context.extends:
-                current = right.context.extends.linked_type
-            else:
-                return False
-    else:
+    if not isinstance(right.context, ClassDecl):
         return False
+    return left.context in right.context.linked_supers
 
 
 def _IsInterfaceAssignable(left, right):
-    seen = set()
-    work_list = [right.context]
-
-    while work_list:
-        decl = work_list.pop()
-        if decl == left.context:
-            return True
-        seen.add(decl)
-        if isinstance(decl, ClassDecl):
-            interfaces = decl.interfaces
-        elif isinstance(decl, InterfaceDecl):
-            interfaces = decl.extends_interface
-        else:
-            return False
-        if interfaces:
-            for node in interfaces:
-                if node.linked_type not in seen:
-                    work_list.append(node.linked_type)
+    if (isinstance(right.context, ClassDecl)
+        or isinstance(right.context, InterfaceDecl)):
+        return left.context in right.context.linked_interfaces
+    elif right.kind == TypeKind.ARRAY:
+        return left.context in [GetCloneable(), GetSerializable()]
     return False
 
 
@@ -56,14 +36,21 @@ def IsAssignable(left, right):
 
     valid = valid_mappings.get(left.kind)
 
-    if valid and right.kind not in valid:
-        return False
+    if valid:
+        return right.kind in valid
 
-    if left.kind == TypeKind.ARRAY and left != right:
-        return False
+    if left.kind == TypeKind.ARRAY:
+        if right.kind == TypeKind.NULL:
+            return True
+        if right.kind == TypeKind.ARRAY:
+            return IsAssignable(left.context, right.context)
+        else:
+            return False
 
     if left.kind == TypeKind.REF:
         if right.kind == TypeKind.NULL:
+            return True
+        if left.context == GetObject() and right.kind in TypeKind.references:
             return True
         if isinstance(left.context, ClassDecl):
             return _IsClassAssignable(left, right)
@@ -81,6 +68,6 @@ def CheckAssignable(token, left, right):
 
 def CheckComparable(token, left, right):
     if not (IsAssignable(left, right) or IsAssignable(right, left)):
-        err(token, "Invalid conversion: {} not comparable to {}".format(
+        err(token, "Invalid conversion: cannot interchange {} and {}".format(
             right, left))
 
