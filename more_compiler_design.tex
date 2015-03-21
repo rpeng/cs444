@@ -1,0 +1,130 @@
+\documentclass[12pt, a4paper]{article}
+
+% Preamble
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{cprotect}
+\usepackage{enumerate}
+\usepackage{pdfpages}
+
+\newcommand{\para}[1]{\paragraph{#1}\mbox{}\\}
+\newcommand{\icode}{\texttt}
+
+\title{Compiler Design Document}
+\date{\today}
+\author{Richard Peng, Jane Wang}
+% Document
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+For the first stage of our compiler, we wanted to create a general purpose scanner and parser, that's not specifically tied to Joos 1W rules. We've built these into Python modules that contain core data structures, as well as generic scanning and parsing algorithms, such as Maximal Munch and Shift-Reduce. A separate module contains all of the Joos specific constructs. \\
+
+We wrote our compiler in Python 2.7, and used GitHub to host the project repository. The report will first give an overview of the directory layout of the repository, the overall architecture of our compiler, and then a description of each component. Finally, it will discuss some of the challenges that we faced during planning and implementations, and our solutions to these challenges.
+
+\section{Directory Structure}
+
+
+
+\subsection{\texttt{extern/} (Omitted from submissions)}
+
+Contains external helpers that were used, such as the Jlalr parse table generator, and the Marmoset test files.
+ 
+\subsection{\texttt{generated/}}
+
+Contains generated files that are not placed under version control. This includes a \verb|joos.cfg| (more about how this was generated later), as well as a \verb|joos.lr1| (the output from the Jlalr generator).
+
+\subsection{\texttt{joos/}}
+
+All of the Joos 1W specific modules are put here. Contains Joos grammar files, the beginnings of an Abstract Syntax, regular expressions for Joos 1W tokens, as well as some Joos specific visitors that will aid in building the AST and weeding.
+\subsubsection{\texttt{compiler/}}
+
+This module contains a Maximum Munch scanner, a Shift-Reduce parser, as well as defines a few errors that may arise - for example when the scanner encounters an invalid token, or the parser is expecting a different one.
+
+\subsection{\texttt{structs/}}
+
+Core data structures that are required for many functions. This includes Finite State Machines, Regular Expressions, and Context-Free Grammars.
+
+\subsection{\texttt{scripts/}}
+
+Contains a helper script that can convert a custom CFG specification format to one that is accepted by the Jlalr token generator.
+
+\subsection{\texttt{lexer/}}
+
+
+\subsection{\texttt{./joosc}}
+
+Executable program entry point. Takes in a path to a Joos file as an argument, and returns 0 if it is valid Joos, 42 if it is not.
+
+\section{Compiler Architecture}
+
+\subsection{Name Resolution}
+\subsubsection{Environment Building}
+
+All files are under joos/compiler/environment/ \\
+
+The environment building stage creates environments (containing current package, current class or interface, fields, methods, parameters, local variables, and imports) for each scope. It also contains inherited environment to gain access to the parent class or interface's environment.\\
+
+During the construction of the environments, method AddField() checks that no two fields declared in the same class may have the same name; AddLocalVar() checks that no two local variables with overlapping scope have the same name.
+
+\subsubsection{Type Linking}
+
+All files are under joos/compiler/$type\_linker$/ \\
+
+The type linking stage connects each use of a named type (class or interface) to the declaration of the type. At this stage, only names that can be syntactically determined to be names of types need to be linked. Some names are syntactically ambiguous, in the sense that type checking is done before it can be determined whether they are names of type or of other entities. These ambiguous names will be linked in a later assignment. \\
+
+A visitor pattern is used in type linking, a scan through the environments of the target AST node is done to resolve the types. \\
+
+In VisitImportDecl(), as we add imports to the environment, we check if import declarations clash with each other or clash with the class or interface declared in the same file. \\
+
+The Resolve function in resolver.py resolve type names to some class or interface. Resolve() is called on any existance of the Name object.\\
+
+\subsubsection{Hierarchy Checking}
+
+All files are under joos/compiler/$hierarchy\_checker$/ \\
+
+The third stage computes the inheritance relationships for classes, interfaces, methods, and fields. \\
+
+In classes.py, rules such as "A class must not extend an interface", "A class must not implement a class" are checked. \\
+
+In interfaces.py, rules such as "An interface must not extend a class", "An interface must not be repeated in an implements clause, or in an extends clause of an interface" are checked. \\
+
+In common.py, rules such as "A nonstatic method must not replace a static method", "A protected method must not replace a public method" are checked. \\
+
+The hierarchy checker iterate through all the classes and/or interfaces and make sure they satisfy the rules.\\
+
+\subsection{Type Checking}
+
+\subsubsection{Disambiguation and Linking of Names}
+
+All files are under joos/compiler/$name\_linker$/ \\
+
+The disambiguation stage determines the meaning of each remaining use of a name, and links the use to the declaration of the entity (field, method, local variable, formal parameter, or type) that the name refers to. \\
+
+In disambiguator.py, it checks that all names can be disambiguated. It is an error if a name cannot be linked to any entity that is in scope at the point where the name is used. 
+
+\subsubsection{Type Checking}
+
+All files are under joos/compiler/$type\_checker$/ \\
+
+The type checking stage determines the types of all expressions and subexpressions, checks that they conform to the Joos 1W typing rules, and links all remaining names to the declarations that they refer to. \\
+
+The type checker again uses a visitor pattern to help traverse the tree. Each AST node will have a return type, which is then checked against the type the variable is assign to, for example, if the types do not match or cannot do an implicit conversion, error is raised.
+
+\subsection{Static Analysis}
+
+\subsubsection*{Reachability Checking}
+
+
+
+\section{Challenges}
+
+We faced several challenges when designing and implementing our compiler. The following is a summary of the challenges, as well as the steps we took in addressing them.
+
+
+\end{document}
