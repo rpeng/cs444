@@ -11,6 +11,9 @@
 
 \newcommand{\para}[1]{\paragraph{#1}\mbox{}\\}
 \newcommand{\icode}{\texttt}
+\newcommand{\class}{\textbf}
+\newcommand{\fpath}{\verb}
+\newcommand{\method}{\textit}
 
 \title{Compiler Design Document}
 \date{\today}
@@ -23,108 +26,143 @@
 
 \section{Introduction}
 
-For the first stage of our compiler, we wanted to create a general purpose scanner and parser, that's not specifically tied to Joos 1W rules. We've built these into Python modules that contain core data structures, as well as generic scanning and parsing algorithms, such as Maximal Munch and Shift-Reduce. A separate module contains all of the Joos specific constructs. \\
+The Name Resolution, Type Checking, and Static Analysis component of our compiler were mostly built as additional visitors to our Abstract Syntax Tree from Assignment 1. This document details the changes to our directory structure since the last report, and explains how the new components are structured. \\
 
-We wrote our compiler in Python 2.7, and used GitHub to host the project repository. The report will first give an overview of the directory layout of the repository, the overall architecture of our compiler, and then a description of each component. Finally, it will discuss some of the challenges that we faced during planning and implementations, and our solutions to these challenges.
+The following notation will be used in this document: File paths are in \fpath|fixed-width| font. Class names are in \class{bold}. Method invocations are in \textit{italics}.
 
-\section{Directory Structure}
+\section{Directory layout}
 
+The following files or directories contain common classes or functions that will be shared among all of the components.
 
+\subsection{\texttt{joos/errors/err.py}}
 
-\subsection{\texttt{extern/} (Omitted from submissions)}
+Contains the \method{err} method, which takes in a \class{Token} object that wraps a lexeme. It prints out the filename, row, and column numbers for a given lexeme, and throws a \class{JoosError} exception, which is caught by our compiler. This helps us differentiate between exceptions due to a problem with the Joos file, and exceptions due to a problem with our compiler.
 
-Contains external helpers that were used, such as the Jlalr parse table generator, and the Marmoset test files.
- 
-\subsection{\texttt{generated/}}
+\subsection{\texttt{joos/grammar/}}
 
-Contains generated files that are not placed under version control. This includes a \verb|joos.cfg| (more about how this was generated later), as well as a \verb|joos.lr1| (the output from the Jlalr generator).
+Context-free grammar specifications for Joos, which generates a parse table in the \verb|.lr1| format.
 
-\subsection{\texttt{joos/}}
+\subsection{\texttt{joos/syntax/}}
 
-All of the Joos 1W specific modules are put here. Contains Joos grammar files, the beginnings of an Abstract Syntax, regular expressions for Joos 1W tokens, as well as some Joos specific visitors that will aid in building the AST and weeding.
-\subsubsection{\texttt{compiler/}}
+Abstract syntax nodes. \verb|base.py| contains the parent \textbf{AbstractSyntaxNode} class, as well as classes for the compilation unit, types, names, and literals.\\ 
 
-This module contains a Maximum Munch scanner, a Shift-Reduce parser, as well as defines a few errors that may arise - for example when the scanner encounters an invalid token, or the parser is expecting a different one.
+\verb|decl.py| contains nodes for package, import, and type declarations. \\
 
-\subsection{\texttt{structs/}}
+\verb|expr.py| has nodes for all the Joos expressions, while \verb|stmt.py| has nodes for statements. \\
 
-Core data structures that are required for many functions. This includes Finite State Machines, Regular Expressions, and Context-Free Grammars.
-
-\subsection{\texttt{scripts/}}
-
-Contains a helper script that can convert a custom CFG specification format to one that is accepted by the Jlalr token generator.
-
-\subsection{\texttt{lexer/}}
-
+Finally, \verb|visitor.py| contains the root node for all visitors that will traverse the AST.
 
 \subsection{\texttt{./joosc}}
 
-Executable program entry point. Takes in a path to a Joos file as an argument, and returns 0 if it is valid Joos, 42 if it is not.
+Executable program entry point. Takes in paths to Joos files as an argument, and returns 0 if it is valid Joos, 42 if it is not. Contains calls to each step of the process, 
 
 \section{Compiler Architecture}
 
 \subsection{Name Resolution}
 \subsubsection{Environment Building}
 
-All files are under joos/compiler/environment/ \\
+All of the components for Environment Building are under \verb|joos/compiler/environment/| File paths, unless fully qualified with \verb|joos/|, will be relative to this one.\\
 
-The environment building stage creates environments (containing current package, current class or interface, fields, methods, parameters, local variables, and imports) for each scope. It also contains inherited environment to gain access to the parent class or interface's environment.\\
+We created an Environment object in \verb|env.py|, which is a shared-tail queue. The other files (\verb|decl.py, base.py, expr.py, stmt.py|) mimic the structure of the AST, and contain visitors for each set of AST nodes. The entry point is defined in \verb|__init__.py|, which creates an \class{EnvBuilder} visitor and calls \method{Start()} to begin the tree traversal (visits the root of the tree). \\
 
-During the construction of the environments, method AddField() checks that no two fields declared in the same class may have the same name; AddLocalVar() checks that no two local variables with overlapping scope have the same name.
+Each visitor takes in the appropriate AST node, and is responsible for populating its \method{env} property with an Environment object, as well as visiting all of the children of the node. Finally, each visitor must return an ``update" Environment - basically a new Environment object that contains the declarations that the current node has defined. \\
+
+Most nodes would return an empty environment, indicating that no further declarations have been made. However, visitors of \class{ClassDecl}, \class{LocalVarDecl}, or similar AST nodes will need to return a new Environment that contains a new declaration. This may be used by the parent node to update its own environment (similar to a synthesized attribute). \\
+
+
+To add a feature in Environment Building, you need to go to the visitor that is responsible for the AST node that you wish to modify. For example, if you wanted to add a new kind of declaration \class{FooDecl}, you need to add the definition to the AST in \verb|joos/syntax/decl.py|, and add a new \method{VisitFooDecl()} method in the environment visitor's \verb|decl.py|.
+
+
 
 \subsubsection{Type Linking}
 
-All files are under joos/compiler/$type\_linker$/ \\
+All files responsible for type linking are under \verb|joos/compiler/type_linker/| \\
 
-The type linking stage connects each use of a named type (class or interface) to the declaration of the type. At this stage, only names that can be syntactically determined to be names of types need to be linked. Some names are syntactically ambiguous, in the sense that type checking is done before it can be determined whether they are names of type or of other entities. These ambiguous names will be linked in a later assignment. \\
+The Type Linking stage is also implemented as an AST visitor. Unlike the Environment Building stage, all of the AST visitors in a single file, \verb|type_linker.py|, instead of being spread out across several files. The entry point is again defined in the \verb|__init__.py|. \\
 
-A visitor pattern is used in type linking, a scan through the environments of the target AST node is done to resolve the types. \\
+This visitor is responsible for updating the \method{linked\_type} property of the \class{Name} AST nodes that are constrained to Type declarations by the Joos grammar. The visitor also updates a \class{TypeMap} instance as it visits the nodes.\\
 
-In VisitImportDecl(), as we add imports to the environment, we check if import declarations clash with each other or clash with the class or interface declared in the same file. \\
+The \class{TypeMap} class is contained in \verb|type_map.py|, which contains information about packages and all the declarations as well as packages that a package contains, mapped by the name. \\
 
-The Resolve function in resolver.py resolve type names to some class or interface. Resolve() is called on any existance of the Name object.\\
+A helper class, the \class{Resolver} (found in \verb|resolver.py|), can resolve a name to a type or package declaration, given a \class{TypeMap} and a \class{Name} AST node. This helper is used during this stage to populate the \method{linked\_type} properties.
+
 
 \subsubsection{Hierarchy Checking}
 
-All files are under joos/compiler/$hierarchy\_checker$/ \\
+The root for our hierarchy checking component is \verb|joos/compiler/hierarchy_checker| \\
 
-The third stage computes the inheritance relationships for classes, interfaces, methods, and fields. \\
+Unlike the previous two components, we opted not to use a visitor pattern for this step. This is because there are only two components that we need to check (\verb|ClassDecl| and \verb|InterfaceDecl|), whereas the visitor pattern is more suitable if every node in the tree should be traversed. \\
 
-In classes.py, rules such as "A class must not extend an interface", "A class must not implement a class" are checked. \\
+The entry point is the \method{CheckHierarchy} method in \verb|hierarchy.py| (imported in \verb|__init__.py| for consistency). \method{CheckHierarchy} traverses the type declarations, and delegates to the correct hierarchy checker. \\
 
-In interfaces.py, rules such as "An interface must not extend a class", "An interface must not be repeated in an implements clause, or in an extends clause of an interface" are checked. \\
+The \method{CheckClass} method checks the hierarchy of a class, and is defined in \verb|classes.py|. Similarly, the \method{CheckInterface} method checks the hierarchy of an interface, defined in \verb|interfaces.py|. \\
 
-In common.py, rules such as "A nonstatic method must not replace a static method", "A protected method must not replace a public method" are checked. \\
+We defined checks that are common to both classes and interfaces in the \verb|common.py| file. This also contains helpers \method{MakeTypeSig} and \method{MakeMethodSig}, that will create a signature object, given a \class{TypeDecl} or \class{MethodDecl} AST node. \\
 
-The hierarchy checker iterate through all the classes and/or interfaces and make sure they satisfy the rules.\\
+In addition to checking for a well-formed structure (no cycles, classes extend classes and implement interfaces, interfaces implement interfaces), we also resolve all of the methods that a given class or interface contains in the \method{ResolveLinkClassMethods} and \method{ResolveLinkInterfaceDecls} methods. This checks method replacement rules, asserts that non abstract classes have no unimplemented methods, and generates a virtual method table for each class.
+
 
 \subsection{Type Checking}
 
 \subsubsection{Disambiguation and Linking of Names}
 
-All files are under joos/compiler/$name\_linker$/ \\
+All files related to disambiguation are under \verb|joos/compiler/name_linker/| \\
 
-The disambiguation stage determines the meaning of each remaining use of a name, and links the use to the declaration of the entity (field, method, local variable, formal parameter, or type) that the name refers to. \\
+For this stage, we once again used the visitor pattern, and implemented all of the visitors in the file \verb|name_linker.py|. The goal of the name linker visitors is to populate the \method{linked\_type} attribute of the \class{MethodInvocation}, and any \class{Name} classes that were not linked during type linking.
 
-In disambiguator.py, it checks that all names can be disambiguated. It is an error if a name cannot be linked to any entity that is in scope at the point where the name is used. 
+A helper \class{Disambiguator} class is declared in \verb|disambiguator.py|. This class contains a \method{DisambiguateAndLink} method, which uses Joos lookup rules to determine what a name, in a given environment, links to. If it determines that the name does not exist, or is ambiguous, it raises an error. Otherwise, it populates the \method{linked\_type} attribute of the given \class{Name} with the linked AST node.
+
 
 \subsubsection{Type Checking}
 
-All files are under joos/compiler/$type\_checker$/ \\
+Type checking components are in \verb|joos/compiler/type_checker/| \\
 
-The type checking stage determines the types of all expressions and subexpressions, checks that they conform to the Joos 1W typing rules, and links all remaining names to the declarations that they refer to. \\
+The type checker again uses a visitor pattern to help traverse the tree. Each visitor will return a \class{TypeKind} class, which represents the type of the return value. For expression AST nodes, the visitors are also responsible for checking that the types agree with Joos typing rules. In addition, it also checks that method invocations will resolve to a defined method, by comparing the signatures of the arguments with that of the methods.\\
 
-The type checker again uses a visitor pattern to help traverse the tree. Each AST node will have a return type, which is then checked against the type the variable is assign to, for example, if the types do not match or cannot do an implicit conversion, error is raised.
+A \class{TypeKind} class is defined in \verb|type_kind.py|. This class represents a type, with support for equality such that two equivalent types will produce the same \class{TypeKind}.
+
 
 \subsection{Static Analysis}
 
-\subsubsection*{Reachability Checking}
+\subsubsection{Reachability Checking}
 
+Static analysis components are in \verb|joos/compiler/static_analysis/| \\
+
+There are two main files. The \verb|evaluator.py| file contains a visitor that implements constant folding: given an AST node it will evaluate it and either return a boolean, a string, an integer, or a special UNKNOWN result. The UNKNOWN result means that the evaluator encountered a name expression, and will not attempt to retrieve it.
+
+The \verb|analyzer.py| file contains a static analyzer that implements reachability checking. There are two state variables that are important: \method{saw\_return} and \method{infinite\_loop}. These variables indicate whether a return statement was reached, or an infinite \textbf{for} or \textbf{while} loop was reached in a block. This indicates that the next statement in the block, if there is one, is unreachable, and will raise an error if one is detected.
+
+\section{Testing}
+
+We downloaded the public tests for Assignments 2 to 4 provided in the \verb|student.cs| environment into our repository. We wrote an integration test script that runs the test for a given assignment, and records the ones that have passed as well as ones that have failed. This script optionally skips  tests that have passed on subsequent runs, which saves a lot of time. \\
+
+We also have unit tests that are contained in the \verb|tests| directory for each given component. These can be run using the python test runner \verb|nosetests|.
 
 
 \section{Challenges}
 
-We faced several challenges when designing and implementing our compiler. The following is a summary of the challenges, as well as the steps we took in addressing them.
+We faced several challenges when designing and implementing our compiler.
 
+\subsection{Compiler performance}
+
+A big problem we encountered was that our compiler began to take a very long time to generate results (on the order of a second or two). This was especially noticeable when the standard library was linked with every compilation. This drastically slowed down the development and test cycle. \\
+
+To resolve this problem, we first built our own light-weight version of the standard library (bare-bones implementation of Object, String, and other classes), so that linking against it would be faster. While this worked for a lot of the test cases, it did not cover all of them. \\
+
+We took another approach by profiling our compiler using the \verb|cProfile| Python module. This revealed some performance bottlenecks, as well as a few bugs (we were building the AST twice for every file). We optimized code hotspots, and fixed the bugs, leading to more improvements in performance. \\
+
+Finally, we enabled parallelism in our compiler. We realized that we could create the ASTs for several files at the same time without any data races. This sped up our compiler a lot, and the improvements in performance brought down the compilation time to reasonable numbers (few hundred msecs), allowing us to iterate quickly.
+
+\subsection{Large visitors}
+
+Originally, the visitors for each component were all implemented in a single file. However, some components had to visit essentially every node of the AST, which made the file large and unmaintainable. \\
+
+For these visitors, our solution was to split it up in the same layout as the abstract syntax definitions. We used the Mixin pattern to combine all of these split visitors into a base visitor. This organized the code enough so that it was easy to find where a visitor for a given AST node was.
+
+\subsection{Complex AST}
+
+As we began to add more attributes to our AST nodes, it became more complex and diffcult to keep track of. As Python is a dynamically-typed language, we were not sure what type each attribute would map to, and we had to look for usage examples to figure it out. \\
+
+To combat this problem, we added annotations (as comments) beside the declarations of each attribute. The annotations describe how the attributes relate to each other, and what types they contain. In addition, since some attributes are optional (may be set to None), we also surface this information in our annotations. \\
 
 \end{document}

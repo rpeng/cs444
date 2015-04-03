@@ -29,9 +29,19 @@ def ProcessFiles(input_files):
     return units
 
 
+def ProcessFetchException(input_file):
+    try:
+        return ProcessFile(input_file)
+    except Exception, e:
+        return e
+
+
 def MultiProcessFiles(input_files):
     pool = Pool(processes=4)
-    units = pool.map(ProcessFile, input_files)
+    units = pool.map(ProcessFetchException, input_files)
+    for unit in units:
+        if isinstance(unit, Exception):
+            raise unit
     return units
 
 
@@ -42,6 +52,7 @@ def Main(input_files):
         CheckHierarchy(app)
         LinkNames(app)
         CheckTypes(app)
+        StaticallyAnalyze(app)
     except JoosError, e:
         print >> sys.stderr, str(e)
         sys.exit(42)

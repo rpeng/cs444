@@ -6,9 +6,12 @@ public class Bare {
     public Bare d;
 
     public Bare(int b) {
+        while (-1 + 1 == 0) {
+        }
+        return;
     }
 
     public static int test() {
-        Bare2.boo = 4;
+        return 1;
     }
 }

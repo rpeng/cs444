@@ -8,8 +8,13 @@ class ASTVisitor(object):
         return self.DefaultBehaviour(node)
 
     # Base
-    def Visit(self, node):  # Entry point
-        return node.visit(self)
+    def Visit(self, node_or_list):
+        if node_or_list is not None:
+            if isinstance(node_or_list, list):
+                for node in node_or_list:
+                    node.visit(self)
+            else:
+                return node_or_list.visit(self)
 
     def VisitCompilationUnit(self, node):
         return self.DefaultBehaviour(node)
