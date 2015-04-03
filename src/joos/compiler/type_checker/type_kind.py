@@ -11,14 +11,16 @@ class TypeKind(object):
     VOID = 'void'
     REF = 'ref'
     ARRAY = 'array'
+    CLASS = 'class'
 
     numerics = [BYTE, CHAR, SHORT, INT]
     primitives = numerics + [BOOL, NULL]
-    references = [NULL, REF, ARRAY]
+    references = [NULL, REF, CLASS, ARRAY]
 
-    def __init__(self, kind, context=None):
+    def __init__(self, kind, context=None, decl=None):
         self.kind = kind
         self.context = context
+        self.decl = decl
 
     @classmethod
     def FromIntegral(cls, integral):
@@ -54,7 +56,7 @@ class TypeKind(object):
     def __repr__(self):
         if self.kind == TypeKind.ARRAY:
             return "{}[]".format(self.context)
-        elif self.kind == TypeKind.REF:
+        elif self.kind == TypeKind.REF or self.kind == TypeKind.CLASS:
             return self.context.name.lexeme
         else:
             return self.kind

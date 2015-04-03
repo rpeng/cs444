@@ -29,6 +29,7 @@ class Disambiguator(object):
     def CheckFields(self, name, env):
         decl = env.LookupField(name)
         if decl is ArrayType.LengthDecl:
+
             return (NameType.EXPR, decl)
         elif decl:
             return (NameType.EXPR, self.TypeToDecl(decl.f_type))
@@ -112,6 +113,7 @@ class Disambiguator(object):
                 name_type, decl_or_pkg = next
             if name_type == NameType.PACKAGE:
                 err(node.tokens[0], "Unexpected package")
+            node.name_type = name_type
             node.linked_type = decl_or_pkg
         else:
             err(node.tokens[0], "Name " + node.AsString() + " not found.")

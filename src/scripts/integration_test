@@ -26,9 +26,9 @@ for file in $ALL_FILES; do
     EXC=$?
 
     if [[ -d $file ]]; then # if the file is a directory
-        ./joosc $stdlib `find $file -type f`
+        ./joosc `find $file -iname *.java` $stdlib
     else
-        ./joosc $stdlib $file
+        ./joosc $file $stdlib
     fi
     JOOSC=$?
 

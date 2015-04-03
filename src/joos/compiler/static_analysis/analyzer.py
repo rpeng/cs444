@@ -96,4 +96,4 @@ class StaticAnalyzer(ASTVisitor):
         self.saw_return = True
 
     def VisitEmptyStatement(self, node):
-        return self.DefaultBehaviour(node)
+        pass

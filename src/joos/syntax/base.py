@@ -183,6 +183,7 @@ class Name(AbstractSyntaxNode):
         self.tokens = tokens  # token[]
         self.linked_type = None  # For linking
         self.linked_decl = None
+        self.name_type = None  # NameType enum
 
     def __repr__(self):
         return """Name: {name}, Linked: {type}""".format(

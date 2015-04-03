@@ -34,6 +34,11 @@ class NameLinker(ASTVisitor):
 
     def VisitMethodInvocation(self, node):
         if node.name:
+            if self.decl is not None:
+                index = node.env.FieldIndex(node.name.Split()[0])
+                if index is not None and index >= self.decl:
+                    err(node.name.tokens[0],
+                        "Invalid forward reference: " + node.name.AsString())
             self.linker.DisambiguateAndLinkMethod(node)
         self.Visit(node.primary)
         self.Visit(node.args)
@@ -52,10 +57,18 @@ class NameLinker(ASTVisitor):
         node.var_decl.visit(self)
         self.decl = None
 
+
+    def VisitAssignmentExpression(self, node):
+        tmp = self.decl
+        self.decl = None
+        self.Visit(node.lhs)
+        self.decl = tmp
+        self.Visit(node.exp)
+
     def VisitName(self, node):
         if not node.linked_type:
             if self.decl is not None:
-                index = node.env.FieldIndex(node.AsString)
+                index = node.env.FieldIndex(node.Split()[0])
                 if index is not None and index >= self.decl:
                     err(node.tokens[0], "Invalid forward reference: " + node.AsString())
             self.linker.DisambiguateAndLink(node)

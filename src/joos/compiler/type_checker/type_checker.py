@@ -1,5 +1,6 @@
 from joos.compiler.hierarchy_check.common import GetStringDecl, StrSig
-from joos.compiler.type_checker.access_check import CheckAccess
+from joos.compiler.name_linker.disambiguator import NameType
+from joos.compiler.type_checker.access_check import AccessChecker
 from joos.compiler.type_checker.assignable import *
 from joos.syntax import *
 
@@ -14,6 +15,8 @@ class TypeChecker(ASTVisitor):
         self.ret_type = None
         self.is_static = None
         self.class_decl = None
+        self.initializer = None
+        self.access_checker = AccessChecker(type_map)
 
         self.string_type = TypeKind(TypeKind.REF, GetStringDecl())
 
@@ -36,6 +39,10 @@ class TypeChecker(ASTVisitor):
 
     def Start(self):
         self.comp.visit(self)
+
+    def CheckNameInitializer(self, node):
+        if node.Split()[0] == self.initializer:
+            err(node.tokens[0], "Name in own initializer")
 
     # Base
     def Visit(self, node_or_list):
@@ -80,11 +87,13 @@ class TypeChecker(ASTVisitor):
             return TypeKind(TypeKind.VOID)
 
     def VisitName(self, node):
-        #  CheckAccess(node, self.class_decl, self.is_static)
+        self.CheckNameInitializer(node)
+        self.access_checker.CheckName(node, is_static=self.is_static)
+
         if node.linked_type is ArrayType.LengthDecl:
-            return TypeKind(TypeKind.INT)
-        elif isinstance(node.linked_type, TypeDecl):
-            return TypeKind(TypeKind.REF, node.linked_type)
+            return TypeKind(TypeKind.INT, decl=ArrayType.LengthDecl)
+        elif node.name_type == NameType.TYPE:
+            return TypeKind(TypeKind.CLASS, node.linked_type)
         elif isinstance(node.linked_type, TypeDecl):
             return TypeKind(TypeKind.REF, node.linked_type)
         else:
@@ -115,6 +124,11 @@ class TypeChecker(ASTVisitor):
         self.Visit(node.field_decls)
         self.Visit(node.method_decls)
         self.Visit(node.constructor_decls)
+        if node.extends is not None:
+            # Check for zero-arg constructor of extends
+            zero_arg_cons = node.extends.linked_type.cons_map.get(())
+            if not zero_arg_cons:
+                err(node.name, "Superclass missing zero argument constructor")
         self.class_decl = None
         return TypeKind(TypeKind.REF, node)
 
@@ -140,9 +154,11 @@ class TypeChecker(ASTVisitor):
             CheckAssignable(node.modifiers[0], lhs, rhs)
 
         self.is_static = None
+        lhs.decl = node
         return lhs
 
     def VisitConstructorDecl(self, node):
+        self.Visit(node.body)
         decl = node.env.LookupClassOrInterface()
         return TypeKind(TypeKind.REF, decl[1])
 
@@ -151,8 +167,13 @@ class TypeChecker(ASTVisitor):
 
     def VisitLocalVarDecl(self, node):
         lhs = self.Visit(node.l_type)
+
+        self.initializer = node.var_decl.var_id.lexeme
         rhs = self.Visit(node.var_decl)
+        self.initializer = None
+
         CheckAssignable(node.var_decl.var_id, lhs, rhs)
+        lhs.decl = node
         return lhs
 
     def VisitParameter(self, node):
@@ -163,6 +184,8 @@ class TypeChecker(ASTVisitor):
         lhs = self.Visit(node.lhs)
         exp = self.Visit(node.exp)
         CheckAssignable(node.debug_token, lhs, exp)
+        if lhs.decl is ArrayType.LengthDecl:
+            err(node.debug_token, "Cannot assign to array length")
         return lhs
 
     def VisitBinaryExpression(self, node):
@@ -170,27 +193,29 @@ class TypeChecker(ASTVisitor):
         left = self.Visit(node.left)
         right = self.Visit(node.right)
         if op in BinaryExpression.CONDITIONAL or op in BinaryExpression.INCLUSIVE:
-            CheckAssignable(node[1].token, TypeKind.BOOL, left)
-            CheckAssignable(node[1].token, TypeKind.BOOL, right)
+            CheckCastable(node[1].token, TypeKind.BOOL, left)
+            CheckCastable(node[1].token, TypeKind.BOOL, right)
             return TypeKind(TypeKind.BOOL)
         elif op in BinaryExpression.RELATIONAL:
-            CheckAssignable(node[1].token, TypeKind.INT, left)
-            CheckAssignable(node[1].token, TypeKind.INT, right)
+            CheckCastable(node[1].token, TypeKind.INT, left)
+            CheckCastable(node[1].token, TypeKind.INT, right)
             return TypeKind(TypeKind.BOOL)
         elif op in BinaryExpression.ARITHMETIC:
             if op == '+':
                 # For implicit String concatenations
-                if (IsAssignable(TypeKind.INT, left)
-                    and IsAssignable(TypeKind.INT, right)):
+                if (left.kind == TypeKind.VOID or right.kind == TypeKind.VOID):
+                    err(node[1].token, "Invalid operands to + operator")
+                if (CanCompare(TypeKind.INT, left)
+                    and CanCompare(TypeKind.INT, right)):
                     return TypeKind(TypeKind.INT)
-                elif (IsAssignable(self.string_type, left) or
-                      IsAssignable(self.string_type, right)):
+                elif (CanCompare(self.string_type, left) or
+                      CanCompare(self.string_type, right)):
                     return self.string_type
                 else:
                     err(node[1].token, "Invalid operands to + operator")
             else:
-                CheckAssignable(node[1].token, TypeKind.INT, left)
-                CheckAssignable(node[1].token, TypeKind.INT, right)
+                CheckCastable(node[1].token, TypeKind.INT, left)
+                CheckCastable(node[1].token, TypeKind.INT, right)
                 return TypeKind(TypeKind.INT)
         elif op == BinaryExpression.INSTANCEOF:
             CheckComparable(node[1].token, left, right)
@@ -209,11 +234,11 @@ class TypeChecker(ASTVisitor):
         sign = node.sign.lexeme
         if sign == UnaryExpression.NEGATE:
             right = self.Visit(node.right)
-            CheckAssignable(node[0].token, TypeKind.BOOL, right)
+            CheckCastable(node[0].token, TypeKind.BOOL, right)
             return TypeKind(TypeKind.BOOL)
         elif sign == UnaryExpression.MINUS:
             right = self.Visit(node.right)
-            CheckAssignable(node[0].token, TypeKind.INT, right)
+            CheckCastable(node[0].token, TypeKind.INT, right)
             return TypeKind(TypeKind.INT)
 
     def VisitCastExpression(self, node):
@@ -221,11 +246,20 @@ class TypeChecker(ASTVisitor):
         if node.is_array:
             cast_type = TypeKind(TypeKind.ARRAY, cast_type)
         exp = self.Visit(node.exp)
-        CheckComparable(node[0].token, cast_type, exp)
+
+        if (exp.kind == TypeKind.CLASS):
+            err(node[0].token, "Unexpected cast of a class")
+        CheckCastable(node[0].token, cast_type, exp)
+
+        if cast_type.kind == TypeKind.CLASS:
+            cast_type.kind = TypeKind.REF
         return cast_type
 
     def VisitParensExpression(self, node):
-        return self.Visit(node.exp)
+        result = self.Visit(node.exp)
+        if result.kind == TypeKind.CLASS:
+            err(node[0].token, "Class in parens expression")
+        return result
 
     def VisitFieldAccess(self, node):
         prim = self.Visit(node.primary)
@@ -249,17 +283,19 @@ class TypeChecker(ASTVisitor):
         if lhs.kind != TypeKind.ARRAY:
             err(node[1].token, "Primary must be an array")
         exp = self.Visit(node.exp)
-        CheckAssignable(node[1].token, TypeKind.INT, exp)
+        CheckCanConvert(node[1].token, TypeKind.INT, exp)
         return lhs.context
 
     def VisitThisExpression(self, node):
+        if self.is_static:
+            err(node.token, "Cannot use 'this' in static context")
         decl = node.env.LookupClassOrInterface()
         return TypeKind(TypeKind.REF, decl[1])
 
     def VisitArrayCreationExpression(self, node):
         array_kind = self.Visit(node.a_type)
         exp_kind = self.Visit(node.exp)
-        CheckAssignable(node[0].token, TypeKind.INT, exp_kind)
+        CheckCanConvert(node[0].token, TypeKind.INT, exp_kind)
         return TypeKind(TypeKind.ARRAY, array_kind)
 
     def VisitStatementExpression(self, node):
@@ -271,23 +307,35 @@ class TypeChecker(ASTVisitor):
     def VisitClassInstanceCreationExpression(self, node):
         sig = self.ArgsSig(node.args)
         decl = node.class_type.linked_type
+        if isinstance(decl, InterfaceDecl) or decl.IsAbstract():
+            err(node[0].token, "Attempt to instantiate abstract class or interface")
         linked = decl.cons_map.get(sig)
         if linked:
             node.linked_type = linked
         else:
             err(node[0].token, "Constructor not found matching sig: {}"
                 .format(StrSig(sig)))
+
+        self.access_checker.CheckConstructor(node)
+
         return TypeKind(TypeKind.REF, decl)
 
     def VisitMethodInvocation(self, node):
+
         if node.name:  # Name method
+            self.CheckNameInitializer(node.name)
+
             sig = self.MethodSig(node)
+            if node.linked_decl == ArrayType.LengthDecl:
+                err(node[1].token, "Cannot invoke array length")
             linked = node.linked_decl.method_map.get(sig)
             if not linked:
                 err(node[1].token, "Method not found matching sig: {}"
                     .format(StrSig(sig)))
             node.linked_method = linked
+            self.access_checker.CheckMethodName(node, self.is_static)
         else:  # Primary + ID
+            # TODO: access check
             type_kind = self.Visit(node.primary)
             if type_kind.kind not in TypeKind.references:
                 err(node[1].token, "{} cannot be dereferenced"
@@ -331,14 +379,17 @@ class TypeChecker(ASTVisitor):
         return None
 
     def VisitReturnStatement(self, node):
+        if self.ret_type is None or self.ret_type == TypeKind(TypeKind.VOID):
+            if node.exp is None:
+                return None
+            else:
+                err(node[0].token, "Expression in void return")
+
         ret = self.Visit(node.exp)
         if ret is None:
             ret = TypeKind(TypeKind.VOID)
-        if self.ret_type is None:
-            # assume no return type means it comes from cons_decl
-            CheckAssignable(node[0].token, TypeKind.VOID, ret)
-        else:
-            CheckAssignable(node[0].token, self.ret_type, ret)
+
+        CheckCanConvert(node[0].token, self.ret_type, ret)
         return None
 
     def VisitEmptyStatement(self, node):

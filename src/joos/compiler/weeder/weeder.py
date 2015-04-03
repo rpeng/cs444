@@ -96,7 +96,7 @@ class WeederVisitor(ASTVisitor):
                 decl.header.visit(self)
 
     def VisitFieldDecl(self, node):
-        self._CheckModifiersCommon(node.f_type, node.modifiers)
+        self._CheckModifiersCommon(node.var_decl.var_id, node.modifiers)
 
         modifiers = [x.lexeme for x in node.modifiers]
         if 'final' in modifiers and node.var_decl.exp is None:

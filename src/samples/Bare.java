@@ -6,8 +6,6 @@ public class Bare {
     public Bare d;
 
     public Bare(int b) {
-        while (-1 + 1 == 0) {
-        }
         return;
     }
 

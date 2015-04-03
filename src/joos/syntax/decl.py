@@ -44,6 +44,10 @@ class ClassDecl(TypeDecl):
     def visit(self, visitor):
         return visitor.VisitClassDecl(self)
 
+    def IsAbstract(self):
+        modifiers = [x.lexeme for x in self.modifiers]
+        return 'abstract' in modifiers
+
     def NonDefaultKeys(self):
         return ['extends', 'interfaces', 'field_decls', 'method_decls',
                 'constructor_decls']
@@ -104,6 +108,10 @@ class MethodDecl(AbstractSyntaxNode):
         modifiers = [x.lexeme for x in self.header.modifiers]
         return 'static' in modifiers
 
+    def IsProtected(self):
+        modifiers = [x.lexeme for x in self.header.modifiers]
+        return 'protected' in modifiers
+
     def __init__(self, header, body_block):
         self.header = header  # MethodHeader
         self.body_block = body_block  # Block?
@@ -136,6 +144,10 @@ class FieldDecl(AbstractSyntaxNode):
         modifiers = [x.lexeme for x in self.modifiers]
         return 'static' in modifiers
 
+    def IsProtected(self):
+        modifiers = [x.lexeme for x in self.modifiers]
+        return 'protected' in modifiers
+
     def __init__(self, modifiers, f_type, var_decl):
         self.modifiers = modifiers  # token[]
         self.f_type = f_type  # Type
@@ -149,6 +161,11 @@ class ConstructorDecl(AbstractSyntaxNode):
 
     def visit(self, visitor):
         return visitor.VisitConstructorDecl(self)
+
+    def IsProtected(self):
+        modifiers = [x.lexeme for x in self.modifiers]
+        return 'protected' in modifiers
+
 
     def __init__(self, modifiers, name, params, body):
         self.modifiers = modifiers  # token[]
