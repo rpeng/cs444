@@ -53,4 +53,15 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         self.DefaultBehaviour(node)
 
     def VisitLiteral(self, node):
-        self.DefaultBehaviour(node)
+        if node.value.token_type == 'INT':
+            self.writer.OutputLine("mov eax, {}".format(node.value.lexeme))
+        elif node.value.token_type == 'true':
+            self.writer.OutputLine("mov eax, 1")
+        elif node.value.token_type == 'false':
+            self.writer.OutputLine("mov eax, 0")
+        elif node.value.token_type == 'CHAR':
+            self.writer.OutputLine("mov eax, {}".format(node.value.lexeme))
+        elif node.value.token_type == 'null':
+            self.writer.OutputLine("mov eax, 0")
+        else: # STRING
+            self.DefaultBehaviour(node)

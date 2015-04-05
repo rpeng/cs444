@@ -65,10 +65,9 @@ def VerifyReplaceDecl(old_decl, new_decl, abstract=False):
     if 'static' not in old_modifiers and 'static' in new_modifiers:
         err(new_header.m_id, "Non-static replaced with static in: " + m_name)
 
-    if not abstract:
-        # Check public -> protected
-        if 'public' in old_modifiers and 'protected' in new_modifiers:
-            err(new_header.m_id, "Public replaced with protected in: " + m_name)
+    # Check public -> protected
+    if 'public' in old_modifiers and 'protected' in new_modifiers:
+        err(new_header.m_id, "Public replaced with protected in: " + m_name)
 
     # Check override final
     if 'final' in old_modifiers:

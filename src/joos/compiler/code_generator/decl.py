@@ -108,7 +108,7 @@ class DeclCodeMixin(object):
             location = self.namer.Visit(node)
             self.Visit(node.var_decl.exp)
             # Result of decl is in eax
-            self.writer.OutputLine('mov [{}], eax')
+            self.writer.OutputLine('mov [{}], eax'.format(location))
         else:
             self.DefaultBehaviour(node)
 
@@ -129,7 +129,7 @@ class DeclCodeMixin(object):
         self.writer.Dedent()
 
     def VisitVariableDeclarator(self, node):
-        self.DefaultBehaviour(node)
+        self.Visit(node.exp)
 
     def VisitLocalVarDecl(self, node):
         self.DefaultBehaviour(node)

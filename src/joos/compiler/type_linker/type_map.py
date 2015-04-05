@@ -18,7 +18,7 @@ class TypeMap(object):
         if pkg_list:
             first, last = pkg_list[0], pkg_list[1:]
             if first not in self.packages:
-                if first in self.decls:
+                if first in self.decls and self.packages:
                     err(decl.name,
                         'Attempted to redefine type with package: ' + name)
                 self.packages[first] = TypeMap()
