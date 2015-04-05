@@ -74,8 +74,8 @@ class Namer(ASTVisitor):
         type_name = self.GetTypeName(node)
 
         args = []
-        if self.params:
-            for param in self.params:
+        if node.params:
+            for param in node.params:
                 args.append(self.Visit(param))
         if args:
             return "{}~{}~{}".format(CONSTRUCTOR_PREFIX, type_name, "~".join(args))
