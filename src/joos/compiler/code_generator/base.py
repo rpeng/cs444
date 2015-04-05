@@ -5,7 +5,7 @@ from joos.compiler.code_generator.tools.symbols import Symbols
 from joos.compiler.code_generator.tools.namer import Namer
 from joos.compiler.code_generator.tools.writer import Writer
 from joos.compiler.type_checker import TypeChecker
-from joos.syntax import ASTVisitor, Parameter
+from joos.syntax import ASTVisitor, Parameter, LocalVarDecl, FieldDecl
 
 
 class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
@@ -59,6 +59,17 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
             offset = self.vars.GetParamOffset(decl)
             self.writer.OutputLine("mov eax, [ebp + {}]".format(offset))
             self.writer.OutputLine("lea ebx, [ebp + {}]".format(offset))
+        elif isinstance(decl, LocalVarDecl):
+            offset = self.vars.GetLocalVarOffset(decl)
+            self.writer.OutputLine("mov eax, [ebp - {}]".format(offset))
+            self.writer.OutputLine("lea ebx, [ebp - {}]".format(offset))
+        elif isinstance(decl, FieldDecl):
+            if decl.IsStatic():
+                name = self.namer.Visit(decl)
+                self.writer.OutputLine("mov eax, [{}]".format(name))
+                self.writer.OutputLine("lea ebx, [{}]".format(name))
+            else:
+                self.DefaultBehaviour(node)
         else:
             self.DefaultBehaviour(node)
 

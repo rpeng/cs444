@@ -27,7 +27,7 @@ class Vars(object):
         self.writer.Dedent()
         if len(self.locals) > 0:
             self.writer.OutputLine(
-                '; add esp {}'.format(len(self.locals)*4))
+                'add esp, {}'.format(len(self.locals)*4))
         self.writer.OutputLine('; end of block')
         return self.parent
 
@@ -60,6 +60,6 @@ class Vars(object):
 
     def GetLocalVarOffset(self, decl):
         offset = self.locals.get(decl)
-        if not offset:
-            offset = self.parent.GetLocalVarOffset(decl)
-        return -offset * 4
+        if not offset and self.parent:
+            return self.parent.GetLocalVarOffset(decl)
+        return offset * 4

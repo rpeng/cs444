@@ -114,7 +114,7 @@ class DeclCodeMixin(object):
                 node.var_decl.var_id.lexeme))
             location = self.namer.Visit(node)
             if node.var_decl.exp is not None:
-                self.Visit(node.var_decl.exp)
+                self.Visit(node.var_decl)
                 self.writer.OutputLine('mov [{}], eax'.format(location))
             else:
                 self.writer.OutputLine('mov [{}], dword 0'.format(location))
@@ -130,10 +130,14 @@ class DeclCodeMixin(object):
             #TODO self.Visit(node.body)
 
     def VisitVariableDeclarator(self, node):
-        self.Visit(node.exp)
+        if node.exp is not None:
+            self.Visit(node.exp)
+        else:
+            self.writer.OutputLine('move eax, 0')
 
     def VisitLocalVarDecl(self, node):
-        self.DefaultBehaviour(node)
+        self.Visit(node.var_decl)
+        self.vars.AddLocalVar(node)
 
     def VisitParameter(self, node):
         self.DefaultBehaviour(node)
