@@ -27,8 +27,11 @@ class Writer(object):
         self.label_number += 1
         return label_name
 
-    def LabelContext(self, name):
+    def OutputLabel(self, name):
         self.OutputLine("{}:".format(name))
+
+    def LabelContext(self, name):
+        self.OutputLabel(name)
         self.Indent()
         yield
         self.Dedent()
