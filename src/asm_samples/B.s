@@ -1,47 +1,51 @@
-extern m~P.A~g~@int
-extern V~P.A
+; Reference assembly for P.B.s
 
 section .data
-
-; Data section
-; Virtual table of B
+; VTable
 V~P.B:
-  dd n~P.B         ; pointer to name of class of B
-  dd V~P.A         ; pointer to superclass of B
-  dd m~P.B~f       ; pointer to B.f (override)
-  dd m~P.A~g~@int  ; pointer to A.g(int)
-  dd m~P.B~h       ; pointer to B.h
+  dd n~P.B
+  dd V~P.A
+  ; methods
+  dd m~P.B~f
+  dd m~P.A~g~@int
+  dd m~P.B~h
 
-; Name for class P.B
 n~P.B:
   db 3, "P.B"
 
 section .bss
-; Uninitialized variables (static vars)
+; Statics
 
 section .text
+; Methods
+mc~P.B:
+  push ebp
+  mov ebp, esp
+  ; constructor body
+  leave
+  ret
 
-; Methods of B
+m~P.B~h:
+  push ebp
+  mov ebp, esp
+  ; method body
+  leave
+  ret
+
+m~P.B~f:
+  push ebp
+  mov ebp, esp
+  ; method body
+  leave
+  ret
+
+; Symbol Exports
 global mc~P.B
-mc~P.B:  ; constructor
-  push ebp
-  mov ebp, esp
-  ; method body
-  leave
-  ret
-
+global V~P.B
 global m~P.B~f
-m~P.B~f:  ; A.f()
-  push ebp
-  mov ebp, esp
-  ; method body
-  leave
-  ret
-
 global m~P.B~h
-m~P.B~h:  ; B.h
-  push ebp
-  mov ebp, esp
-  ; method body
-  leave
-  ret
+global n~P.B
+
+; Symbol Imports
+extern V~P.A
+extern m~P.A~g~@int

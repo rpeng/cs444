@@ -1,45 +1,48 @@
-section .data
-; Data section
-; Virtual table of A
-global V~P.A
-V~P.A:
-  dd n~P.A         ; pointer to name of class of A
-  dd 0             ; pointer to superclass of A (none)
-  dd m~P.A~f       ; pointer to A.f
-  dd m~P.A~g~@int  ; pointer to A.g(int)
+; Reference assembly for A.java
 
-; Name for class P.A
-global n~P.A
+section .data
+; VTable
+V~P.A:
+  dd n~P.A
+  dd 0
+  ; methods
+  dd m~P.A~f
+  dd m~P.A~g~@int
+
 n~P.A:
   db 3, "P.A"
 
 section .bss
-; Uninitialized variables (static vars)
+; Statics
 
 section .text
+; Methods
+mc~P.A:
+  push ebp
+  mov ebp, esp
+  ; constructor body
+  leave
+  ret
 
-; Methods of A
+m~P.A~f:
+  push ebp
+  mov ebp, esp
+  ; method body
+  leave
+  ret
+
+m~P.A~g~@int:
+  push ebp
+  mov ebp, esp
+  ; method body
+  leave
+  ret
+
+; Symbol Exports
+global V~P.A
 global mc~P.A
-mc~P.A:  ; constructor
-  push ebp
-  mov ebp, esp
-  ; method body
-  leave
-  ret
-
-global m~P.A~f
-m~P.A~f:  ; A.f()
-  push ebp
-  mov ebp, esp
-  ; method body
-  leave
-  ret
-
+global n~P.A
 global m~P.A~g~@int
-m~P.A~g~@int:  ; A.g(int)
-  push ebp
-  mov ebp, esp
-  ; method body
-  leave
-  ret
+global m~P.A~f
 
+; Symbol Imports
