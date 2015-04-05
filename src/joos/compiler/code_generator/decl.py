@@ -1,36 +1,40 @@
-from joos.compiler.environment import Environment
-
-
 class DeclCodeMixin(object):
     def VisitPackageDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitImportDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitClassDecl(self, node):
-        raise NotImplementedError
+        self.writer.OutputLine("; Code for class decl")
+        # .data
+        self.writer.OutputLine("; VTable for class decl")
+        self.writer.OutputLine("; Name for class decl")
+        # .bss
+        self.writer.OutputLine("; Statics for class decl")
+        self.writer.OutputLine("; Methods for class decl")
+        self.DefaultBehaviour(node)
 
     def VisitInterfaceDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitMethodDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitMethodHeader(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitFieldDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitConstructorDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitVariableDeclarator(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitLocalVarDecl(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitParameter(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)

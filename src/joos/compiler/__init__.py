@@ -7,3 +7,4 @@ from hierarchy_check import CheckHierarchy
 from name_linker import LinkNames
 from type_checker import CheckTypes
 from static_analysis import StaticallyAnalyze
+from code_generator import GenerateCode

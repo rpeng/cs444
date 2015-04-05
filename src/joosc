@@ -53,6 +53,7 @@ def Main(input_files):
         LinkNames(app)
         CheckTypes(app)
         StaticallyAnalyze(app)
+        GenerateCode(app, "output/")
     except JoosError, e:
         print >> sys.stderr, str(e)
         sys.exit(42)

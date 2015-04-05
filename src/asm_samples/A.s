@@ -3,11 +3,11 @@ section .data
 ; Virtual table of A
 global V~P.A
 V~P.A:
-  dw n~P.A         ; pointer to name of class of A
-  dw 0             ; pointer to superclass of A (none)
-  dw m~P.A~f       ; pointer to A.f
-  dw m~P.A~g~@int  ; pointer to A.g(int)
-  
+  dd n~P.A         ; pointer to name of class of A
+  dd 0             ; pointer to superclass of A (none)
+  dd m~P.A~f       ; pointer to A.f
+  dd m~P.A~g~@int  ; pointer to A.g(int)
+
 ; Name for class P.A
 global n~P.A
 n~P.A:

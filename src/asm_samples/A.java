@@ -1,6 +1,6 @@
 package P;
 
-class A {
+public class A {
     public int a;
     public int b;
 

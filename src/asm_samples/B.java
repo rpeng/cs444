@@ -1,6 +1,6 @@
 package P;
 
-class B {
+public class B extends A {
     public int c;
     public int d;
 

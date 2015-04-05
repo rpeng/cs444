@@ -6,11 +6,11 @@ section .data
 ; Data section
 ; Virtual table of B
 V~P.B:
-  dw n~P.B         ; pointer to name of class of B
-  dw V~P.A         ; pointer to superclass of B
-  dw m~P.B~f       ; pointer to B.f (override)
-  dw m~P.A~g~@int  ; pointer to A.g(int)
-  dw m~P.B~h       ; pointer to B.h
+  dd n~P.B         ; pointer to name of class of B
+  dd V~P.A         ; pointer to superclass of B
+  dd m~P.B~f       ; pointer to B.f (override)
+  dd m~P.A~g~@int  ; pointer to A.g(int)
+  dd m~P.B~h       ; pointer to B.h
 
 ; Name for class P.B
 n~P.B:

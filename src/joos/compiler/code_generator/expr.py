@@ -1,41 +1,41 @@
 class ExprCodeMixin(object):
     # Expression
     def VisitAssignmentExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitBinaryExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitUnaryExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitCastExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitParensExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitFieldAccess(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitArrayAccess(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitThisExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitArrayCreationExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitStatementExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitNameExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitClassInstanceCreationExpression(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitMethodInvocation(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 

@@ -1,10 +1,20 @@
 from joos.compiler.code_generator.decl import DeclCodeMixin
 from joos.compiler.code_generator.expr import ExprCodeMixin
 from joos.compiler.code_generator.stmt import StmtCodeMixin
+from joos.compiler.code_generator.tools.writer import Writer
 from joos.syntax import ASTVisitor
 
 
 class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
+
+    def __init__(self, compilation_unit, type_map, output_dir):
+        self.compilation_unit = compilation_unit
+        self.type_map = type_map
+        self.output_dir = output_dir
+        self.writer = Writer(output_dir, self.compilation_unit)
+
+    def Start(self):
+        self.Visit(self.compilation_unit)
 
     # Base
     def Visit(self, node_or_list):
@@ -19,22 +29,23 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         raise NotImplementedError
 
     def VisitCompilationUnit(self, node):
-        raise NotImplementedError
+        self.writer.OutputLine(";  Code for compilation unit")
+        self.Visit(node.type_decl)
 
     def VisitArrayType(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitClassOrInterfaceType(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitVoidType(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitPrimitiveType(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitName(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)
 
     def VisitLiteral(self, node):
-        raise NotImplementedError
+        self.DefaultBehaviour(node)

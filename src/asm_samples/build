@@ -4,3 +4,4 @@ mkdir output
 nasm -O1 -f elf -g -F dwarf A.s -o output/A.o
 nasm -O1 -f elf -g -F dwarf B.s -o output/B.o
 nasm -O1 -f elf -g -F dwarf runtime.s -o output/runtime.o
+nasm -O1 -f elf -g -F dwarf __main.s -o output/__main.o
