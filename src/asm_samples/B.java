@@ -7,9 +7,9 @@ public class B extends A {
     public B() {
     }
 
-    public void f() { // Overrides A.f
+    public void h() { // New method
     }
 
-    public void h() { // New method
+    public void f() { // Overrides A.f
     }
 }

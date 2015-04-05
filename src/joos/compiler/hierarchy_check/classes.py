@@ -1,3 +1,4 @@
+import collections
 from .common import *
 from .interfaces import ResolveLinkInterfaceDecls, AddDecls
 from joos.errors import err
@@ -64,7 +65,7 @@ def CheckClassSimple(node):
 @memoize
 def ResolveLinkClassMethods(node):
     # Returns decls: set(MethodDecls)
-    decl_map = {}
+    decl_map = collections.OrderedDict()
     class_modifiers = [x.lexeme for x in node.modifiers]
     is_abstract = 'abstract' in class_modifiers
 

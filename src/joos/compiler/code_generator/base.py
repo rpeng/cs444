@@ -31,7 +31,6 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         raise NotImplementedError
 
     def VisitCompilationUnit(self, node):
-        self.writer.OutputLine(";  Code for compilation unit")
         self.Visit(node.type_decl)
 
     def VisitArrayType(self, node):

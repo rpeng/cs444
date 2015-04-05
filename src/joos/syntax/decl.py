@@ -68,6 +68,8 @@ class ClassDecl(TypeDecl):
         self.method_map = {}  # Methods [sig -> decl]
         self.cons_map = {}  # Constructors [sig -> decl]
 
+        # for codegen (essentially a vtable)
+        self.ordered_decls = {} # Methods (ordered) [sig -> decl]
     def __str__(self):
         return self.name.lexeme
 
