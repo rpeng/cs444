@@ -14,7 +14,9 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         self.type_map = type_map
         self.output_dir = output_dir
         self.namer = Namer()
-        self.writer = Writer(self.namer, output_dir, self.compilation_unit)
+        self.filename = "{}/{}.s".format(output_dir,
+                                         self.namer.Visit(self.compilation_unit))
+        self.writer = Writer(self.filename)
         self.symbols = Symbols(self.writer)
 
     def Start(self):

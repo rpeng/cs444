@@ -14,4 +14,8 @@ public class A {
 
     public void g(int i) {
     }
+
+    public static int test() {
+        return 0;
+    }
 }

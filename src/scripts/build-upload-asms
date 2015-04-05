@@ -1,0 +1,12 @@
+#!/bin/bash
+
+rm -rf output
+mkdir output
+
+cp asm_samples/build asm_samples/link asm_samples/uwdo output/ asm_samples/output output/
+./joosc asm_samples/*.java
+
+(
+  cd output
+  ./uwdo "./build && ./link && ./main && echo All done!"
+)

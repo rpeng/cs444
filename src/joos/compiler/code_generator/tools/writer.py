@@ -1,6 +1,5 @@
 class Writer(object):
-    def __init__(self, namer, output_dir, comp_unit):
-        filename = "{}/{}.s".format(output_dir, namer.Visit(comp_unit))
+    def __init__(self, filename):
         self.file = open(filename, 'w')
         self.indent = 0
 
@@ -10,7 +9,8 @@ class Writer(object):
     def Dedent(self, indentation=2):
         self.indent -= indentation
 
-    def OutputLine(self, string):
-        self.file.write(" " * self.indent)
-        self.file.write(string)
+    def OutputLine(self, string=None):
+        if string:
+            self.file.write(" " * self.indent)
+            self.file.write(string)
         self.file.write('\n')

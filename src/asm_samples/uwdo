@@ -1,0 +1,14 @@
+#!/bin/sh
+
+SYNC_FILES="*"
+SYNC_ENV="uw"
+SYNC_DIR="~/tmp/test"
+
+echo "Syncing files"
+rsync -rave ssh $SYNC_FILES "$SYNC_ENV:$SYNC_DIR"
+
+if [ ! -z "$@" ]; then
+  echo "Running '$@'"
+  ssh -t $SYNC_ENV "cd $SYNC_DIR && $@"
+fi
+
