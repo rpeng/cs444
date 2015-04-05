@@ -13,6 +13,8 @@ class DeclCodeMixin(object):
         # .bss
         self.writer.OutputLine("; Statics for class decl")
         self.writer.OutputLine("; Methods for class decl")
+
+        import ipdb; ipdb.set_trace();
         self.DefaultBehaviour(node)
 
     def VisitInterfaceDecl(self, node):

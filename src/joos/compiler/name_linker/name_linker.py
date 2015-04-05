@@ -23,7 +23,8 @@ class NameLinker(ASTVisitor):
             child.visit(self)
 
     def VisitArrayType(self, node):
-        node.method_map = GetObject().method_map
+        if GetObject():
+            node.method_map = GetObject().method_map
         self.DefaultBehaviour(node)
 
     def VisitPackageDecl(self, node):
