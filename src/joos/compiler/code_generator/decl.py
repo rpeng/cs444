@@ -47,6 +47,7 @@ class DeclCodeMixin(object):
 
         self.writer.OutputLine("section .bss")
         self.writer.OutputLine("; Statics")
+        self.Visit(node.field_decls)
         self.writer.OutputLine("")
 
         # .text
@@ -81,7 +82,9 @@ class DeclCodeMixin(object):
         self.DefaultBehaviour(node)
 
     def VisitFieldDecl(self, node):
-        self.DefaultBehaviour(node)
+        if node.IsStatic():
+            field_name = self.namer.Visit(node)
+            self.writer.OutputLine(field_name + ' resd 1')
 
     def VisitConstructorDecl(self, node):
         # link the methods globally

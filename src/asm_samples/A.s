@@ -14,6 +14,7 @@ n~P.A:
 
 section .bss
 ; Statics
+s~P.A~i resd 1
 
 section .text
 ; Methods

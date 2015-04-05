@@ -63,7 +63,6 @@ class Namer(ASTVisitor):
             for param in node.header.params:
                 args.append(self.Visit(param))
 
-
         if args:
             return "{}~{}~{}~{}".format(prefix, type_name,
                                         method_name, "~".join(args))
@@ -83,3 +82,8 @@ class Namer(ASTVisitor):
             return "{}~{}".format(CONSTRUCTOR_PREFIX, type_name)
 
 
+    def VisitFieldDecl(self, node):
+        type_name = self.GetTypeName(node)
+        var_name = node.var_decl.var_id.lexeme
+
+        return "s~{}~{}".format(type_name, var_name)
