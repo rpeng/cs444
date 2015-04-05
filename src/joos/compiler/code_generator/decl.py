@@ -1,6 +1,8 @@
 from joos.compiler.code_generator.tools.vars import Vars
 
 
+NATIVE_WRITE = "NATIVEjava.io.OutputStream.nativeWrite"
+
 class DeclCodeMixin(object):
     def VisitPackageDecl(self, node):
         self.DefaultBehaviour(node)
@@ -87,11 +89,19 @@ class DeclCodeMixin(object):
         method_name = self.namer.Visit(node)
         self.symbols.DefineSymbolLabel(method_name)
         with self.writer.FunctionContext():
-            self.writer.OutputLine('; method body')
-
             self.vars = Vars(self.writer)
             self.vars.AddParams(node.header.params, node.IsStatic())
-            self.Visit(node.body_block)
+            if node.IsNative():
+                self.symbols.Import(NATIVE_WRITE)
+                self.writer.OutputLine("; native output")
+                self.writer.OutputLine("mov eax, [ebp + 8]")
+                self.writer.OutputLine("push ecx")
+                self.writer.OutputLine("push edx")
+                self.writer.OutputLine("call {}".format(NATIVE_WRITE))
+                self.writer.OutputLine("pop edx")
+                self.writer.OutputLine("pop ecx")
+            else:
+                self.Visit(node.body_block)
             self.vars = None
 
     def VisitMethodHeader(self, node):

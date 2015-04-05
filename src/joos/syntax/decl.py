@@ -103,20 +103,21 @@ class MethodDecl(AbstractSyntaxNode):
         return visitor.VisitMethodDecl(self)
 
     def IsAbstract(self):
-        modifiers = [x.lexeme for x in self.header.modifiers]
-        return self.body_block is None and 'native' not in modifiers
+        return self.body_block is None and 'native' not in self.modifiers
 
     def IsStatic(self):
-        modifiers = [x.lexeme for x in self.header.modifiers]
-        return 'static' in modifiers
+        return 'static' in self.modifiers
 
     def IsProtected(self):
-        modifiers = [x.lexeme for x in self.header.modifiers]
-        return 'protected' in modifiers
+        return 'protected' in self.modifiers
+
+    def IsNative(self):
+        return 'native' in self.modifiers
 
     def __init__(self, header, body_block):
         self.header = header  # MethodHeader
         self.body_block = body_block  # Block?
+        self.modifiers = [x.lexeme for x in self.header.modifiers]
 
 
 class MethodHeader(AbstractSyntaxNode):
