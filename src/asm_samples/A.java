@@ -5,6 +5,7 @@ public class A {
     public int b;
     public static int i = -2;
     public static char A = 'a';
+    public static A o;
 
     public A() {
     }

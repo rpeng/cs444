@@ -1,3 +1,6 @@
+from contextlib import contextmanager
+
+
 class Writer(object):
     def __init__(self, filename):
         self.file = open(filename, 'w')
@@ -14,3 +17,14 @@ class Writer(object):
             self.file.write(" " * self.indent)
             self.file.write(string)
         self.file.write('\n')
+
+    @contextmanager
+    def FunctionContext(self):
+        self.Indent()
+        self.OutputLine('push ebp')
+        self.OutputLine('mov ebp, esp')
+        yield
+        self.OutputLine('leave')
+        self.OutputLine('ret')
+        self.OutputLine()
+        self.Dedent()

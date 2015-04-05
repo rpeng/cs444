@@ -34,13 +34,11 @@ class DeclCodeMixin(object):
         # Static initializer
         self.writer.OutputLine("; Static initializer")
         self.symbols.DefineSymbolLabel("is~{}".format(class_name))
-        self.writer.Indent()
-        if node.field_decls:
-            for decl in node.field_decls:
-                if decl.IsStatic():
-                    self.VisitFieldDecl(decl)
-        self.writer.Dedent()
-        self.writer.OutputLine()
+        with self.writer.FunctionContext():
+            if node.field_decls:
+                for decl in node.field_decls:
+                    if decl.IsStatic():
+                        self.VisitFieldDecl(decl)
 
     def VisitClassDecl(self, node):
         class_name = self.namer.Visit(node)
@@ -85,17 +83,9 @@ class DeclCodeMixin(object):
         # link the methods globally
         method_name = self.namer.Visit(node)
         self.symbols.DefineSymbolLabel(method_name)
-        self.writer.Indent()
-        self.writer.OutputLine('push ebp')
-        self.writer.OutputLine('mov ebp, esp')
-
-        self.writer.OutputLine('; method body')
-        #TODO self.Visit(node.body_block)
-
-        self.writer.OutputLine('leave')
-        self.writer.OutputLine('ret')
-        self.writer.OutputLine('')
-        self.writer.Dedent()
+        with self.writer.FunctionContext():
+            self.writer.OutputLine('; method body')
+            #TODO self.Visit(node.body_block)
 
     def VisitMethodHeader(self, node):
         self.DefaultBehaviour(node)
@@ -106,11 +96,11 @@ class DeclCodeMixin(object):
             self.writer.OutputLine('; initializer for field {}'.format(
                 node.var_decl.var_id.lexeme))
             location = self.namer.Visit(node)
-            if node.var_decl.exp is None:
+            if node.var_decl.exp is not None:
                 self.Visit(node.var_decl.exp)
                 self.writer.OutputLine('mov [{}], eax'.format(location))
             else:
-                self.writer.OutputLine('mov [{}], 0'.format(location))
+                self.writer.OutputLine('mov [{}], dword 0'.format(location))
         else:
             self.DefaultBehaviour(node)
 
@@ -118,17 +108,9 @@ class DeclCodeMixin(object):
         # link the methods globally
         constructor_name = self.namer.Visit(node)
         self.symbols.DefineSymbolLabel(constructor_name)
-        self.writer.Indent()
-        self.writer.OutputLine('push ebp')
-        self.writer.OutputLine('mov ebp, esp')
-
-        self.writer.OutputLine('; constructor body')
-        #TODO self.Visit(node.body)
-
-        self.writer.OutputLine('leave')
-        self.writer.OutputLine('ret')
-        self.writer.OutputLine('')
-        self.writer.Dedent()
+        with self.writer.FunctionContext():
+            self.writer.OutputLine('; constructor body')
+            #TODO self.Visit(node.body)
 
     def VisitVariableDeclarator(self, node):
         self.Visit(node.exp)

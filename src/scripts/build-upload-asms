@@ -3,7 +3,7 @@
 rm -rf output
 mkdir output
 
-cp asm_samples/build asm_samples/link asm_samples/uwdo output/ asm_samples/output output/
+cp asm_samples/build asm_samples/link asm_samples/uwdo asm_samples/output output/
 cp asm_samples/runtime.s output/
 
 ./joosc asm_samples/*.java
