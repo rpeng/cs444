@@ -29,6 +29,19 @@ class DeclCodeMixin(object):
 
         self.writer.Dedent()
 
+    def OutputStaticInitializer(self, node):
+        class_name = self.namer.Visit(node)
+        # Static initializer
+        self.writer.OutputLine("; Static initializer")
+        self.symbols.DefineSymbolLabel("is~{}".format(class_name))
+        self.writer.Indent()
+        if node.field_decls:
+            for decl in node.field_decls:
+                if decl.IsStatic():
+                    self.VisitFieldDecl(decl)
+        self.writer.Dedent()
+        self.writer.OutputLine()
+
     def VisitClassDecl(self, node):
         class_name = self.namer.Visit(node)
 
@@ -46,8 +59,12 @@ class DeclCodeMixin(object):
         self.writer.OutputLine("")
 
         self.writer.OutputLine("section .bss")
-        self.writer.OutputLine("; Statics")
-        self.Visit(node.field_decls)
+        self.writer.OutputLine("; Static decls")
+        if node.field_decls:
+            for decl in node.field_decls:
+                if decl.IsStatic():
+                    field_name = self.namer.Visit(decl)
+                    self.writer.OutputLine(field_name + ' resd 1')
         self.writer.OutputLine("")
 
         # .text
@@ -55,6 +72,8 @@ class DeclCodeMixin(object):
         self.writer.OutputLine("; Methods")
         self.Visit(node.constructor_decls)
         self.Visit(node.method_decls)
+
+        self.OutputStaticInitializer(node)
 
         # imports
         self.symbols.GenerateSymbolsSection()
@@ -82,9 +101,16 @@ class DeclCodeMixin(object):
         self.DefaultBehaviour(node)
 
     def VisitFieldDecl(self, node):
+        # For its initializer
         if node.IsStatic():
-            field_name = self.namer.Visit(node)
-            self.writer.OutputLine(field_name + ' resd 1')
+            self.writer.OutputLine('; initializer for field {}'.format(
+                node.var_decl.var_id.lexeme))
+            location = self.namer.Visit(node)
+            self.Visit(node.var_decl.exp)
+            # Result of decl is in eax
+            self.writer.OutputLine('mov [{}], eax')
+        else:
+            self.DefaultBehaviour(node)
 
     def VisitConstructorDecl(self, node):
         # link the methods globally

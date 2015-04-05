@@ -83,7 +83,9 @@ class Namer(ASTVisitor):
 
 
     def VisitFieldDecl(self, node):
-        type_name = self.GetTypeName(node)
-        var_name = node.var_decl.var_id.lexeme
-
-        return "s~{}~{}".format(type_name, var_name)
+        if node.IsStatic():
+            type_name = self.GetTypeName(node)
+            var_name = node.var_decl.var_id.lexeme
+            return "s~{}~{}".format(type_name, var_name)
+        else:
+            return self.DefaultBehaviour(node)

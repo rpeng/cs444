@@ -39,11 +39,17 @@ m~P.A~g~@int:
   leave
   ret
 
+; Static initializer
+is~P.A:
+ ; initializer for field i
+ ; initializer for field A
+
 ; Symbol Exports
 global V~P.A
 global mc~P.A
 global n~P.A
 global m~P.A~g~@int
 global m~P.A~f
+global is~P.A
 
 ; Symbol Imports

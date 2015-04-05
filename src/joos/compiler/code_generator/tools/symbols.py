@@ -23,4 +23,5 @@ class Symbols(object):
 
     def DefineSymbolLabel(self, name):
         self.exported_names.add(name)
+        self.writer.OutputLine("global {}".format(name))
         self.writer.OutputLine("{}:".format(name))
