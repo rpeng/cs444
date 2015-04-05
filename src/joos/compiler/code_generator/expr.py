@@ -1,4 +1,5 @@
-from joos.syntax import UnaryExpression
+from joos.compiler.type_checker.type_kind import TypeKind
+from joos.syntax import UnaryExpression, BinaryExpression
 
 
 class ExprCodeMixin(object):
@@ -42,6 +43,93 @@ class ExprCodeMixin(object):
             self.writer.OutputLine('pop ebx')
             self.writer.OutputLabel(and_end)
             self.writer.OutputLine('and eax, ebx')
+        elif node.op.lexeme == '==':
+            equal = self.writer.NewLabel('equal')
+            self.Visit(node.left)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.right)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('cmp eax, ebx')
+            self.writer.OutputLine('mov eax, 1')
+            self.writer.OutputLine('je {}'.format(equal))
+            self.writer.OutputLine('mov eax, 0')
+            self.writer.OutputLine(equal)
+        elif node.op.lexeme == '!=':
+            not_equal = self.writer.NewLabel('not_equal')
+            self.Visit(node.left)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.right)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('cmp eax, ebx')
+            self.writer.OutputLine('mov eax, 0')
+            self.writer.OutputLine('je {}'.format(not_equal))
+            self.writer.OutputLine('mov eax, 1')
+            self.writer.OutputLine(not_equal)
+        elif node.op.lexeme in BinaryExpression.RELATIONAL:
+            relational = self.writer.NewLabel('relational')
+            self.Visit(node.left)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.right)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('cmp ebx, eax')
+            self.writer.OutputLine('mov eax, 1')
+            if node.op.lexeme == '>':
+                self.writer.OutputLine('jg {}'.format(relational))
+            elif node.op.lexeme == '<':
+                self.writer.OutputLine('jl {}'.format(relational))
+            elif node.op.lexeme == '>=':
+                self.writer.OutputLine('jge {}'.format(relational))
+            elif node.op.lexeme == '<=':
+                self.writer.OutputLine('jle {}'.format(relational))
+            self.writer.OutputLine('mov eax, 0')
+            self.writer.OutputLine(relational)
+        elif node.op.lexeme == 'instanceof':
+            self.DefaultBehaviour(node)
+        elif node.op.lexeme == '+':
+            left_kind = self.types.Visit(node.left)
+            right_kind = self.types.Visit(node.right)
+            if (left_kind.kind in TypeKind.numerics and right_kind.kind in TypeKind.numerics):
+                self.Visit(node.left)
+                self.writer.OutputLine('push eax')
+                self.Visit(node.right)
+                self.writer.OutputLine('pop ebx')
+                self.writer.OutputLine('add eax, ebx')
+            else: #STRING
+                self.DefaultBehaviour(node)
+        elif node.op.lexeme == '-':
+            self.Visit(node.left)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.right)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('sub ebx, eax')
+            self.writer.OutputLine('mov eax, ebx')
+        elif node.op.lexeme == '*':
+            self.Visit(node.left)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.right)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('push edx')
+            self.writer.OutputLine('imul eax, ebx')
+            self.writer.OutputLine('pop edx')
+        elif node.op.lexeme == '/':
+            self.writer.OutputLine('push edx')
+            self.Visit(node.right)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.left)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('cdq')
+            self.writer.OutputLine('idiv ebx')
+            self.writer.OutputLine('pop edx')
+        elif node.op.lexeme == '%':
+            self.writer.OutputLine('push edx')
+            self.Visit(node.right)
+            self.writer.OutputLine('push eax')
+            self.Visit(node.left)
+            self.writer.OutputLine('pop ebx')
+            self.writer.OutputLine('cdq')
+            self.writer.OutputLine('idiv ebx')
+            self.writer.OutputLine('mov eax, edx')
+            self.writer.OutputLine('pop edx')
         else:
             self.DefaultBehaviour(node)
 

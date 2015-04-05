@@ -4,6 +4,7 @@ from joos.compiler.code_generator.stmt import StmtCodeMixin
 from joos.compiler.code_generator.tools.symbols import Symbols
 from joos.compiler.code_generator.tools.namer import Namer
 from joos.compiler.code_generator.tools.writer import Writer
+from joos.compiler.type_checker import TypeChecker
 from joos.syntax import ASTVisitor
 
 
@@ -18,6 +19,7 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
                                          self.namer.Visit(self.compilation_unit))
         self.writer = Writer(self.filename)
         self.symbols = Symbols(self.writer)
+        self.types = TypeChecker(compilation_unit, type_map)
 
     def Start(self):
         self.Visit(self.compilation_unit)
