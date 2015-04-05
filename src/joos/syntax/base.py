@@ -182,7 +182,7 @@ class Name(AbstractSyntaxNode):
     def __init__(self, tokens):
         self.tokens = tokens  # token[]
         self.linked_type = None  # For linking
-        self.linked_decl = None
+        self.context = None  # AccessContext
         self.name_type = None  # NameType enum
 
     def __repr__(self):

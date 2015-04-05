@@ -1,3 +1,6 @@
+from joos.compiler.code_generator.tools.vars import Vars
+
+
 class DeclCodeMixin(object):
     def VisitPackageDecl(self, node):
         self.DefaultBehaviour(node)
@@ -85,7 +88,11 @@ class DeclCodeMixin(object):
         self.symbols.DefineSymbolLabel(method_name)
         with self.writer.FunctionContext():
             self.writer.OutputLine('; method body')
-            #TODO self.Visit(node.body_block)
+
+            self.vars = Vars(self.writer)
+            self.vars.AddParams(node.header.params, node.IsStatic())
+            self.Visit(node.body_block)
+            self.vars = None
 
     def VisitMethodHeader(self, node):
         self.DefaultBehaviour(node)

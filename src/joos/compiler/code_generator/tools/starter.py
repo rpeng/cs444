@@ -11,7 +11,6 @@ class Starter(object):
         self.symbols = Symbols(self.writer)
 
 
-
     def GenerateStartScript(self):
         self.writer.OutputLine("; Program entry point")
         self.writer.OutputLine()

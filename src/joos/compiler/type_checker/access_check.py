@@ -8,15 +8,15 @@ class AccessContext(object):
     PKG = 2  # some package
     PRIM = 3  # Primitive type
 
-    def __init__(self, type, decl, parent_type=None):
+    def __init__(self, type, decl, parent_type=None, linked=None):
         self.type = type
         self.decl = decl
         self.parent_type = parent_type
+        self.linked = linked
 
 
 class AccessError(Exception):
     pass
-
 
 
 class AccessChecker(object):
@@ -67,13 +67,13 @@ class AccessChecker(object):
         env = context.decl.env
         decl = env.LookupLocalVar(name)
         if decl:
-            return (AccessContext.EXPR, self.TypeToDecl(decl.l_type))
+            return (AccessContext.EXPR, self.TypeToDecl(decl.l_type), decl)
 
     def CheckParams(self, name, context):
         env = context.decl.env
         decl = env.LookupParameter(name)
         if decl:
-            return (AccessContext.EXPR, self.TypeToDecl(decl.p_type))
+            return (AccessContext.EXPR, self.TypeToDecl(decl.p_type), decl)
 
     def CheckFields(self, name, context):
         env = context.decl.env
@@ -84,7 +84,7 @@ class AccessChecker(object):
 
         decl = env.LookupField(name)
         if decl is ArrayType.LengthDecl:
-            return (AccessContext.EXPR, decl)
+            return (AccessContext.EXPR, decl, decl)
         elif decl:
             if (context.type == AccessContext.CLASS and not decl.IsStatic()):
                 raise AccessError("Access of non-static field in static context")
@@ -95,41 +95,41 @@ class AccessChecker(object):
                 if decl.IsStatic():
                     context.decl = decl
                 self.CheckProtectedAccess(context, decl, decl.IsStatic())
-            return (AccessContext.EXPR, self.TypeToDecl(decl.f_type))
+            return (AccessContext.EXPR, self.TypeToDecl(decl.f_type), decl)
 
     def CheckClassImport(self, name, context):
         env = context.decl.env
         decl = env.LookupClassImport(name)
         if decl:
-            return (AccessContext.CLASS, decl[1])
+            return (AccessContext.CLASS, decl[1], decl)
 
     def CheckOwnPackage(self, name, context):
         env = context.decl.env
         type_map = env.VisibleTypes()
         decl = type_map.LookupType(name)
         if decl:
-            return (AccessContext.CLASS, decl)
+            return (AccessContext.CLASS, decl, decl)
 
     def CheckPackageImport(self, name, context):
         env = context.decl.env
         decl = env.LookupNameInPackages(name)
         if decl:
-            return (AccessContext.CLASS, decl[0])
+            return (AccessContext.CLASS, decl[0], decl)
 
     def CheckPackage(self, name, context):
         pkg = self.type_map.LookupPackage(name)
         if pkg:
-            return (AccessContext.PKG, pkg)
+            return (AccessContext.PKG, pkg, pkg)
 
     def CheckTypeInPackage(self, name, context):
         decl = context.decl.LookupType(name)
         if decl:
-            return (AccessContext.CLASS, decl)
+            return (AccessContext.CLASS, decl, decl)
 
     def CheckPackageInPackage(self, name, context):
         new_pkg = context.decl.LookupPackage(name)
         if new_pkg:
-            return (AccessContext.PKG, new_pkg)
+            return (AccessContext.PKG, new_pkg, new_pkg)
 
     def CheckAll(self, name, context):
         return (self.CheckLocalVars(name, context) or
@@ -146,22 +146,18 @@ class AccessChecker(object):
 
     def CheckAccess(self, debug_token, names, context):
         if not names:
-            return context
+            return None
 
-        first = names[0]
-        rest = names[1:]
-
-        try:
-            if context.type == AccessContext.PKG:
-                (type, decl) = self.CheckInPackage(first, context)
-            else:
-                (type, decl) = self.CheckAll(first, context)
-            next_context = AccessContext(type, decl, context.parent_type)
-        except AccessError, e:
-            err(debug_token, e.message)
-
-        return self.CheckAccess(debug_token, rest, next_context)
-
+        for current in names:
+            try:
+                if context.type == AccessContext.PKG:
+                    (type, decl, linked) = self.CheckInPackage(current, context)
+                else:
+                    (type, decl, linked) = self.CheckAll(current, context)
+                context = AccessContext(type, decl, context.parent_type, linked)
+            except AccessError, e:
+                err(debug_token, e.message)
+        return context
 
     # Entry Points
     def CheckName(self, node, is_static):
@@ -171,7 +167,7 @@ class AccessChecker(object):
             context = AccessContext(AccessContext.CLASS, node, parent)
         else:
             context = AccessContext(AccessContext.EXPR, node, parent)
-        return self.CheckAccess(node.tokens[0], tokens, context)
+        node.context = self.CheckAccess(node.tokens[0], tokens, context)
 
 
     def CheckConstructor(self, node):
@@ -209,6 +205,8 @@ class AccessChecker(object):
                     node.linked_method,
                     static=node.linked_method.IsStatic()):
                 err(node[1].token, "Access of protected method")
+
+        node.context = context
 
 
 

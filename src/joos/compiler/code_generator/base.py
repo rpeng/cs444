@@ -5,7 +5,7 @@ from joos.compiler.code_generator.tools.symbols import Symbols
 from joos.compiler.code_generator.tools.namer import Namer
 from joos.compiler.code_generator.tools.writer import Writer
 from joos.compiler.type_checker import TypeChecker
-from joos.syntax import ASTVisitor
+from joos.syntax import ASTVisitor, Parameter
 
 
 class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
@@ -14,12 +14,14 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         self.compilation_unit = compilation_unit
         self.type_map = type_map
         self.output_dir = output_dir
+
         self.namer = Namer()
         self.filename = "{}/{}.s".format(output_dir,
                                          self.namer.Visit(self.compilation_unit))
         self.writer = Writer(self.filename)
         self.symbols = Symbols(self.writer)
         self.types = TypeChecker(compilation_unit, type_map)
+        self.vars = None
 
     def Start(self):
         self.Visit(self.compilation_unit)
@@ -52,7 +54,13 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         self.DefaultBehaviour(node)
 
     def VisitName(self, node):
-        self.DefaultBehaviour(node)
+        decl = node.context.linked
+        if isinstance(decl, Parameter):
+            offset = self.vars.GetParamOffset(decl)
+            self.writer.OutputLine("mov eax, [ebp + {}]".format(offset))
+            self.writer.OutputLine("lea ebx, [ebp + {}]".format(offset))
+        else:
+            self.DefaultBehaviour(node)
 
     def VisitLiteral(self, node):
         if node.value.token_type == 'INT':

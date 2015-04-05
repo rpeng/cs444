@@ -3,10 +3,20 @@ from joos.syntax import UnaryExpression, BinaryExpression
 
 
 class ExprCodeMixin(object):
+
+    def InvokeMethod(self, method_name, args):
+        if args is None:
+            args = []
+        for (i, arg) in enumerate(args):
+            self.writer.OutputLine('; argument {}'.format(i))
+            self.Visit(arg)
+            self.writer.OutputLine('push eax')
+        self.writer.OutputLine('call {}'.format(method_name))
+        self.writer.OutputLine('add esp, {}'.format(len(args) * 4))
+
     # Expression
     def VisitAssignmentExpression(self, node):
-        self.Visit(node.lhs)
-        self.Visit(node.exp)
+        self.DefaultBehaviour(node)
 
     def VisitBinaryExpression(self, node):
         if node.op.lexeme == '|':
@@ -160,14 +170,19 @@ class ExprCodeMixin(object):
         self.DefaultBehaviour(node)
 
     def VisitStatementExpression(self, node):
-        self.DefaultBehaviour(node)
+        self.Visit(node.stmt)
 
     def VisitNameExpression(self, node):
-        self.DefaultBehaviour(node)
+        return self.Visit(node.name)
 
     def VisitClassInstanceCreationExpression(self, node):
         self.DefaultBehaviour(node)
 
     def VisitMethodInvocation(self, node):
-        self.DefaultBehaviour(node)
+        method_name = self.namer.Visit(node.linked_method)
+        if node.linked_method.IsStatic():
+            self.writer.OutputLine('; Static method invocation')
+            self.InvokeMethod(method_name, node.args)
+        else:
+            self.DefaultBehaviour(node)
 
