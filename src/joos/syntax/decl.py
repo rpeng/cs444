@@ -186,7 +186,7 @@ class VariableDeclarator(AbstractSyntaxNode):
 
     def __init__(self, var_id, exp):
         self.var_id = var_id  # token
-        self.exp = exp  # Expression
+        self.exp = exp  # Expression?
 
 
 class LocalVarDecl(AbstractSyntaxNode):

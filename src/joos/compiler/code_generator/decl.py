@@ -106,9 +106,11 @@ class DeclCodeMixin(object):
             self.writer.OutputLine('; initializer for field {}'.format(
                 node.var_decl.var_id.lexeme))
             location = self.namer.Visit(node)
-            self.Visit(node.var_decl.exp)
-            # Result of decl is in eax
-            self.writer.OutputLine('mov [{}], eax'.format(location))
+            if node.var_decl.exp is None:
+                self.Visit(node.var_decl.exp)
+                self.writer.OutputLine('mov [{}], eax'.format(location))
+            else:
+                self.writer.OutputLine('mov [{}], 0'.format(location))
         else:
             self.DefaultBehaviour(node)
 
