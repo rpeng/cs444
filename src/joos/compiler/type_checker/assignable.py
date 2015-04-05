@@ -9,6 +9,7 @@ valid_mappings = {
     TypeKind.CHAR: [TypeKind.CHAR],
     TypeKind.BYTE: [TypeKind.BYTE],
     TypeKind.SHORT: [TypeKind.BYTE, TypeKind.SHORT],
+    TypeKind.NULL: [],
     TypeKind.VOID: [TypeKind.VOID]
 }
 

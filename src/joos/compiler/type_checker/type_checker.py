@@ -371,7 +371,7 @@ class TypeChecker(ASTVisitor):
 
     def VisitForStatement(self, node):
         test_type = self.Visit(node.test_expr)
-        if test_type.kind != TypeKind.BOOL:
+        if test_type is not None and test_type.kind != TypeKind.BOOL:
             err(node[0].token, "Expected boolean in for test")
         self.Visit(node.init)
         self.Visit(node.update)

@@ -63,7 +63,6 @@ class StaticAnalyzer(ASTVisitor):
         node2_ret = False
 
         self.Visit(node.test_expr)
-
         self.Visit(node.stmt_true)
         node1_ret = self.saw_return
         self.saw_return = False
@@ -75,7 +74,6 @@ class StaticAnalyzer(ASTVisitor):
 
     def VisitWhileStatement(self, node):
         result = self.evaluator.Visit(node.test_expr)
-        should_break = False
         if result is False:
             err(node[0].token, "Unreachable statement in while loop.")
         if result is True:
@@ -84,12 +82,14 @@ class StaticAnalyzer(ASTVisitor):
         self.saw_return = False
 
     def VisitForStatement(self, node):
-        result = self.evaluator.Visit(node.test_expr)
+        result = True
+        self.Visit(node.body)
+        if node.test_expr is not None:
+            result = self.evaluator.Visit(node.test_expr)
         if result is False:
             err(node[0].token, "Unreachable statement in for loop.")
         if result is True:
             self.infinite_loop = True
-        self.Visit(node.body)
         self.saw_return = False
 
     def VisitReturnStatement(self, node):
