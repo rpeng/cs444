@@ -14,7 +14,3 @@ class Writer(object):
         self.file.write(" " * self.indent)
         self.file.write(string)
         self.file.write('\n')
-
-    def DefineGlobalLabel(self, label):
-        self.OutputLine("global {}".format(label))
-        self.OutputLine("{}:".format(label))

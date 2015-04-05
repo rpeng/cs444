@@ -1,6 +1,7 @@
 from joos.compiler.code_generator.decl import DeclCodeMixin
 from joos.compiler.code_generator.expr import ExprCodeMixin
 from joos.compiler.code_generator.stmt import StmtCodeMixin
+from joos.compiler.code_generator.tools.symbols import Symbols
 from joos.compiler.code_generator.tools.namer import Namer
 from joos.compiler.code_generator.tools.writer import Writer
 from joos.syntax import ASTVisitor
@@ -14,6 +15,7 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         self.output_dir = output_dir
         self.namer = Namer()
         self.writer = Writer(self.namer, output_dir, self.compilation_unit)
+        self.symbols = Symbols(self.writer)
 
     def Start(self):
         self.Visit(self.compilation_unit)

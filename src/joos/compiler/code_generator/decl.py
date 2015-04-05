@@ -8,19 +8,24 @@ class DeclCodeMixin(object):
     def OutputVtable(self, node):
         class_name = self.namer.Visit(node)
         self.writer.OutputLine("; VTable")
-        self.writer.DefineGlobalLabel("V~{}".format(class_name))
+        self.symbols.DefineSymbolLabel("V~{}".format(class_name))
         self.writer.Indent()
 
         self.writer.OutputLine("dd n~{}".format(class_name))
         if node.extends:
-            # TODO: request import
-            self.writer.OutputLine("dd V~{}".format(node.extends.linked_type))
+            super_name = self.namer.Visit(node.extends.linked_type)
+            v_name = "V~{}".format(super_name)
+            self.symbols.Import(v_name)
+            self.writer.OutputLine("dd {}".format(v_name))
         else:
             self.writer.OutputLine("dd 0")
 
         self.writer.OutputLine("; methods")
         for decl in node.method_map.values():
-            self.writer.OutputLine("dd {}".format(self.namer.Visit(decl)))
+            if not decl.IsStatic():
+                decl_name = self.namer.Visit(decl)
+                self.symbols.Import(decl_name)
+                self.writer.OutputLine("dd {}".format(decl_name))
 
         self.writer.Dedent()
 
@@ -34,7 +39,7 @@ class DeclCodeMixin(object):
         self.writer.OutputLine("")
 
         # class name
-        self.writer.DefineGlobalLabel("n~{}".format(class_name))
+        self.symbols.DefineSymbolLabel("n~{}".format(class_name))
         self.writer.Indent()
         self.writer.OutputLine("db {}, \"{}\"".format(len(class_name), class_name))
         self.writer.Dedent()
@@ -49,7 +54,9 @@ class DeclCodeMixin(object):
         self.writer.OutputLine("; Methods")
         self.Visit(node.constructor_decls)
         self.Visit(node.method_decls)
-        self.writer.OutputLine("")
+
+        # imports
+        self.symbols.GenerateSymbolsSection()
 
     def VisitInterfaceDecl(self, node):
         self.DefaultBehaviour(node)
@@ -57,8 +64,9 @@ class DeclCodeMixin(object):
     def VisitMethodDecl(self, node):
         # link the methods globally
         method_name = self.namer.Visit(node)
-        self.writer.DefineGlobalLabel(method_name)
-        self.writer.OutputLine('push ebp, esp')
+        self.symbols.DefineSymbolLabel(method_name)
+        self.writer.Indent()
+        self.writer.OutputLine('push ebp')
         self.writer.OutputLine('mov ebp, esp')
 
         self.writer.OutputLine('; method body')
@@ -67,6 +75,7 @@ class DeclCodeMixin(object):
         self.writer.OutputLine('leave')
         self.writer.OutputLine('ret')
         self.writer.OutputLine('')
+        self.writer.Dedent()
 
     def VisitMethodHeader(self, node):
         self.DefaultBehaviour(node)
@@ -77,8 +86,9 @@ class DeclCodeMixin(object):
     def VisitConstructorDecl(self, node):
         # link the methods globally
         constructor_name = self.namer.Visit(node)
-        self.writer.DefineGlobalLabel(constructor_name)
-        self.writer.OutputLine('push ebp, esp')
+        self.symbols.DefineSymbolLabel(constructor_name)
+        self.writer.Indent()
+        self.writer.OutputLine('push ebp')
         self.writer.OutputLine('mov ebp, esp')
 
         self.writer.OutputLine('; constructor body')
@@ -87,6 +97,7 @@ class DeclCodeMixin(object):
         self.writer.OutputLine('leave')
         self.writer.OutputLine('ret')
         self.writer.OutputLine('')
+        self.writer.Dedent()
 
     def VisitVariableDeclarator(self, node):
         self.DefaultBehaviour(node)
