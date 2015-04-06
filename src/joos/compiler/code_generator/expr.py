@@ -16,7 +16,11 @@ class ExprCodeMixin(object):
 
     # Expression
     def VisitAssignmentExpression(self, node):
-        self.DefaultBehaviour(node)
+        self.Visit(node.lhs)  # addr in ebx
+        self.writer.OutputLine('push ebx')
+        self.Visit(node.exp)
+        self.writer.OutputLine('pop ebx')
+        self.writer.OutputLine('mov [ebx], eax')
 
     def VisitBinaryExpression(self, node):
         if node.op.lexeme == '|':
@@ -63,7 +67,7 @@ class ExprCodeMixin(object):
             self.writer.OutputLine('mov eax, 1')
             self.writer.OutputLine('je {}'.format(equal))
             self.writer.OutputLine('mov eax, 0')
-            self.writer.OutputLine(equal)
+            self.writer.OutputLabel(equal)
         elif node.op.lexeme == '!=':
             not_equal = self.writer.NewLabel('not_equal')
             self.Visit(node.left)
@@ -74,7 +78,7 @@ class ExprCodeMixin(object):
             self.writer.OutputLine('mov eax, 0')
             self.writer.OutputLine('je {}'.format(not_equal))
             self.writer.OutputLine('mov eax, 1')
-            self.writer.OutputLine(not_equal)
+            self.writer.OutputLabel(not_equal)
         elif node.op.lexeme in BinaryExpression.RELATIONAL:
             relational = self.writer.NewLabel('relational')
             self.Visit(node.left)
@@ -92,7 +96,7 @@ class ExprCodeMixin(object):
             elif node.op.lexeme == '<=':
                 self.writer.OutputLine('jle {}'.format(relational))
             self.writer.OutputLine('mov eax, 0')
-            self.writer.OutputLine(relational)
+            self.writer.OutputLabel(relational)
         elif node.op.lexeme == 'instanceof':
             self.DefaultBehaviour(node)
         elif node.op.lexeme == '+':
