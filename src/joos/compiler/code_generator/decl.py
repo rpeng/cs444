@@ -90,8 +90,8 @@ class DeclCodeMixin(object):
             self.writer.OutputLine("call if~{}".format(class_name))
             self.writer.OutputLine("pop eax")
 
-            self.writer.OutputLine('pop ecx')
             self.writer.OutputLine('pop edx')
+            self.writer.OutputLine('pop ecx')
 
         self.writer.Dedent()
 

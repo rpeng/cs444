@@ -10,7 +10,11 @@ public class A {
     }
 
     public A(int i) {
-        a = i;
+        this.a = i;
+    }
+
+    public A(A other, int plus) {
+        this.a = other.a + plus;
     }
 
     public static native int foo(int bar);
@@ -27,10 +31,7 @@ public class A {
     }
 
     public static int test() {
-        A b = new B();
-        b.hi();
-        b.f();
-
+        new A(new A(4), 3).hi();
         return 0;
     }
 }

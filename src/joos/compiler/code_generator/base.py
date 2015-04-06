@@ -41,7 +41,7 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
                 return node_or_list.visit(self)
 
     def DefaultBehaviour(self, node):
-        pass
+        raise NotImplementedError
 
     def VisitCompilationUnit(self, node):
         self.Visit(node.type_decl)

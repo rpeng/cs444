@@ -191,7 +191,11 @@ class ExprCodeMixin(object):
         self.Visit(node.exp)
 
     def VisitFieldAccess(self, node):
-        self.DefaultBehaviour(node)
+        self.Visit(node.primary)
+        offset = self.vars.GetFieldOffset(node.linked_type)
+        self.writer.OutputLine("add eax, {}".format(offset))
+        self.writer.OutputLine("lea ebx, [eax]")
+        self.writer.OutputLine("mov eax, [eax]")
 
     def VisitArrayAccess(self, node):
         self.DefaultBehaviour(node)
@@ -232,6 +236,7 @@ class ExprCodeMixin(object):
 
     def VisitMethodInvocation(self, node):
         method_name = self.namer.Visit(node.linked_method)
+        # TODO: interface methods
         # A.b.c()
         if node.linked_method.IsStatic():
             self.writer.OutputLine('; Static method invocation')
