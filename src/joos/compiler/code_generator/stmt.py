@@ -23,28 +23,30 @@ class StmtCodeMixin(object):
         self.writer.OutputLabel(statement_end)
 
     def VisitWhileStatement(self, node):
-        statement_begin = self.writer.NewLabel('statement_begin')
-        statement_end = self.writer.NewLabel('statement_end')
-        self.writer.OutputLabel(statement_begin)
+        while_begin = self.writer.NewLabel('while_begin')
+        while_end = self.writer.NewLabel('while_end')
+        self.writer.OutputLabel(while_begin)
         self.Visit(node.test_expr)
         self.writer.OutputLine('cmp eax, 0')
-        self.writer.OutputLine('je {}'.format(statement_end))
+        self.writer.OutputLine('je {}'.format(while_end))
         self.Visit(node.body)
-        self.writer.OutputLine('jmp {}'.format(statement_begin))
-        self.writer.OutputLabel(statement_end)
+        self.writer.OutputLine('jmp {}'.format(while_begin))
+        self.writer.OutputLabel(while_end)
 
     def VisitForStatement(self, node):
-        statement_begin = self.writer.NewLabel('statement_begin')
-        statement_end = self.writer.NewLabel('statement_end')
+        for_begin = self.writer.NewLabel('for_begin')
+        for_end = self.writer.NewLabel('for_end')
+        self.vars.NewBlock()
         self.Visit(node.init)
-        self.writer.OutputLabel(statement_begin)
+        self.writer.OutputLabel(for_begin)
         self.Visit(node.test_expr)
         self.writer.OutputLine('cmp eax, 0')
-        self.writer.OutputLine('je {}'.format(statement_end))
+        self.writer.OutputLine('je {}'.format(for_end))
         self.Visit(node.body)
         self.Visit(node.update)
-        self.writer.OutputLine('jmp {}'.format(statement_begin))
-        self.writer.OutputLabel(statement_end)
+        self.writer.OutputLine('jmp {}'.format(for_begin))
+        self.writer.OutputLabel(for_end)
+        self.vars.EndBlock()
 
     def VisitReturnStatement(self, node):
         if node.exp:
