@@ -40,6 +40,10 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
             else:
                 return node_or_list.visit(self)
 
+    def GenerateException(self):
+        self.symbols.Import("__exception")
+        self.writer.OutputLine("call __exception")
+
     def DefaultBehaviour(self, node):
         raise NotImplementedError
 

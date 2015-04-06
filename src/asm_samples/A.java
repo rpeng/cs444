@@ -37,7 +37,7 @@ public class A {
         int[] j = new int[4];
         j[0] = 1;
         j[1] = 2;
-        new A(j[0]).hi();
+        new A(j[3]).hi();
         return 0;
     }
 }

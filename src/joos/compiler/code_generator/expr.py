@@ -202,9 +202,17 @@ class ExprCodeMixin(object):
         self.vars.PushReg("eax")
         self.Visit(node.exp)
         self.vars.PopReg("ebx") # ebx has address, eax has the index
+
+        access_label = self.writer.NewLabel("bounds_chk_ok")
+        self.writer.OutputLine("cmp eax, [ebx + 4]")
+        self.writer.OutputLine("jl {}".format(access_label))
+        self.GenerateException()
+
+        self.writer.OutputLabel(access_label)
         self.writer.OutputLine("lea eax, [ebx + 8 + eax * 4]")
         self.writer.OutputLine("lea ebx, [eax]")
         self.writer.OutputLine("mov eax, [eax]")
+
 
     def VisitThisExpression(self, node):
         self.writer.OutputLine('mov eax, [ebp+8]')
