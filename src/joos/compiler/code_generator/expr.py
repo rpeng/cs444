@@ -198,13 +198,28 @@ class ExprCodeMixin(object):
         self.writer.OutputLine("mov eax, [eax]")
 
     def VisitArrayAccess(self, node):
-        self.DefaultBehaviour(node)
+        self.Visit(node.name_or_primary)
+        self.vars.PushReg("eax")
+        self.Visit(node.exp)
+        self.vars.PopReg("ebx") # ebx has address, eax has the index
+        self.writer.OutputLine("lea eax, [ebx + 8 + eax * 4]")
+        self.writer.OutputLine("lea ebx, [eax]")
+        self.writer.OutputLine("mov eax, [eax]")
 
     def VisitThisExpression(self, node):
         self.writer.OutputLine('mov eax, [ebp+8]')
 
     def VisitArrayCreationExpression(self, node):
-        self.DefaultBehaviour(node)
+        class_name = self.namer.Visit(node.a_type)
+        self.Visit(node.exp)  # size in eax
+        array_creator = "new~$"
+        vtable_name = "V~${}".format(class_name)
+        self.symbols.Import(array_creator)
+        self.symbols.Import(vtable_name)
+        self.writer.OutputLine("; creating array of {}".format(class_name))
+        self.writer.OutputLine("call {}".format(array_creator))
+        self.writer.OutputLine("mov [eax], dword {}".format(vtable_name))
+
 
     def VisitStatementExpression(self, node):
         self.Visit(node.stmt)

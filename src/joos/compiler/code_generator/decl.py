@@ -1,4 +1,5 @@
 from joos.compiler.code_generator.tools.vars import Vars
+from joos.compiler.hierarchy_check.common import GetObject
 from structs.utils import memoize
 
 
@@ -12,12 +13,15 @@ class DeclCodeMixin(object):
         self.symbols.DefineSymbolLabel("V~{}".format(class_name))
         self.writer.Indent()
 
-        self.writer.OutputLine("dd n~{}".format(class_name))
         if node.extends:
             super_name = self.namer.Visit(node.extends.linked_type)
             v_name = "V~{}".format(super_name)
             self.symbols.Import(v_name)
             self.writer.OutputLine("dd {}".format(v_name))
+        elif node != GetObject() and GetObject() is not None:
+            object_vtable = "V~{}".format(self.namer.Visit(GetObject()))
+            self.symbols.Import(object_vtable)
+            self.writer.OutputLine("dd {}".format(object_vtable))
         else:
             self.writer.OutputLine("dd 0")
 
@@ -29,6 +33,31 @@ class DeclCodeMixin(object):
                 self.writer.OutputLine("dd {}".format(decl_name))
 
         self.writer.Dedent()
+        self.writer.OutputLine()
+
+    def OutputArrayVtable(self, node):
+        class_name = self.namer.Visit(node)
+
+        self.writer.OutputLine("; Array VTable")
+
+        label = "V~${}".format(class_name)
+        obj_label = 0
+        obj_decl = GetObject()
+        if obj_decl:
+            obj_label = "V~{}".format(self.namer.Visit(GetObject()))
+            self.symbols.Import(obj_label)
+
+        self.symbols.DefineSymbolLabel(label)
+        self.writer.Indent()
+        self.writer.OutputLine("dd {}".format(obj_label))
+        if obj_decl:
+            for decl in obj_decl.ordered_methods.values():
+                if not decl.IsStatic():
+                    decl_name = self.namer.Visit(decl)
+                    self.symbols.Import(decl_name)
+                    self.writer.OutputLine("dd {}".format(decl_name))
+        self.writer.Dedent()
+        self.writer.OutputLine()
 
     def OutputStaticInitializer(self, node):
         class_name = self.namer.Visit(node)
@@ -107,14 +136,7 @@ class DeclCodeMixin(object):
         # v-table
         self.writer.OutputLine("section .data")
         self.OutputVtable(node)
-        self.writer.OutputLine("")
-
-        # class name
-        self.symbols.DefineSymbolLabel("n~{}".format(class_name))
-        self.writer.Indent()
-        self.writer.OutputLine("db {}, \"{}\"".format(len(class_name), class_name))
-        self.writer.Dedent()
-        self.writer.OutputLine("")
+        self.OutputArrayVtable(node)
 
         self.writer.OutputLine("section .bss")
         self.writer.OutputLine("; Static decls")
@@ -201,4 +223,4 @@ class DeclCodeMixin(object):
         self.vars.AddLocalVar(node)
 
     def VisitParameter(self, node):
-        self.DefaultBehaviour(node)
+        pass

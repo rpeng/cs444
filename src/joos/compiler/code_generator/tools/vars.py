@@ -34,8 +34,16 @@ class Vars(object):
     def Push(self, times=1):
         self.offset += times
 
+    def PushReg(self, reg):
+        self.writer.OutputLine("push {}".format(reg))
+        self.Push()
+
     def Pop(self, times=1):
         self.offset -= times
+
+    def PopReg(self, reg):
+        self.writer.OutputLine("pop {}".format(reg))
+        self.Pop()
 
     def AddLocalVar(self, decl):
         # Puts value of eax into local variable decl
@@ -73,5 +81,5 @@ class Vars(object):
     @staticmethod
     def GetMethodOffset(decl):
         class_decl = decl.env.LookupClassOrInterface()[1]
-        return class_decl.ordered_methods.values().index(decl) * 4 + 8
+        return class_decl.ordered_methods.values().index(decl) * 4 + 4
 
