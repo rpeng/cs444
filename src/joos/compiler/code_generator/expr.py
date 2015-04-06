@@ -1,5 +1,5 @@
 from joos.compiler.type_checker.type_kind import TypeKind
-from joos.syntax import UnaryExpression, BinaryExpression
+from joos.syntax import UnaryExpression, BinaryExpression, InterfaceDecl, PrimitiveType
 
 
 class ExprCodeMixin(object):
@@ -185,7 +185,33 @@ class ExprCodeMixin(object):
             self.writer.OutputLine('neg eax')
 
     def VisitCastExpression(self, node):
-        self.DefaultBehaviour(node)
+        cast_name = self.namer.Visit(node.cast_type)
+        if node.is_array:
+            cast_vtable = "V~${}".format(cast_name)
+        else:
+            cast_vtable = "V~{}".format(cast_name)
+
+        self.symbols.Import(cast_vtable)
+        self.Visit(node.exp)
+        if isinstance(node.cast_type, PrimitiveType): # don't need to check primitives
+            return
+
+        cast_loop = self.writer.NewLabel('cast_check')
+        cast_ok = self.writer.NewLabel('cast_ok')
+
+        self.writer.OutputLine("push eax")
+        self.symbols.Import("__exception")
+        with self.writer.LabelContext(cast_loop):
+            self.writer.OutputLine("cmp [eax], dword {}".format(cast_vtable))
+            self.writer.OutputLine("je {}".format(cast_ok))
+            self.writer.OutputLine("mov eax, [eax]")
+            self.writer.OutputLine("cmp [eax], dword 0")
+            self.writer.OutputLine("je __exception")
+            self.writer.OutputLine("jmp {}".format(cast_loop))
+
+        self.writer.OutputLabel(cast_ok)
+        self.writer.OutputLine("pop eax")
+
 
     def VisitParensExpression(self, node):
         self.Visit(node.exp)
@@ -266,7 +292,10 @@ class ExprCodeMixin(object):
             self.symbols.Import(method_name)
             self.InvokeStaticMethod(method_name, node.args)
         else:
+            type_decl = node.linked_method.env.LookupClassOrInterface()[1]
             self.writer.OutputLine('; Instance method locate this')
+            if isinstance(type_decl, InterfaceDecl):
+                self.DefaultBehaviour(node)
 
             # Need to get 'this' and put it in eax
             if node.name is not None: # A.b.c()

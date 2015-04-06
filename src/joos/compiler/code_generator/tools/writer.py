@@ -30,6 +30,7 @@ class Writer(object):
     def OutputLabel(self, name):
         self.OutputLine("{}:".format(name))
 
+    @contextmanager
     def LabelContext(self, name):
         self.OutputLabel(name)
         self.Indent()

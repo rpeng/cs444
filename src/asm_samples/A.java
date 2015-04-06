@@ -31,13 +31,10 @@ public class A {
     }
 
     public static int test() {
-    /*
-        new A(new A(4), 3).hi();
-        new B().hi(); */
-        int[] j = new int[4];
-        j[0] = 1;
-        j[1] = 2;
-        new A(j.length).hi();
+        Object a = (Object)new B();
+        ((A)a).hi();
+        A.foo((int)'W');
+        A.foo((int)'\n');
         return 0;
     }
 }

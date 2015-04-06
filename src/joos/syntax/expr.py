@@ -205,6 +205,6 @@ class MethodInvocation(Expression):
         self.args = args  # Expression[]?
 
         # linked in disambiguation
-        self.linked_decl = None  # ClassOrInterfaceDecl
+        self.linked_decl = None  # ClassDecl or InterfaceDecl
         # linked in type checking
         self.linked_method = None  # MethodDecl

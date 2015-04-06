@@ -46,6 +46,12 @@ class Namer(ASTVisitor):
             element_type = self.Visit(node.type_or_name)
         return "${}".format(element_type)
 
+    def VisitNameExpression(self, node):
+        return self.Visit(node.name)
+
+    def VisitName(self, node):
+        return self.Visit(node.linked_type)
+
     def VisitParameter(self, node):
         return self.Visit(node.p_type)
 
