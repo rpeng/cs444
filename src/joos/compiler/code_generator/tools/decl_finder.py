@@ -89,6 +89,9 @@ class DeclFinder(object):
                 self.CheckPackageImport(name, env) or
                 self.CheckPackage(name, env))
 
+    def CheckArrayLength(self):
+        self.writer.OutputLine("mov eax, [eax + 4]")
+
     def ResolveName(self, node, vars, skip_last=False):
         # Eventually loads value to eax, location to ebx
         self.vars = vars
@@ -108,7 +111,10 @@ class DeclFinder(object):
             if type is None:
                 (type, decl) = self.CheckNameAndEnv(name, env)
             elif type == NameType.TYPE or type == NameType.EXPR:
-                (type, decl) = self.CheckFields(name, decl.env)
+                if isinstance(decl, ArrayType) and name == 'length':
+                    self.CheckArrayLength()
+                else:
+                    (type, decl) = self.CheckFields(name, decl.env)
             elif type == NameType.PACKAGE:
                 (type, decl) = (self.CheckTypeInPackage(name, decl) or
                                 self.CheckPackageInPackage(name, decl))
