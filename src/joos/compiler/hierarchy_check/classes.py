@@ -107,6 +107,24 @@ def GetAndLinkOrderedFields(node):
     node.ordered_fields = fields
     return fields
 
+def GetAndLinkOrderedMethods(node):
+    if node.ordered_methods is not None:
+        return node.ordered_methods
+    methods = collections.OrderedDict()
+    if node.extends:
+        parent_methods = GetAndLinkOrderedMethods(node.extends.linked_type)
+        methods.update(parent_methods)
+    elif GetObject():
+        for method in GetObject().method_decls:
+            if not method.IsStatic():
+                methods[MakeMethodSig(method.header)] = method
+    if node.method_decls:
+        for method in node.method_decls:
+            if not method.IsStatic():
+                methods[MakeMethodSig(method.header)] = method
+    node.ordered_methods = methods
+    return methods
+
 
 def LinkClass(node):
     ifaces = set()
@@ -122,6 +140,7 @@ def LinkClass(node):
         current = current.extends and current.extends.linked_type
     node.linked_supers = supers
     GetAndLinkOrderedFields(node)
+    GetAndLinkOrderedMethods(node)
 
 
 def CheckClass(node):

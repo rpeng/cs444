@@ -1,31 +1,36 @@
 package P;
 
 public class A {
-    public int a = 1;
-    public int b = 2;
-    public int c = 3;
-    public int d = 4;
-
-    // public static int i = A.sub(3,1);
-    // public static int j = A.i;
+    public int a;
+    public static int b = 3;
+    public A next;
 
     public A() {
+
+    }
+
+    public A(int i) {
+        a = i;
     }
 
     public static native int foo(int bar);
 
-    /*
-    public static int add(int a, int b) {
-        return a + b;
+    public void f() {
+        A.foo('a' + 0);
+        A.foo('f' + 0);
+        A.foo('\n' + 0);
     }
 
-    public static int sub(int a, int b) {
-        return a - b;
+    public void hi() {
+        A.foo(a + '0');
+        A.foo('\n' + 0);
     }
-    */
 
     public static int test() {
-        A a = new A();
+        A b = new B();
+        b.hi();
+        b.f();
+
         return 0;
     }
 }

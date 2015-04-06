@@ -22,7 +22,7 @@ class DeclCodeMixin(object):
             self.writer.OutputLine("dd 0")
 
         self.writer.OutputLine("; methods")
-        for decl in node.method_map.values():
+        for decl in node.ordered_methods.values():
             if not decl.IsStatic():
                 decl_name = self.namer.Visit(decl)
                 self.symbols.Import(decl_name)
@@ -53,7 +53,9 @@ class DeclCodeMixin(object):
                 self.namer.Visit(node.extends.linked_type))
             self.symbols.Import(parent_initializer)
             self.writer.OutputLine("; parent field initializer")
+            self.writer.OutputLine("push eax")
             self.writer.OutputLine("call {}".format(parent_initializer))
+            self.writer.OutputLine("add esp, 4")
 
         self.writer.OutputLine("; own fields")
         with self.writer.FunctionContext(0):
@@ -145,8 +147,7 @@ class DeclCodeMixin(object):
         method_name = self.namer.Visit(node)
         self.symbols.DefineSymbolLabel(method_name)
         with self.writer.FunctionContext():
-            self.vars = Vars(self.writer)
-            self.vars.AddParams(node.header.params, node.IsStatic())
+            self.vars.SetParams(node.header.params, node.IsStatic())
             if node.IsNative():
                 self.symbols.Import(NATIVE_WRITE)
                 self.writer.OutputLine("; native output")
@@ -158,7 +159,6 @@ class DeclCodeMixin(object):
                 self.writer.OutputLine("pop ecx")
             else:
                 self.Visit(node.body_block)
-            self.vars = None
 
     def VisitMethodHeader(self, node):
         self.DefaultBehaviour(node)
@@ -187,7 +187,8 @@ class DeclCodeMixin(object):
         self.symbols.DefineSymbolLabel(constructor_name)
         with self.writer.FunctionContext():
             self.writer.OutputLine('; constructor body')
-            #TODO self.Visit(node.body)
+            self.vars.SetParams(node.params, False)
+            self.Visit(node.body)
 
     def VisitVariableDeclarator(self, node):
         if node.exp is not None:

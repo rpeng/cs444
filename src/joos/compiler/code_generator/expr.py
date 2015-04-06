@@ -4,17 +4,29 @@ from joos.syntax import UnaryExpression, BinaryExpression
 
 class ExprCodeMixin(object):
 
-    def InvokeStaticMethod(self, method_name, args):
-        if args is None:
-            args = []
+    def PushArguments(self, args):
         for (i, arg) in enumerate(args):
             self.writer.OutputLine('; argument {}'.format(i))
             self.Visit(arg)
             self.writer.OutputLine('push eax')
+
+    def InvokeStaticMethod(self, method_name, args):
+        if args is None:
+            args = []
+        self.PushArguments(args)
         self.writer.OutputLine('call {}'.format(method_name))
         self.writer.OutputLine('add esp, {}'.format(len(args) * 4))
 
-    def InvokeInstanceMethod(self, method_name, args):
+    def InvokeConstructorMethod(self, method_name, args):
+        # Assumes 'this' pointer is in ecx
+        if args is None:
+            args = []
+        self.PushArguments(args)
+        self.writer.OutputLine('push ecx')  # this
+        self.writer.OutputLine('call {}'.format(method_name))
+        self.writer.OutputLine('add esp, {}'.format(len(args) * 4 + 4))
+
+    def InvokeInstanceMethod(self, method_decl, args):
         # Assumes 'this' pointer is in ecx
         if args is None:
             args = []
@@ -22,8 +34,13 @@ class ExprCodeMixin(object):
             self.writer.OutputLine('; argument {}'.format(i))
             self.Visit(arg)
             self.writer.OutputLine('push eax')
-        self.writer.OutputLine('push ecx')  # this
-        self.writer.OutputLine('call {}'.format(method_name))
+
+        self.writer.OutputLine('push ecx')
+        # Before we call the method, we need to look it up in the vtable
+        offset = self.vars.GetMethodOffset(method_decl)
+        self.writer.OutputLine('mov eax, [ecx]')
+        self.writer.OutputLine('add eax, {}'.format(offset))
+        self.writer.OutputLine('call [eax]')
         self.writer.OutputLine('add esp, {}'.format(len(args) * 4 + 4))
 
     # Expression
@@ -204,15 +221,36 @@ class ExprCodeMixin(object):
         self.writer.OutputLine("; creating class {}".format(class_name))
         self.writer.OutputLine("call {}".format(class_creator))
 
+        self.vars.Push() # for extra ecx on stack
+        self.writer.OutputLine("push ecx")
         self.writer.OutputLine("mov ecx, eax")
-        self.InvokeInstanceMethod(class_cons, node.args)
+        self.InvokeConstructorMethod(class_cons, node.args)
+        self.writer.OutputLine("mov eax, ecx")
+        self.writer.OutputLine("pop ecx")
+        self.vars.Pop()
 
 
     def VisitMethodInvocation(self, node):
         method_name = self.namer.Visit(node.linked_method)
+        # A.b.c()
         if node.linked_method.IsStatic():
             self.writer.OutputLine('; Static method invocation')
+            self.symbols.Import(method_name)
             self.InvokeStaticMethod(method_name, node.args)
         else:
-            self.DefaultBehaviour(node)
+            self.writer.OutputLine('; Instance method locate this')
 
+            # Need to get 'this' and put it in eax
+            if node.name is not None: # A.b.c()
+                self.finder.ResolveName(node.name, self.vars, skip_last=True)
+            elif node.primary is not None: # (A.b()).c()
+                self.Visit(node.primary)
+
+            self.writer.OutputLine('; Instance method invocation')
+            self.vars.Push()
+            self.writer.OutputLine("push ecx")
+            self.writer.OutputLine("mov ecx, eax")
+            self.InvokeInstanceMethod(node.linked_method, node.args)
+            self.writer.OutputLine("mov eax, ecx")
+            self.writer.OutputLine("pop ecx")
+            self.vars.Pop()

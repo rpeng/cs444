@@ -64,13 +64,11 @@ class ClassDecl(TypeDecl):
 
         # linked
         self.ordered_fields = None  # All non-static fields of this class
+        self.ordered_methods = None  # All non-static methods in order
         self.linked_interfaces = set()
         self.linked_supers = []
         self.method_map = {}  # Methods [sig -> decl]
         self.cons_map = {}  # Constructors [sig -> decl]
-
-        # for codegen (essentially a vtable)
-        self.ordered_decls = {} # Methods (ordered) [sig -> decl]
     def __str__(self):
         return self.name.lexeme
 

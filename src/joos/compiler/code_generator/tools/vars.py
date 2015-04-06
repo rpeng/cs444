@@ -44,7 +44,8 @@ class Vars(object):
         self.offset += 1
         self.locals[decl] = self.offset
 
-    def AddParams(self, decls, static_method=False):
+    def SetParams(self, decls, static_method=False):
+        self.params = {}
         if static_method:
             this_offset = 0
         else:
@@ -68,3 +69,9 @@ class Vars(object):
     def GetFieldOffset(decl):
         class_decl = decl.env.LookupClassOrInterface()[1]
         return class_decl.ordered_fields.index(decl) * 4 + 4
+
+    @staticmethod
+    def GetMethodOffset(decl):
+        class_decl = decl.env.LookupClassOrInterface()[1]
+        return class_decl.ordered_methods.values().index(decl) * 4 + 8
+
