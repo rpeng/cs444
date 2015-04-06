@@ -1,3 +1,4 @@
+import ast
 from joos.compiler.code_generator.decl import DeclCodeMixin
 from joos.compiler.code_generator.expr import ExprCodeMixin
 from joos.compiler.code_generator.stmt import StmtCodeMixin
@@ -81,7 +82,8 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         elif node.value.token_type == 'false':
             self.writer.OutputLine("mov eax, 0")
         elif node.value.token_type == 'CHAR':
-            self.writer.OutputLine("mov eax, {}".format(node.value.lexeme))
+            self.writer.OutputLine("mov eax, {}".format(
+                ord(ast.literal_eval(node.value.lexeme))))
         elif node.value.token_type == 'null':
             self.writer.OutputLine("mov eax, 0")
         else: # STRING

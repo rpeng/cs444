@@ -168,7 +168,7 @@ class ExprCodeMixin(object):
         self.DefaultBehaviour(node)
 
     def VisitThisExpression(self, node):
-        self.DefaultBehaviour(node)
+        self.writer.OutputLine('mov eax, [ebp+8]')
 
     def VisitArrayCreationExpression(self, node):
         self.DefaultBehaviour(node)
