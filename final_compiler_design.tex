@@ -1,0 +1,193 @@
+\documentclass[12pt, a4paper]{article}
+
+% Preamble
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{cprotect}
+\usepackage{enumerate}
+\usepackage{pdfpages}
+
+\newcommand{\para}[1]{\paragraph{#1}\mbox{}\\}
+\newcommand{\icode}{\texttt}
+\newcommand{\class}{\textbf}
+\newcommand{\fpath}{\verb}
+\newcommand{\method}{\textit}
+
+\title{Compiler Design Document}
+\date{\today}
+\author{Richard Peng, Jiaer Wang}
+% Document
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+The Code Generation component of our compiler were mostly built as additional visitors to our Abstract Syntax Tree. This document details the changes to our directory structure since the last report, and explains how the new components are structured. \\
+
+The following notation will be used in this document: File paths are in \fpath|fixed-width| font. Class names are in \class{bold}. Method invocations are in \textit{italics}.
+
+\section{Directory layout}
+
+The following files or directories contain common classes or functions that will be shared among all of the components.
+
+\subsection{\texttt{joos/compiler/code\_generator/}}
+
+Contains visitors to each abstract syntax node to generate i386 assembly language. Several utility functions are implemented to help within the process. \\
+
+\verb|namer.py| has a visitor for assembling canonical name of a given abstract syntax node. \\
+
+\verb|symbols.py| has helpers to declare imports and exports in the target assembly file. \\
+
+\verb|vars.py| keeps track of local variables, and parameters on stack inside of a block. \\
+
+\verb|writer.py| helps formating assembly outputs.
+
+
+\subsection{\texttt{./joosc}}
+
+Executable program entry point. Takes in paths to Joos files as an argument, and returns 0 if it is valid Joos, 42 if it is not. Contains calls to each step of the process, 
+
+\section{Compiler Architecture}
+
+\subsection{Code Generation Design}
+\subsubsection{Parameter Passing}
+
+\paragraph{Return Values}
+All return values are placed in eax, all addresses of the return value is placed in ebx. We will use the callee-save convention.
+
+\paragraph{Static Methods}
+Push arguments in the original order onto the stack.
+
+\paragraph{Instance Methods}
+Push arguments in reverse order onto the stack, then push \class{this}.
+
+\subsubsection{Naming}
+
+\paragraph{For Primitive Types}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+   int & @int \\ \hline
+   bool & @bool \\ \hline
+   byte & @byte \\ \hline
+   short & @short \\ \hline
+   char & @char \\ \hline
+\end{tabular}
+\end{center}
+
+\paragraph{For arrays of type T\\}
+\noindent \\
+\textdollar\{T\} \\
+For example: \\
+\indent array of ints is denoted as \textdollar@int \\
+\indent array of M.N’s is denoted as \textdollar M.N
+
+\paragraph{For class or interface C in package P\\}
+\noindent \\
+P.C \\
+For convience, denote as \{C\} in the report.
+
+\paragraph{For constructor of class C\\}
+\noindent \\
+Without arguments: $mc\sim\{C\}$ \\
+With arguments of type A and B: $mc\sim\{C\}\sim\{A\}\sim\{B\}$ 
+
+\paragraph{For methods of a class C with name f\\}
+\noindent \\
+Without arguments: $m\sim\{C\}\sim f$ \\
+With arguments of type A and B: $m\sim\{C\}\sim f\sim\{A\}\sim\{B\}$
+
+\paragraph{For static method of a class C with name m\\}
+\noindent \\
+Without arguments: $ms\sim\{C\}\sim f$ \\
+With arguments of type A and B: $ms\sim\{C\}\sim f\sim\{A\}\sim\{B\}$
+
+\paragraph{For static fields of a class C with name m\\}
+\noindent \\
+$s\sim\{C\}\sim m$ \\
+
+\paragraph{For static initializer of a class C\\}
+\noindent \\
+$is\sim\{C\}$ \\
+
+\paragraph{For field initializer of a class C\\}
+\noindent \\
+$if\sim\{C\}$ \\
+
+\paragraph{For instance creator of a class C\\}
+\noindent \\
+$new\sim\{C\}$ \\
+
+\subsubsection{Local Variable Storage}
+Local variables are pushed on the stack as they are declared. They are popped from the stack when they fall out of scope.
+
+\subsubsection{Object Layout}
+
+\paragraph{Instances of classes\\}
+\noindent \\
+For class C with fields a,b (in order of declaration): \\
+\\
+$V\sim\{C\}$: \\
+4 bytes for vptr \\
+4 bytes for field a \\
+4 bytes for field b \\
+\\
+For class D which extends C with fields d, e \\
+\\
+$V\sim\{D\}$: \\
+4 bytes for vptr \\
+4 bytes for field a \\
+4 bytes for field b \\
+4 bytes for field d \\
+4 bytes for field e 
+
+\paragraph{Class Data\\}
+\noindent \\
+String data format: (not String Object) \\
+\\
+Class B has methods f, g. \\
+Class C extends B with methods m, n \\
+\\
+Layout of virtual method table \\
+\\
+B: \\
+4 bytes = 0 \\
+4 bytes for ptr to f \\
+4 bytes for ptr to g \\
+\\
+C: \\
+4 bytes for ptr to B \\
+4 bytes for ptr to f \\
+4 bytes for ptr to g \\
+4 bytes for ptr to m \\
+4 bytes for ptr to n 
+
+\paragraph{Array Vtables\\}
+\noindent \\
+Array of int[ ]: \\
+$V\sim$\textdollar@int: \\
+\indent 4 bytes ptr to Object \\
+\\
+Array of P.C[ ]: \\
+$V\sim$\textdollar P.C: \\
+\indent 4 bytes ptr to Object
+
+\section{Testing}
+
+Required to discuss
+
+\section{Challenges}
+
+We faced several challenges when designing and implementing our compiler.
+
+Possible Topics to discuss:
+String
+\subsection{Arrays}
+
+\subsection{Strings}
+
+\end{document}
