@@ -47,7 +47,7 @@ def MultiProcessFiles(input_files):
 
 def Main(input_files):
     try:
-        units = MultiProcessFiles(input_files)
+        units = ProcessFiles(input_files)
         app = LinkTypes(units)
         CheckHierarchy(app)
         LinkNames(app)

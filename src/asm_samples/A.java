@@ -1,8 +1,11 @@
 package P;
 
 public class A {
-    public int a;
-    public int b;
+    public int a = 1;
+    public int b = 2;
+    public int c = 3;
+    public int d = 4;
+
     // public static int i = A.sub(3,1);
     // public static int j = A.i;
 
@@ -22,7 +25,7 @@ public class A {
     */
 
     public static int test() {
-        int m = 4;
+        A a = new A();
         return 0;
     }
 }

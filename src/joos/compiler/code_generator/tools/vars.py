@@ -63,3 +63,8 @@ class Vars(object):
         if not offset and self.parent:
             return self.parent.GetLocalVarOffset(decl)
         return offset * 4
+
+    @staticmethod
+    def GetFieldOffset(decl):
+        class_decl = decl.env.LookupClassOrInterface()[1]
+        return class_decl.ordered_fields.index(decl) * 4 + 4

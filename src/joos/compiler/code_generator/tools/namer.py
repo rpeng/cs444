@@ -6,7 +6,7 @@ CONSTRUCTOR_PREFIX = 'mc'
 
 PRIMITIVE_MAP = {
     'int': '@int',
-    'bool': '@bool',
+    'boolean': '@bool',
     'byte': '@byte',
     'char': '@char',
     'short': '@short'

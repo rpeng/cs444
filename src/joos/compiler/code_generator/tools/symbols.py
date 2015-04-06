@@ -8,6 +8,7 @@ class Symbols(object):
         self.imported_names.add(name)
 
     def Export(self, name):
+        self.writer.OutputLine("global {}".format(name))
         self.exported_names.add(name)
 
     def GenerateSymbolsSection(self):

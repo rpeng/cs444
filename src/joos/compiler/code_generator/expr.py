@@ -4,7 +4,7 @@ from joos.syntax import UnaryExpression, BinaryExpression
 
 class ExprCodeMixin(object):
 
-    def InvokeMethod(self, method_name, args):
+    def InvokeStaticMethod(self, method_name, args):
         if args is None:
             args = []
         for (i, arg) in enumerate(args):
@@ -13,6 +13,18 @@ class ExprCodeMixin(object):
             self.writer.OutputLine('push eax')
         self.writer.OutputLine('call {}'.format(method_name))
         self.writer.OutputLine('add esp, {}'.format(len(args) * 4))
+
+    def InvokeInstanceMethod(self, method_name, args):
+        # Assumes 'this' pointer is in ecx
+        if args is None:
+            args = []
+        for (i, arg) in enumerate(args):
+            self.writer.OutputLine('; argument {}'.format(i))
+            self.Visit(arg)
+            self.writer.OutputLine('push eax')
+        self.writer.OutputLine('push ecx')  # this
+        self.writer.OutputLine('call {}'.format(method_name))
+        self.writer.OutputLine('add esp, {}'.format(len(args) * 4 + 4))
 
     # Expression
     def VisitAssignmentExpression(self, node):
@@ -180,13 +192,27 @@ class ExprCodeMixin(object):
         return self.Visit(node.name)
 
     def VisitClassInstanceCreationExpression(self, node):
-        self.DefaultBehaviour(node)
+        class_type = node.linked_type.env.LookupClassOrInterface()[1]
+        class_name = self.namer.Visit(class_type)
+
+        class_creator = "new~{}".format(class_name)
+        class_cons = self.namer.Visit(node.linked_type)
+
+        self.symbols.Import(class_creator)
+        self.symbols.Import(class_cons)
+
+        self.writer.OutputLine("; creating class {}".format(class_name))
+        self.writer.OutputLine("call {}".format(class_creator))
+
+        self.writer.OutputLine("mov ecx, eax")
+        self.InvokeInstanceMethod(class_cons, node.args)
+
 
     def VisitMethodInvocation(self, node):
         method_name = self.namer.Visit(node.linked_method)
         if node.linked_method.IsStatic():
             self.writer.OutputLine('; Static method invocation')
-            self.InvokeMethod(method_name, node.args)
+            self.InvokeStaticMethod(method_name, node.args)
         else:
             self.DefaultBehaviour(node)
 

@@ -1,10 +1,12 @@
 import ast
+from joos.compiler.code_generator import Vars
 from joos.compiler.code_generator.decl import DeclCodeMixin
 from joos.compiler.code_generator.expr import ExprCodeMixin
 from joos.compiler.code_generator.stmt import StmtCodeMixin
 from joos.compiler.code_generator.tools.symbols import Symbols
 from joos.compiler.code_generator.tools.namer import Namer
 from joos.compiler.code_generator.tools.writer import Writer
+from joos.compiler.name_linker.disambiguator import NameType
 from joos.compiler.type_checker import TypeChecker
 from joos.syntax import ASTVisitor, Parameter, LocalVarDecl, FieldDecl
 
@@ -27,6 +29,36 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
     def Start(self):
         self.Visit(self.compilation_unit)
 
+    # Name loading logic
+    def IterateLoadName(self, node):
+        names = node.Split()
+
+        # Eventually loads value to eax, location to ebx
+        self.writer.OutputLine('; loading name {}'.format(names.AsString()))
+        self.writer.OutputLine('mov eax, [ebp + 8]')  # move 'this' as starting point
+
+        env = node.env
+        kind = None
+        for name in names:
+            if kind == None:  # Check everything
+                field = env.LookupField(name)
+                if field:
+                    offset = Vars.GetFieldOffset(field[1])
+                    self.writer.OutputLine('; load subname {}'.format(name))
+                    self.writer.OutputLine("mov eax, [eax]")
+                    self.writer.OutputLine("add eax, {}".format(offset))
+                    self.writer.OutputLine("lea ebx, [eax]")
+                    self.writer.OutputLine("mov eax, [eax]")
+            elif kind == NameType.EXPR:
+                # Next must be a non-static field
+                pass
+            elif kind == NameType.PACKAGE:
+                # Next one is either a package or a type
+                pass
+            elif kind == NameType.TYPE:
+                # Next one has to be a static field
+                pass
+
     # Base
     def Visit(self, node_or_list):
         if node_or_list is not None:
@@ -37,7 +69,7 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
                 return node_or_list.visit(self)
 
     def DefaultBehaviour(self, node):
-        raise NotImplementedError
+        pass
 
     def VisitCompilationUnit(self, node):
         self.Visit(node.type_decl)
@@ -67,6 +99,7 @@ class CodeGenerator(DeclCodeMixin, ExprCodeMixin, StmtCodeMixin, ASTVisitor):
         elif isinstance(decl, FieldDecl):
             if decl.IsStatic():
                 name = self.namer.Visit(decl)
+                self.symbols.Import(name)
                 self.writer.OutputLine("mov eax, [{}]".format(name))
                 self.writer.OutputLine("lea ebx, [{}]".format(name))
             else:

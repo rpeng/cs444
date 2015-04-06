@@ -94,6 +94,20 @@ def ResolveLinkClassMethods(node):
     return set(decl_map.values())
 
 
+def GetAndLinkOrderedFields(node):
+    if node.ordered_fields is not None:
+        return node.ordered_fields
+    fields = []
+    if node.extends:
+        fields.extend(GetAndLinkOrderedFields(node.extends.linked_type))
+    if node.field_decls:
+        for field in node.field_decls:
+            if not field.IsStatic():
+                fields.append(field)
+    node.ordered_fields = fields
+    return fields
+
+
 def LinkClass(node):
     ifaces = set()
     if node.interfaces:
@@ -107,6 +121,7 @@ def LinkClass(node):
         supers.append(current)
         current = current.extends and current.extends.linked_type
     node.linked_supers = supers
+    GetAndLinkOrderedFields(node)
 
 
 def CheckClass(node):

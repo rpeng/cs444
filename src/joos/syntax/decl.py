@@ -63,6 +63,7 @@ class ClassDecl(TypeDecl):
         self.constructor_decls = constructor_decls  # ConstructorDecl[]
 
         # linked
+        self.ordered_fields = None  # All non-static fields of this class
         self.linked_interfaces = set()
         self.linked_supers = []
         self.method_map = {}  # Methods [sig -> decl]

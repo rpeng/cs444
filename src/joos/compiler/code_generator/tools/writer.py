@@ -37,12 +37,12 @@ class Writer(object):
         self.Dedent()
 
     @contextmanager
-    def FunctionContext(self):
-        self.Indent()
+    def FunctionContext(self, indent=1):
+        self.Indent(indent)
         self.OutputLine('push ebp')
         self.OutputLine('mov ebp, esp')
         yield
         self.OutputLine('leave')
         self.OutputLine('ret')
         self.OutputLine()
-        self.Dedent()
+        self.Dedent(indent)

@@ -80,7 +80,7 @@ class AccessChecker(object):
 
         if isinstance(context.decl, ArrayType):
             if name == 'length':
-                return (AccessContext.PRIM, ArrayType.LengthDecl)
+                return (AccessContext.PRIM, ArrayType.LengthDecl, ArrayType.LengthDecl)
 
         decl = env.LookupField(name)
         if decl is ArrayType.LengthDecl:
@@ -146,13 +146,14 @@ class AccessChecker(object):
 
     def CheckAccess(self, debug_token, names, context):
         if not names:
-            return None
+            return context
 
         for current in names:
             try:
                 if context.type == AccessContext.PKG:
                     (type, decl, linked) = self.CheckInPackage(current, context)
                 else:
+                    b = self.CheckAll(current, context)
                     (type, decl, linked) = self.CheckAll(current, context)
                 context = AccessContext(type, decl, context.parent_type, linked)
             except AccessError, e:
